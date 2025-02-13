@@ -1,9 +1,12 @@
 package com.sparta.bedelivery.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
 
@@ -14,8 +17,7 @@ import java.util.UUID;
 public class IndustryCategory extends BaseSystemFieldEntity {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @UuidGenerator
     @Column(columnDefinition = "UUID", updatable = false, nullable = false)
     private UUID id;
 

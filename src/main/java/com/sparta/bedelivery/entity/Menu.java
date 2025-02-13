@@ -3,7 +3,7 @@ package com.sparta.bedelivery.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -15,9 +15,7 @@ import java.util.UUID;
 public class Menu extends BaseSystemFieldEntity {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(columnDefinition = "UUID", updatable = false, nullable = false)
+    @UuidGenerator
     private UUID id;
 
     @ManyToOne
