@@ -17,6 +17,12 @@ public class Review extends BaseSystemFieldEntity {
     @UuidGenerator
     private UUID id;
 
+    @Column(nullable = false)
+    private Integer rating;
+
+    @Column(columnDefinition = "TEXT")
+    private String comment;
+
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
@@ -25,14 +31,7 @@ public class Review extends BaseSystemFieldEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "store_id", nullable = false)
-    private Store store;
-
-    @Column(nullable = false)
-    private Integer rating;
-
-    @Column(columnDefinition = "TEXT")
-    private String comment;
+    // store_id
+    // N의 관계 실제 데이터베이스에는 Review 테이블에 store_id가 있음
 }
 

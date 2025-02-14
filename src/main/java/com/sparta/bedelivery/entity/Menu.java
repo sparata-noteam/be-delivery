@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -18,10 +20,6 @@ public class Menu extends BaseSystemFieldEntity {
     @UuidGenerator
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "store_id", nullable = false)
-    private Store store;
-
     @Column(nullable = false, length = 255)
     private String name;
 
@@ -33,5 +31,9 @@ public class Menu extends BaseSystemFieldEntity {
 
     @Column(nullable = false)
     private Boolean isHidden = false;
+
+    @OneToMany
+    @JoinColumn(name = "p_menus_id") // 외래키의 주인이 외래키를 컨트롤 할 수 있다.
+    private List<MenuImage> imageList = new ArrayList<>(); // 메뉴 이미지 테이블에 1 : N 단방향 관계 메뉴 하나가 여러 개의 이미지
 }
 

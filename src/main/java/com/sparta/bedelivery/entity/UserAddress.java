@@ -10,16 +10,12 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@Table(name = "p_user_addresses")
+@Table(name = "p_user_addresses") // 한 명의 유저가 여러 개의 배송지를 저장할 수 있다.
 public class UserAddress extends BaseSystemFieldEntity {
 
     @Id
     @UuidGenerator
     private UUID id;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 
     @Column(nullable = false, length = 255)
     private String addressName;

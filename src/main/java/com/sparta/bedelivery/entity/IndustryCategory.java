@@ -1,13 +1,12 @@
 package com.sparta.bedelivery.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -22,6 +21,5 @@ public class IndustryCategory extends BaseSystemFieldEntity {
     private UUID id;
 
     @Column(nullable = false, unique = true, length = 255)
-    private String name;
+    private String name; // 업종명
 }
-

@@ -18,18 +18,14 @@ public class OrderItem extends BaseSystemFieldEntity {
     @UuidGenerator
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
-
-    @ManyToOne
-    @JoinColumn(name = "menu_id", nullable = false)
-    private Menu menu;
-
     @Column(nullable = false)
     private Integer quantity;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
+
+    @ManyToOne // 어떤 사용자가 주문을 한 건지 알아야 한다.
+    @JoinColumn(name = "menu_id", nullable = false)
+    private Menu menu;
 }
 

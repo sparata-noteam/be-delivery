@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/<DB?>
-    username: <PostgreSQL ???>
-    password: <????>
+    url: jdbc:postgresql://localhost:5432/bedelivery
+    username: postgres
+    password: root
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true
