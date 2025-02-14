@@ -9,6 +9,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +23,10 @@ public class AdminController {
 
     private final AdminService adminService;
 
+//    1. Spring Security가 SecurityContextHolder에서 현재 사용자의 Authentication 정보 확인
+//    2. getAuthorities()에서 ROLE_ADMIN이 있는지 체크
+//    3. 없으면 AccessDeniedException 발생 (403 Forbidden)
+
     // 1.8 사용자 목록 조회
     @GetMapping("/users")
     public ResponseEntity<Page<UserResponse>> getAllUsers(
@@ -27,11 +34,12 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createAt") String sortBy,
             @RequestParam(defaultValue = "desc") String direction
-    ) {
-        Pageable pageable = PageRequest.of(
-                page, size, Sort.by(Sort.Direction.fromString(direction), sortBy)
-        );
-
+    )
+    {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        System.out.println("🔍 현재 SecurityContext 사용자: " + authentication.getPrincipal());
+//        System.out.println("🔍 현재 SecurityContext 권한: " + authentication.getAuthorities());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(direction), sortBy));
         return ResponseEntity.ok(adminService.getAllUsers(pageable));
     }
 

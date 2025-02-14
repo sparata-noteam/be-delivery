@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -32,7 +33,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             AuthRequest authRequest = new ObjectMapper().readValue(request.getInputStream(), AuthRequest.class);
             UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword());
+                    new UsernamePasswordAuthenticationToken(authRequest.getUserId(), authRequest.getPassword());
             return authenticationManager.authenticate(authenticationToken);
         } catch (IOException e) {
             throw new RuntimeException("로그인 요청 파싱 실패", e);
@@ -45,8 +46,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult) throws IOException, ServletException {
+
         UserDetails userDetails = (UserDetails) authResult.getPrincipal();
-        String token = jwtUtil.generateAccessToken(userDetails.getUsername());
+        String role = ((CustomUserDetails) userDetails).getUser().getRole().name();
+
+        String token = jwtUtil.generateAccessToken(userDetails.getUsername(), role);
 
         response.setHeader("Authorization", "Bearer " + token);
 //        response.setContentType("application/json");

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtUtil {
@@ -19,13 +21,34 @@ public class JwtUtil {
     /**
      * JWT 토큰 생성
      */
-    public String generateAccessToken(String username) {
+    public String generateAccessToken(String userId, String role) {
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role); //role 정보 추가
+//        return Jwts.builder()
+//                .setSubject(username)
+//                .setIssuedAt(new Date())
+//                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+//                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
+//                .compact();
         return Jwts.builder()
-                .setSubject(username)
+                .setClaims(claims)
+                .setSubject(userId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    //JWT에서 role 추출
+    public String extractRole(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("role", String.class);
     }
 
     /**
@@ -50,4 +73,5 @@ public class JwtUtil {
             return false;
         }
     }
+
 }

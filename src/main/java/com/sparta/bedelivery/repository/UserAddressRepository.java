@@ -9,5 +9,5 @@ import java.util.UUID;
 public interface UserAddressRepository extends JpaRepository<UserAddress, UUID> {
     void deleteById(UUID id);
     Optional<UserAddress> findById(UUID addressId);
-    List<UserAddress> findByUserEmail(String email);
+    List<UserAddress> findByUser_UserId(String userId);
 }

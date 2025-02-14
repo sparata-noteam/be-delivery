@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "p_industry_categories")
-public class IndustryCategory extends BaseSystemFieldEntity {
+public class IndustryCategory extends BaseSystemFieldEntity { //업종
 
     @Id
     @GeneratedValue(generator = "UUID")

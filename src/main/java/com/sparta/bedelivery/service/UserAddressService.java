@@ -24,8 +24,8 @@ public class UserAddressService {
 
     // 배송지 추가
     @Transactional
-    public UserAddressResponse addUserAddress(String email, UserAddressRequest request) {
-        User user = userRepository.findByEmail(email)
+    public UserAddressResponse addUserAddress(String userId, UserAddressRequest request) {
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         UserAddress address = new UserAddress(user, request.getAddressName(), request.getRecipientName(),
@@ -36,8 +36,8 @@ public class UserAddressService {
     }
 
     // 특정 사용자의 배송지 목록 조회
-    public List<UserAddressResponse> getUserAddresses(String email) {
-        List<UserAddress> addresses = userAddressRepository.findByUserEmail(email);
+    public List<UserAddressResponse> getUserAddresses(String userId) {
+        List<UserAddress> addresses = userAddressRepository.findByUser_UserId(userId);
         return addresses.stream()
                 .map(UserAddressResponse::new)
                 .collect(Collectors.toList());

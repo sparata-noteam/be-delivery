@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserResponse {
     private Long id;
-    private String username;
-    private String email;
+    private String userId;
     private String name;
+    private String nickName;
     private String phone;
     private String role;
     private LocalDateTime createdAt;
@@ -23,9 +23,9 @@ public class UserResponse {
 
     public UserResponse(User user) {
         this.id = user.getId();
-        this.username = user.getUsername();
-        this.email = user.getEmail();
+        this.userId = user.getUserId();
         this.name = user.getName();
+        this.nickName = user.getNickname();
         this.phone = user.getPhone();
         this.role = user.getRole().name();
         this.createdAt=user.getCreateAt();

@@ -20,26 +20,26 @@ public class UserService implements UserDetailsService {
     private final UserAddressRepository userAddressRepository;
 
     // 사용자 정보 조회
-    public UserResponse getUserInfo(String email) {
-        User user = userRepository.findByEmail(email)
+    public UserResponse getUserInfo(String userId) {
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         return new UserResponse(user);
     }
 
     // 사용자 정보 수정
     @Transactional
-    public UserResponse updateUser(String email, UserUpdateRequest request) {
-        User user = userRepository.findByEmail(email)
+    public UserResponse updateUser(String userId, UserUpdateRequest request) {
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        user.updateInfo(request.getName(), request.getPhone());
+        user.updateInfo(request);
         return new UserResponse(user);
     }
 
     // 사용자 탈퇴
     @Transactional
-    public void deleteUser(String email) {
-        User user = userRepository.findByEmail(email)
+    public void deleteUser(String userId) {
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         String deletedBy = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -47,9 +47,9 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with userId: " + userId));
         return new CustomUserDetails(user);
     }
 
