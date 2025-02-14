@@ -3,7 +3,7 @@ package com.sparta.bedelivery.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +13,11 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "p_industry_categories")
-public class IndustryCategory extends BaseSystemFieldEntity {
+public class IndustryCategory extends BaseSystemFieldEntity { //업종
 
     @Id
-    @UuidGenerator
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(columnDefinition = "UUID", updatable = false, nullable = false)
     private UUID id;
 
