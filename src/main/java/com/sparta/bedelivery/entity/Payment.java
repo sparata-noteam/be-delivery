@@ -3,7 +3,7 @@ package com.sparta.bedelivery.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.util.UUID;
 
@@ -14,7 +14,9 @@ import java.util.UUID;
 public class Payment extends BaseSystemFieldEntity {
 
     @Id
-    @UuidGenerator
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(columnDefinition = "UUID", updatable = false, nullable = false)
     private UUID id;
 
     @ManyToOne
