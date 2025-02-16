@@ -1,9 +1,6 @@
 package com.sparta.bedelivery.service;
 
-import com.sparta.bedelivery.dto.CreateOrderRequest;
-import com.sparta.bedelivery.dto.CreateOrderResponse;
-import com.sparta.bedelivery.dto.LoginUser;
-import com.sparta.bedelivery.dto.OrderItemRequest;
+import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.entity.Order;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.repository.OrderRepository;
@@ -14,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -50,8 +48,57 @@ public class OrderService {
         return new CreateOrderResponse(orderResponse, "대충 아무거나");
     }
 
+
+    public List<CustomerOrderResponse> getCustomerOrderList(String userId) {
+        User user = userRepository.findByUserId(userId).orElseThrow(() -> new IllegalArgumentException("해당하는 계정이 존재하지 않습니다."));
+        List<Order> orders = orderRepository.findByUserId(user.getId());
+        return orders.stream().map(CustomerOrderResponse::new).toList();
+    }
+
     private BigDecimal findItemPrice(String menuId) {
         // 대충 검색하고
         return BigDecimal.valueOf(2000);
+    }
+
+    public List<OwnerOrderResponse> getOwnerOrderList(String storeId) {
+        List<Order> orders = orderRepository.findByStore(storeId);
+        return orders.stream().map(OwnerOrderResponse::new).toList();
+    }
+
+    @Transactional
+    public OrderAcceptResponse accept(String orderId) {
+        Order order = orderRepository.findById(UUID.fromString(orderId)).orElseThrow(() -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다."));
+        Order.OrderStatus status = order.getStatus();
+        //주문 확인이 완료된 경우
+        if (status == Order.OrderStatus.CONFIRMED) {
+            throw new IllegalArgumentException("주문 확인이 완료되었습니다.");
+        }
+        //취소가된 경우
+        if (status == Order.OrderStatus.CANCELLED) {
+            throw new IllegalArgumentException("취소된 주문입니다.");
+        }
+        //배달중인 경우
+        if (status == Order.OrderStatus.DELIVERING) {
+            throw new IllegalArgumentException("이미 배달 중인 주문입니다.");
+        }
+        //배달이 완료된 경우
+        if (status == Order.OrderStatus.COMPLETED) {
+            throw new IllegalArgumentException("배달이 완료된 주문입니다.");
+        }
+
+        //완료처리
+        order.confirm();
+
+        return new OrderAcceptResponse(order);
+    }
+
+    @Transactional
+    public OrderStatusResponse status(String orderId, Order.OrderStatus status) {
+        Order order = orderRepository.findById(UUID.fromString(orderId))
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다."));
+
+        order.changeStatus(status);
+
+        return new OrderStatusResponse(order);
     }
 }

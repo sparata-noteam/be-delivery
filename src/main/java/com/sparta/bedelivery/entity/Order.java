@@ -71,6 +71,14 @@ public class Order extends BaseSystemFieldEntity {
         this.orderType = OrderType.TAKEOUT;
     }
 
+    public void confirm() {
+        this.status = OrderStatus.CONFIRMED;
+    }
+
+    public void changeStatus(OrderStatus status) {
+        this.status = status;
+    }
+
     public enum OrderStatus {
         PENDING, CONFIRMED, CANCELLED, DELIVERING, COMPLETED
     }
