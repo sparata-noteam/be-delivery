@@ -1,5 +1,6 @@
 package com.sparta.bedelivery.entity;
 
+import com.sparta.bedelivery.dto.CreateOrderRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,20 +26,19 @@ public class Order extends BaseSystemFieldEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "store_id", nullable = false)
-    private Store store;
+    @Column
+    private String store;
 
-    @ManyToOne
-    @JoinColumn(name = "address_id")
-    private UserAddress address;
+
+    @Column(nullable = false, length = 255)
+    private String address;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private Status status;
+    private OrderStatus status;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -50,9 +50,31 @@ public class Order extends BaseSystemFieldEntity {
     @Column(nullable = false)
     private LocalDateTime orderedAt;
 
-    public enum Status {
+    public Order() {}
+
+    public Order(CreateOrderRequest createOrderRequest, BigDecimal totalPrice) {
+        this.address = createOrderRequest.getAddress();
+        this.totalPrice = totalPrice;
+        this.store = "248f20b9-6c9b-48e1-ba45-45959c10504e";
+        this.status  = OrderStatus.PENDING;
+        this.orderType = OrderType.DELIVERY;
+        this.orderedAt = LocalDateTime.now();
+        this.description = createOrderRequest.getDescription();
+    }
+
+    public void who(User user) {
+        this.user = user;
+    }
+
+    public void confirmOrder() {
+        this.status = OrderStatus.CONFIRMED;
+        this.orderType = OrderType.TAKEOUT;
+    }
+
+    public enum OrderStatus {
         PENDING, CONFIRMED, CANCELLED, DELIVERING, COMPLETED
     }
+
 
     public enum OrderType {
         TAKEOUT, DELIVERY

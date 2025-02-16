@@ -3,6 +3,7 @@ package com.sparta.bedelivery.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "p_stores")
+@NoArgsConstructor
 public class Store extends BaseSystemFieldEntity {
 
     @Id
@@ -43,6 +45,10 @@ public class Store extends BaseSystemFieldEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
     private Status status;
+
+    public Store(UUID storeId) {
+        this.id = storeId;
+    }
 
     public enum Status {
         OPEN, CLOSED, SUSPENDED
