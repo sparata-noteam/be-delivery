@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -136,5 +137,28 @@ public class OrderService {
         order.changeStatus(status);
 
         return new OrderStatusResponse(order);
+    }
+
+    @Transactional
+    public OrderCancelResponse cancel(UUID orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다."));
+        LocalDateTime orderTime = order.getOrderedAt().plusMinutes(5L);
+        LocalDateTime now = LocalDateTime.now();
+        Order.OrderStatus status = order.getStatus();
+
+        if(status != Order.OrderStatus.PENDING) {
+            throw new IllegalArgumentException("주문은 대기 상태일때만 취소할 수 있습니다.");
+        }
+
+        if(now.isAfter(orderTime)) {
+            throw new IllegalArgumentException("주문 생성후 5분이내에만 취소가 가능합니다.");
+        }
+
+        // 주문 취소
+        order.cancel();
+
+        // 아이템 제거
+
+        return new OrderCancelResponse(order);
     }
 }

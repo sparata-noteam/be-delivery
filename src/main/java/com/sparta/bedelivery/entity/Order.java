@@ -57,13 +57,14 @@ public class Order extends BaseSystemFieldEntity {
     @JoinColumn(name = "order_Id")
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    public Order() {}
+    public Order() {
+    }
 
     public Order(CreateOrderRequest createOrderRequest, BigDecimal totalPrice) {
         this.address = createOrderRequest.getAddress();
         this.totalPrice = totalPrice;
         this.store = "248f20b9-6c9b-48e1-ba45-45959c10504e";
-        this.status  = OrderStatus.PENDING;
+        this.status = OrderStatus.PENDING;
         this.orderType = OrderType.DELIVERY;
         this.orderedAt = LocalDateTime.now();
         this.description = createOrderRequest.getDescription();
@@ -82,6 +83,10 @@ public class Order extends BaseSystemFieldEntity {
         this.status = OrderStatus.CONFIRMED;
     }
 
+    public void cancel() {
+        this.status = OrderStatus.CANCELLED;
+    }
+
     public void changeStatus(OrderStatus status) {
         this.status = status;
     }
@@ -89,6 +94,7 @@ public class Order extends BaseSystemFieldEntity {
     public void addMenu(List<OrderItem> prepareOrderItems) {
         this.orderItems.addAll(prepareOrderItems);
     }
+
 
     public enum OrderStatus {
         PENDING, CONFIRMED, CANCELLED, DELIVERING, COMPLETED
