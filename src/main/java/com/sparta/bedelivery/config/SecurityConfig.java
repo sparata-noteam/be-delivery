@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/login", "/api/users/register").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("MASTER") // URL 패턴에서도 권한 설정
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 // 인증 필터를 UsernamePasswordAuthenticationFilter 전에 추가 (로그인 필터 역할)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

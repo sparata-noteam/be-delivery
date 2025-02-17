@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Arrays;
 import java.util.List;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class User extends BaseSystemFieldEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private Role role= Role.CUSTOMER;
+    private Role role = Role.CUSTOMER;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAddress> addresses;
@@ -54,6 +55,10 @@ public class User extends BaseSystemFieldEntity {
         this.name = request.getName();
         this.phone = request.getPhone();
         this.role = Role.fromString(null);
+    }
+
+    public User(String userId) {
+        this.userId = userId;
     }
 
 //    public User(String username, String email, String encode, String name, String phone, String role) {
@@ -86,6 +91,12 @@ public class User extends BaseSystemFieldEntity {
             } catch (IllegalArgumentException | NullPointerException e) {
                 return Role.CUSTOMER; // 기본값 설정
             }
+        }
+
+        public static Role findRole(String authority) {
+            return Arrays.stream(values()).filter(r -> authority.contains(r.name())).findFirst().orElseThrow(
+                    () -> new IllegalArgumentException("해당하는 권한은 존재하지 않습니다.")
+            );
         }
     }
 
