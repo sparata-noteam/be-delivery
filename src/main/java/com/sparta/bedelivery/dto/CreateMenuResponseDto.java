@@ -18,7 +18,6 @@ public class CreateMenuResponseDto {
     private BigDecimal price;
     private String description;
     private Boolean isHidden;
-    private String message;
 
     public CreateMenuResponseDto(Menu menu) {
         this.menuId = menu.getId();

@@ -38,7 +38,7 @@ public class Menu extends BaseSystemFieldEntity {
     private Boolean isHidden = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", nullable = false)
+    @JoinColumn(name = "store_id", nullable = false) // 연관 관계 추가
     private Store store;
 
     @OneToMany
