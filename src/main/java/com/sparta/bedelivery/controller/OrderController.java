@@ -2,6 +2,7 @@ package com.sparta.bedelivery.controller;
 
 import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.entity.User;
+import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -79,8 +80,8 @@ public class OrderController {
     // 상세 조회 (점주용)
     // all
     @GetMapping("/{orderId}")
-    public void getDetail() {
-
+    public ResponseEntity<ApiResponseData<OrderDetailResponse>> getDetail(@PathVariable String orderId) {
+        return ResponseEntity.ok(ApiResponseData.success(orderService.getDetails(orderId)));
     }
 
     // 상세 조회 (점주용)

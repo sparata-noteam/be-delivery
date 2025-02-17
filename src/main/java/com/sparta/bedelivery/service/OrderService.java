@@ -89,6 +89,18 @@ public class OrderService {
         return orders.stream().map(OwnerOrderResponse::new).toList();
     }
 
+
+    public OrderDetailResponse getDetails(String orderId) {
+
+        Order order = orderRepository.findById(UUID.fromString(orderId)).orElseThrow(
+                () -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다.")
+        );
+
+        //TODO: 결재 정보를 가져온다.
+
+        return new OrderDetailResponse(order);
+    }
+
     @Transactional
     public OrderAcceptResponse accept(String orderId) {
         Order order = orderRepository.findById(UUID.fromString(orderId)).orElseThrow(() -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다."));

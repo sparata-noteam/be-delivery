@@ -34,5 +34,9 @@ public class Payment extends BaseSystemFieldEntity {
     public enum Status {
         PENDING, PAID, FAILED, REFUNDED
     }
+    public enum method {
+        KAKAO_PAY, CASH, TOSS, NAVER_PAY, CREDIT_CARD
+    }
+
 }
 
