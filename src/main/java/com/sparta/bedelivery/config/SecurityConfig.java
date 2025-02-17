@@ -1,5 +1,6 @@
 package com.sparta.bedelivery.config;
 
+import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.security.JwtAuthenticationFilter;
 import com.sparta.bedelivery.security.JwtAuthorizationFilter;
 import com.sparta.bedelivery.security.JwtUtil;
@@ -40,7 +41,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil,authenticationManager());
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil, authenticationManager());
         jwtAuthenticationFilter.setFilterProcessesUrl("/api/users/login"); // 로그인 요청 URL 설정
 
         JwtAuthorizationFilter jwtAuthorizationFilter = new JwtAuthorizationFilter(jwtUtil, userDetailsService, authenticationManager());
