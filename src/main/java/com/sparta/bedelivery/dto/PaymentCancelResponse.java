@@ -11,4 +11,9 @@ import java.util.UUID;
 public class PaymentCancelResponse {
     private UUID id;
     private Payment.Status status;
+
+    public PaymentCancelResponse(Payment payment) {
+        this.id = payment.getId();
+        this.status = Payment.Status.CANCELLED;
+    }
 }

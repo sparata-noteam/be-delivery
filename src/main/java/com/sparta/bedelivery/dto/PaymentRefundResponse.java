@@ -5,10 +5,18 @@ import com.sparta.bedelivery.entity.Payment;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 public class PaymentRefundResponse {
-       private String id;
-       private Order.OrderStatus orderStatus;
-       private Payment.Status paymentStatus;
+    private UUID id;
+    private Order.OrderStatus orderStatus;
+    private Payment.Status paymentStatus;
+
+    public PaymentRefundResponse(Order.OrderStatus orderStatus, Payment payment) {
+        this.id = payment.getId();
+        this.orderStatus = orderStatus;
+        this.paymentStatus = Payment.Status.REFUNDED;
+    }
 }

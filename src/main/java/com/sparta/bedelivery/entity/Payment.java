@@ -27,8 +27,6 @@ public class Payment extends BaseSystemFieldEntity {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @Column
-    private BigDecimal amount;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -38,19 +36,24 @@ public class Payment extends BaseSystemFieldEntity {
     @Column(nullable = false, length = 50)
     private Status status;
 
-    public Payment(CreatePaymentRequest createPaymentRequest, User user, Order order) {
+    public Payment(User user, Order order) {
         this.order = order;
-        this.amount = createPaymentRequest.getAmount();
         this.user = user;
         this.status = Status.PENDING;
     }
 
+    public void refund() {
+        this.status = Status.REFUNDED;
+    }
+
+    public void cancel() {
+        this.status = Status.CANCELLED;
+    }
+
     public enum Status {
-        PENDING, PAID, FAILED, REFUNDED
+        PENDING, PAID, FAILED, CANCELLED, REFUNDED
     }
-    public enum method {
-        KAKAO_PAY, CASH, TOSS, NAVER_PAY, CREDIT_CARD
-    }
+
 
 }
 

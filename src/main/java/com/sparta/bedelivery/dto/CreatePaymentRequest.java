@@ -1,5 +1,7 @@
 package com.sparta.bedelivery.dto;
 
+import com.sparta.bedelivery.entity.Payment;
+import com.sparta.bedelivery.entity.PaymentDetail;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,5 +13,5 @@ import java.util.UUID;
 public class CreatePaymentRequest {
     private UUID orderId;
     private BigDecimal amount;
-    private String method;
+    private PaymentDetail.Method method;
 }

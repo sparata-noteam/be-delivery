@@ -14,4 +14,11 @@ public class CreatePaymentResponse {
     private Payment.Status status;
     private BigDecimal amount;
     private String method;
+
+    public CreatePaymentResponse(Payment payment) {
+        this.id = payment.getId();
+        this.status = payment.getStatus();
+//        this.amount = payment.getAmount();
+        //TODO 메소드 입력
+    }
 }
