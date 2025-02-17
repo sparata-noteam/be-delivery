@@ -51,6 +51,6 @@ public class GeminiResponse {
             return "응답을 처리할 수 없습니다.";
         }
 
-        return part.getText();
+        return part.getText().replaceAll("\\n$","");
     }
 }

@@ -27,10 +27,8 @@ public class AIInteractionController {
     @PostMapping("/interactions")
     public ResponseEntity<ApiResponseData<AIInteractionResponse>> getAIInteractionText(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody AIInteractionRequest requestDTO) throws ExecutionException, InterruptedException {
-        CompletableFuture<AIInteractionResponse> aiInteractionResponseAsync = geminiInteractionService.processChatInteractionAsync(
-                userDetails.getUsername(), requestDTO);
-        return ResponseEntity.ok(ApiResponseData.success(aiInteractionResponseAsync.get()));
-//        return ResponseEntity.ok(ApiResponseData.success(geminiInteractionService.processChatInteractionAsync(userDetails.getUsername(), requestDTO).get()));
+            @RequestBody AIInteractionRequest requestDTO) {
+
+        return ResponseEntity.ok(ApiResponseData.success(geminiInteractionService.processChatInteraction(userDetails.getUsername(), requestDTO)));
     }
 }
