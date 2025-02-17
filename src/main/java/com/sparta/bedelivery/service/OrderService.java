@@ -1,8 +1,11 @@
 package com.sparta.bedelivery.service;
 
 import com.sparta.bedelivery.dto.*;
+import com.sparta.bedelivery.entity.Menu;
 import com.sparta.bedelivery.entity.Order;
+import com.sparta.bedelivery.entity.OrderItem;
 import com.sparta.bedelivery.entity.User;
+import com.sparta.bedelivery.repository.MenuRepository;
 import com.sparta.bedelivery.repository.OrderRepository;
 import com.sparta.bedelivery.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderService {
     private final UserRepository userRepository;
+    private final MenuRepository menuRepository;
     private final OrderRepository orderRepository;
 
 
@@ -28,15 +33,38 @@ public class OrderService {
         User user = userRepository.findByUserId(loginUser.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 계정은 존재하지 않습니다."));
 
+        // 해당하는 메뉴를 찾는다.
+        List<OrderItemRequest> items = createOrderRequest.getItem();
+        List<UUID> allMenuIdList = items.stream().map(OrderItemRequest::getMenuId).toList();
+        List<Menu> allMenuList = menuRepository.findAllById(allMenuIdList);
+
+        List<OrderCalculate> calculates = new ArrayList<>();
+
         // 가격정보를 가져온뒤에 반영시킨다.
+        // 히든 처리된 상품은 가져오지 않는다.
         for (OrderItemRequest orderItemRequest : createOrderRequest.getItem()) {
-            BigDecimal price = findItemPrice(orderItemRequest.getMenuId());
-            BigDecimal multiply = price.multiply(BigDecimal.valueOf(orderItemRequest.getAmount()));
+            Menu menu = allMenuList.stream().filter(m ->
+                            m.getId().equals(orderItemRequest.getMenuId()))
+                    .filter(m -> !m.getIsHidden())
+                    .findFirst().orElse(null);
+
+            // 메뉴가 존재하지 않는 경우에는 무시한다.
+            if (menu == null) continue;
+
+            BigDecimal multiply = menu.getPrice().multiply(BigDecimal.valueOf(orderItemRequest.getAmount()));
+
+            // 메뉴를 넣는다.
+            calculates.add(new OrderCalculate(menu.getId().toString(),
+                                              menu.getName(),
+                                              multiply,
+                                              orderItemRequest.getAmount()));
             totalPrice = totalPrice.add(multiply);
         }
 
         Order order = new Order(createOrderRequest, totalPrice);
         order.who(user);
+
+        order.addMenu(calculates.stream().map(OrderItem::new).toList());
 
         //점주(직원)가 주문을 받는 경우
         if (List.of(User.Role.MANAGER, User.Role.OWNER).contains(loginUser.getRole())) {
@@ -55,10 +83,6 @@ public class OrderService {
         return orders.stream().map(CustomerOrderResponse::new).toList();
     }
 
-    private BigDecimal findItemPrice(String menuId) {
-        // 대충 검색하고
-        return BigDecimal.valueOf(2000);
-    }
 
     public List<OwnerOrderResponse> getOwnerOrderList(String storeId) {
         List<Order> orders = orderRepository.findByStore(storeId);

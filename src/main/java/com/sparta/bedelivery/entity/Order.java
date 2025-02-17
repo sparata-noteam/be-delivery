@@ -1,6 +1,7 @@
 package com.sparta.bedelivery.entity;
 
 import com.sparta.bedelivery.dto.CreateOrderRequest;
+import com.sparta.bedelivery.dto.OrderCalculate;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +9,8 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -50,6 +53,11 @@ public class Order extends BaseSystemFieldEntity {
     @Column(nullable = false)
     private LocalDateTime orderedAt;
 
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_Id")
+    private List<OrderItem> orderItems = new ArrayList<>();
+
     public Order() {}
 
     public Order(CreateOrderRequest createOrderRequest, BigDecimal totalPrice) {
@@ -77,6 +85,10 @@ public class Order extends BaseSystemFieldEntity {
 
     public void changeStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public void addMenu(List<OrderItem> prepareOrderItems) {
+        this.orderItems.addAll(prepareOrderItems);
     }
 
     public enum OrderStatus {
