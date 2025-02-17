@@ -2,10 +2,8 @@ package com.sparta.bedelivery.dto;
 
 import com.sparta.bedelivery.entity.Order;
 import lombok.Getter;
-import org.aspectj.weaver.ast.Or;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
