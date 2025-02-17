@@ -24,7 +24,7 @@ public class MenuService {
 
     private final JwtUtil jwtUtil;
 
-    public Menu createMenu(CreateMenuRequestDto requestDto, HttpServletRequest request) {
+    public CreateMenuResponseDto createMenu(CreateMenuRequestDto requestDto, HttpServletRequest request) {
         // 토큰 검증
         String token = request.getHeader("Authorization");
         if (token == null || !token.startsWith("Bearer ")) {
@@ -50,7 +50,7 @@ public class MenuService {
 
         Menu savedMenu = menuRepository.save(menu);
 
-        return savedMenu;
+        return new CreateMenuResponseDto(savedMenu);
     }
 
     public List<CreateMenuResponseDto> findAllMenus(UUID storeId) {
@@ -69,7 +69,7 @@ public class MenuService {
         throw new RuntimeException("해당 메뉴는 없습니다.");
     }
 
-    public Menu updateMenu(UUID menuId, CreateMenuRequestDto requestDto, HttpServletRequest request) {
+    public CreateMenuResponseDto updateMenu(UUID menuId, CreateMenuRequestDto requestDto, HttpServletRequest request) {
         Menu menu = menuRepository.findById(menuId).orElseThrow(RuntimeException::new);
 
         String token = request.getHeader("Authorization");
@@ -89,10 +89,10 @@ public class MenuService {
 
         menuRepository.save(menu);
 
-        return menu;
+        return new CreateMenuResponseDto(menu);
     }
 
-    public CreateMenuResponseDto deleteMenu(UUID menuId, HttpServletRequest request) {
+    public void deleteMenu(UUID menuId, HttpServletRequest request) {
         Menu menu = menuRepository.findById(menuId).orElseThrow(RuntimeException::new);
 
         String token = request.getHeader("Authorization");
@@ -107,7 +107,5 @@ public class MenuService {
         }
         menu.setIsHidden(true);
         menuRepository.save(menu);
-
-        return new CreateMenuResponseDto(menu);
     }
 }
