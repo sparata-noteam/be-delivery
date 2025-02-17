@@ -2,6 +2,7 @@ package com.sparta.bedelivery.controller;
 
 import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.entity.User;
+import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -79,15 +81,15 @@ public class OrderController {
     // 상세 조회 (점주용)
     // all
     @GetMapping("/{orderId}")
-    public void getDetail() {
-
+    public ResponseEntity<ApiResponseData<OrderDetailResponse>> getDetail(@PathVariable String orderId) {
+        return ResponseEntity.ok(ApiResponseData.success(orderService.getDetails(orderId)));
     }
 
-    // 상세 조회 (점주용)
+    //주문 취소 (점주용)
     // c,o,m
     @PutMapping("/{orderId}/cancel")
-    public void cancel() {
-
+    public ResponseEntity<ApiResponseData<OrderCancelResponse>>  cancel(@PathVariable String orderId) {
+        return ResponseEntity.ok(ApiResponseData.success(orderService.cancel(UUID.fromString(orderId)), "주문이 취소되고 결제가 환불되었습니다."));
     }
 
     // admin/orders/ get
