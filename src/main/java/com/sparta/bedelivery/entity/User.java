@@ -10,6 +10,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Arrays;
 import java.util.List;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -96,4 +99,15 @@ public class User extends BaseSystemFieldEntity {
             );
         }
     }
+
+    @OneToMany
+    @JoinColumn(name = "user_address_id") // 한 명의 사용자는 여러 개의 주소를 관리한다.
+    private List<UserAddress> userAddressList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orderList = new ArrayList<>();
+
+    @OneToMany
+    @JoinColumn(name = "store_id")
+    private List<Store> storeList = new ArrayList<>();
 }

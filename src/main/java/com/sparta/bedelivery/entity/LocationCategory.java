@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,7 +27,11 @@ public class LocationCategory extends BaseSystemFieldEntity {
     @Column(nullable = false, unique = true, length = 255)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private LocationCategory parent;
+
+    @OneToMany(mappedBy = "parent")
+    private List<LocationCategory> children = new ArrayList<>();
+
 }
