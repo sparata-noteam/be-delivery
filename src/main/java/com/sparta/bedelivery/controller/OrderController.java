@@ -38,6 +38,14 @@ public class OrderController {
         return ResponseEntity.ok(orderService.accept(UUID.fromString(orderId)));
     }
 
+    //주문 취소
+    // c,o,m
+    @PutMapping("/{orderId}/cancel")
+    public ResponseEntity<ApiResponseData<OrderCancelResponse>> cancel(@PathVariable String orderId) {
+        return ResponseEntity.ok(ApiResponseData.success(orderService.cancel(UUID.fromString(orderId)),
+                "주문이 취소가 되었습니다."));
+    }
+
     //상태 변경 o m
     @PutMapping("/{orderId}/status")
     public ResponseEntity<OrderStatusResponse> status(
@@ -82,12 +90,6 @@ public class OrderController {
         return ResponseEntity.ok(ApiResponseData.success(orderService.getDetails(orderId)));
     }
 
-    //주문 취소 (점주용)
-    // c,o,m
-    @PutMapping("/{orderId}/cancel")
-    public ResponseEntity<ApiResponseData<OrderCancelResponse>>  cancel(@PathVariable String orderId) {
-        return ResponseEntity.ok(ApiResponseData.success(orderService.cancel(UUID.fromString(orderId)), "주문이 취소되고 결제가 환불되었습니다."));
-    }
 
     // admin/orders/ get
     // admin/orders/{orderId}/status put
