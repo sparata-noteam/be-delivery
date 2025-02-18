@@ -26,14 +26,15 @@ public class Review extends BaseSystemFieldEntity {
     private String comment;
 
     @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(nullable = false)
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(nullable = false)
     private User user;
 
-    // store_id
-    // N의 관계 실제 데이터베이스에는 Review 테이블에 store_id가 있음
+    @ManyToOne
+    private Menu menu;
+
 }
 

@@ -23,4 +23,7 @@ public class IndustryCategory extends BaseSystemFieldEntity { //업종
 
     @Column(nullable = false, unique = true, length = 255)
     private String name; // 업종명
+
+    @OneToMany(mappedBy = "industryCategory")
+    private List<StoreIndustryCategory> storeIndustryCategories = new ArrayList<>();
 }
