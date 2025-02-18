@@ -4,6 +4,7 @@ import com.sparta.bedelivery.AIInteraction.dto.AIInteractionRequest;
 import com.sparta.bedelivery.AIInteraction.dto.AIInteractionResponse;
 import com.sparta.bedelivery.AIInteraction.service.GeminiInteractionService;
 import com.sparta.bedelivery.global.response.ApiResponseData;
+import jakarta.validation.Valid;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class AIInteractionController {
     @PostMapping("/interactions")
     public ResponseEntity<ApiResponseData<AIInteractionResponse>> getAIInteractionText(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody AIInteractionRequest requestDTO) {
+            @RequestBody @Valid AIInteractionRequest requestDTO) {
 
         return ResponseEntity.ok(ApiResponseData.success(geminiInteractionService.processChatInteraction(userDetails.getUsername(), requestDTO)));
     }
