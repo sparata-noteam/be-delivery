@@ -29,13 +29,12 @@ public class Payment extends BaseSystemFieldEntity {
     private Order order;
 
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false, length = 255)
+    private String  userId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private PaymentDetail.Method method;
+    private Payment.Method method;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
@@ -49,9 +48,8 @@ public class Payment extends BaseSystemFieldEntity {
     @Column(nullable = false, length = 50)
     private Status status;
 
-    public Payment(User user, Order order) {
+    public Payment(Order order) {
         this.order = order;
-        this.user = user;
         this.status = Status.PENDING;
     }
 
@@ -60,11 +58,28 @@ public class Payment extends BaseSystemFieldEntity {
     }
 
     public void cancel() {
-        this.status = Status.CANCELLED;
+        this.status = Status.PENDING;
     }
 
+    public void checkAmount(BigDecimal totalPrice) {
+        BigDecimal buyAmount = this.getAmount();
+        if(totalPrice.compareTo(buyAmount) < 0) {
+            throw new IllegalArgumentException("주문 금액보다 낮은 금액으로 결제가 불가능합니다.");
+        }
+
+    }
+
+    // 결제 상태 변경, 결제 수단 등록, 결제 시작!
+    public void start(String userId ,CreatePaymentRequest createPaymentRequest) {
+        this.userId = userId;
+        this.method = createPaymentRequest.getMethod();
+        this.amount = createPaymentRequest.getAmount();
+        this.status = Status.PAID;
+    }
+
+    //실패시 결재 대기로 돌아간다.
     public enum Status {
-        PENDING, PAID, FAILED, CANCELLED, REFUNDED
+        PENDING, PAID, REFUNDED
     }
 
     public enum Method {

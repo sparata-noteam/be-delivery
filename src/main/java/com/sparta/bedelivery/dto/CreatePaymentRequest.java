@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CreatePaymentRequest {
-    private UUID orderId;
+    private UUID paymentId;
     private BigDecimal amount;
-    private PaymentDetail.Method method;
+    private Payment.Method method;
 }

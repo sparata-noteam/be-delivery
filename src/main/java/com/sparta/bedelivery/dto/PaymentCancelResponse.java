@@ -14,6 +14,6 @@ public class PaymentCancelResponse {
 
     public PaymentCancelResponse(Payment payment) {
         this.id = payment.getId();
-        this.status = Payment.Status.CANCELLED;
+        this.status = Payment.Status.PENDING;
     }
 }

@@ -1,12 +1,10 @@
 package com.sparta.bedelivery.service;
 
 import com.sparta.bedelivery.dto.*;
-import com.sparta.bedelivery.entity.Menu;
-import com.sparta.bedelivery.entity.Order;
-import com.sparta.bedelivery.entity.OrderItem;
-import com.sparta.bedelivery.entity.User;
+import com.sparta.bedelivery.entity.*;
 import com.sparta.bedelivery.repository.MenuRepository;
 import com.sparta.bedelivery.repository.OrderRepository;
+import com.sparta.bedelivery.repository.PaymentRepository;
 import com.sparta.bedelivery.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +22,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final MenuRepository menuRepository;
     private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
 
 
     @Transactional
@@ -63,7 +62,7 @@ public class OrderService {
         }
 
         Order order = new Order(createOrderRequest, totalPrice);
-        order.who(user);
+        order.who(user.getUserId());
 
         order.addMenu(calculates.stream().map(OrderItem::new).toList());
 
@@ -72,15 +71,17 @@ public class OrderService {
             order.confirmOrder();
         }
 
-
         Order orderResponse = orderRepository.save(order);
+
+        paymentRepository.save(new Payment(order));
+
         return new CreateOrderResponse(orderResponse, "대충 아무거나");
     }
 
 
     public List<CustomerOrderResponse> getCustomerOrderList(String userId) {
         User user = userRepository.findByUserId(userId).orElseThrow(() -> new IllegalArgumentException("해당하는 계정이 존재하지 않습니다."));
-        List<Order> orders = orderRepository.findByUserId(user.getId());
+        List<Order> orders = orderRepository.findByUserId(user.getUserId());
         return orders.stream().map(CustomerOrderResponse::new).toList();
     }
 

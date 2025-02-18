@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -20,25 +21,27 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public CreatePaymentResponse create(LoginUser loginUser, CreatePaymentRequest createPaymentRequest) {
-        UUID orderId = createPaymentRequest.getOrderId();
+        UUID paymentId = createPaymentRequest.getPaymentId();
+
         User user = userRepository.findByUserId(loginUser.getUserId()).orElseThrow(() -> new IllegalArgumentException("계정이 존재하지 않습니다."));
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다."));
 
-        if (order.getStatus() != Order.OrderStatus.PENDING) {
-            throw new IllegalArgumentException("주문 대기인 경우에만 결제를 생성할 수 있습니다.");
-        }
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제는 진행중이 아닙니다."));
 
-        Payment payment = paymentRepository.findByOrderId(orderId).orElse(null);
+        UUID orderId = payment.getOrder().getId();
 
-        if (payment != null) {
-            throw new IllegalArgumentException("결재 진행중에 있습니다.");
-        }
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문은 존재하지 않습니다."));
+        BigDecimal totalPrice = order.getTotalPrice();
+        payment.checkAmount(totalPrice);
 
-        Payment savePay = paymentRepository.save(new Payment(user, order));
+        // 결제 시작
+        // 과금 추가
+        payment.start(user.getUserId(), createPaymentRequest);
+        //TODO 각 결제 API 를 통해 실 결제를 진핸한다.
+        BigDecimal reminder = order.getTotalPrice().subtract(createPaymentRequest.getAmount());
 
-        //TODO: 결제 상세 정보 저장
-        return new CreatePaymentResponse(savePay);
+        return new CreatePaymentResponse(payment, reminder);
     }
 
     @Transactional
@@ -60,7 +63,7 @@ public class PaymentService {
     public PaymentCancelResponse cancel(UUID paymentId) {
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new IllegalArgumentException("해당하는 결재가 존재하지 않습니다."));
 
-        if(payment.getStatus() != Payment.Status.PAID) {
+        if (payment.getStatus() != Payment.Status.PAID) {
             throw new IllegalArgumentException("결제 상태가 PAID일 때만 가능합니다.");
         }
 
