@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,9 +56,9 @@ public class OrderService {
 
             // 메뉴를 넣는다.
             calculates.add(new OrderCalculate(menu.getId().toString(),
-                                              menu.getName(),
-                                              multiply,
-                                              orderItemRequest.getAmount()));
+                    menu.getName(),
+                    multiply,
+                    orderItemRequest.getAmount()));
             totalPrice = totalPrice.add(multiply);
         }
 
@@ -120,7 +121,7 @@ public class OrderService {
         }
 
         // 결제 대기 상태가 아닌경우
-        if(payment.getStatus() != Payment.Status.PAID) {
+        if (payment.getStatus() != Payment.Status.PAID) {
             throw new IllegalArgumentException("결제 대기인 상태인 주문만 취소가 가능합니다.");
         }
 
@@ -147,7 +148,7 @@ public class OrderService {
 
         Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제가 존재하지 않습니다."));
 
-        if(payment.getStatus() != Payment.Status.PAID) {
+        if (payment.getStatus() != Payment.Status.PAID) {
             throw new IllegalArgumentException("주문 상태는 결제 진행중인 경우에만 변경이 가능합니다.");
         }
 
@@ -163,11 +164,11 @@ public class OrderService {
         LocalDateTime now = LocalDateTime.now();
         Order.OrderStatus status = order.getStatus();
 
-        if(status != Order.OrderStatus.PENDING) {
+        if (status != Order.OrderStatus.PENDING) {
             throw new IllegalArgumentException("주문은 대기 상태일때만 취소할 수 있습니다.");
         }
 
-        if(now.isAfter(orderTime)) {
+        if (now.isAfter(orderTime)) {
             throw new IllegalArgumentException("주문 생성후 5분이내에만 취소가 가능합니다.");
         }
 
@@ -179,8 +180,74 @@ public class OrderService {
         return new OrderCancelResponse(order);
     }
 
+    @Transactional
+    public ChangeForceStatusResponse forceChange(UUID orderId, Order.OrderStatus nextStatus) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문은 존재하지 않습니다."));
+
+        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제는 존재하지 않습니다."));
+
+        Order.OrderStatus currentStatus = order.getStatus();
+
+        // 주문상태는 초기화가 가능합니다.
+        // 다만 결제 상태가 발생한 이후에는 배달과 배달 처리만 가능합니다.
+        LinkedList<Order.OrderStatus> orderStatusLinkedList = new LinkedList<>();
+        // 결제 이전에 바꿀 수 있음
+        orderStatusLinkedList.add(0, Order.OrderStatus.PENDING);
+        orderStatusLinkedList.add(1, Order.OrderStatus.CONFIRMED);
+        // 결제 이후 진행이 되어야 함
+        orderStatusLinkedList.add(2, Order.OrderStatus.DELIVERING);
+        orderStatusLinkedList.add(3, Order.OrderStatus.COMPLETED);
+
+
+        Payment.Status currentPaymentStatus = payment.getStatus();
+        // 결제 대기상태 && 주문 대기, 주문확인으로 바꾸는게 가능합니다.
+        if (currentPaymentStatus == Payment.Status.PENDING && orderStatusLinkedList.indexOf(currentStatus) < 2) {
+            order.changeStatus(nextStatus);
+            return new ChangeForceStatusResponse(nextStatus);
+        }
+
+        // 결제 상태 && 배달중, 완료상태인 경우에만 변경할 수 있습니다.
+        if (currentPaymentStatus == Payment.Status.PAID && orderStatusLinkedList.indexOf(currentStatus) > 1) {
+            order.changeStatus(nextStatus);
+            return new ChangeForceStatusResponse(nextStatus);
+        }
+
+        // 결제 상태가 진행중인데 주문대기로 초기화하는 경우
+        // TODO: 실제 환불처리는 일어나지 않습니다.
+        if (currentPaymentStatus == Payment.Status.PENDING && orderStatusLinkedList.indexOf(currentStatus) > 1) {
+            order.changeStatus(nextStatus);
+            payment.initStatus();
+            return new ChangeForceStatusResponse(nextStatus);
+        }
+
+        //그 이외의 조건은 주문 상태값은 비즈니스 플로우가 적용되어집니다.
+        if (orderStatusLinkedList.indexOf(nextStatus) - orderStatusLinkedList.indexOf(currentStatus) != 1) {
+            throw new IllegalArgumentException("변경할 수 없는 주문 상태입니다. 주문을 다시 확인해주세요.");
+        }
+
+        return new ChangeForceStatusResponse(nextStatus);
+    }
+
     public List<AdminOrderListResponse> getOrderList() {
         List<Order> orders = orderRepository.findAll();
-        return orders.stream().map(order -> new AdminOrderListResponse(order)).toList();
+        return orders.stream().map(AdminOrderListResponse::new).toList();
     }
+
+    @Transactional
+    public Object deleteOrder(LoginUser loginUser, UUID orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문은 존재하지 않습니다."));
+
+        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제는 존재하지 않습니다."));
+
+        // 결제 상태인 경우에 주문을 삭제하는 경우에는 결제 상태 초기화
+        //TODO 실제 환불 처리는 일어나지 않습니다.
+        if (payment.getStatus() == Payment.Status.PAID) {
+            payment.initStatus();
+        }
+
+        order.delete(loginUser.getUserId());
+        return null;
+    }
+
+
 }

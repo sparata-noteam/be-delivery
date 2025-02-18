@@ -81,6 +81,14 @@ public class Payment extends BaseSystemFieldEntity {
         this.status = Status.REFUNDED;
     }
 
+    // 초기화
+    public void initStatus() {
+        this.status = Status.PENDING;
+        this.userId = null;
+        this.method = null;
+        this.amount = BigDecimal.ZERO;
+    }
+
     //실패시 결재 대기로 돌아간다.
     public enum Status {
         PENDING, PAID, REFUNDED_CALL, REFUNDED

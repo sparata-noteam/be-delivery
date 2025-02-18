@@ -93,10 +93,21 @@ public class PaymentService {
     @Transactional
     public Payment refundSuccess(UUID paymentId) {
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제가 존재하지 않습니다."));
-        if(payment.getStatus() != Payment.Status.REFUNDED_CALL) {
+        if (payment.getStatus() != Payment.Status.REFUNDED_CALL) {
             throw new IllegalArgumentException("환불 요청인 경우에만 환불이 가능합니다.");
         }
         payment.refundDone();
         return payment;
+    }
+
+    // 결제 삭제시 주문 삭제도 함께 일어난다.
+    @Transactional
+    public Object deletePayment(LoginUser loginUser, UUID paymentId) {
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제가 존재하지 않습니다."));
+        Order order = orderRepository.findById(payment.getOrder().getId()).orElseThrow(() -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다."));
+        String userId = loginUser.getUserId();
+        payment.delete(userId);
+        order.delete(userId);
+        return null;
     }
 }
