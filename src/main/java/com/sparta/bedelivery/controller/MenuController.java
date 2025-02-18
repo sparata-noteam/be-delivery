@@ -2,10 +2,8 @@ package com.sparta.bedelivery.controller;
 
 import com.sparta.bedelivery.dto.CreateMenuRequestDto;
 import com.sparta.bedelivery.dto.CreateMenuResponseDto;
-import com.sparta.bedelivery.entity.Menu;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.MenuService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +21,9 @@ public class MenuController {
 
     // 7.1 메뉴 등록
     @PostMapping("/menus")
-    public ResponseEntity<ApiResponseData<CreateMenuResponseDto>> createMenu(@RequestBody CreateMenuRequestDto requestDto,
-                                                                            HttpServletRequest request){
+    public ResponseEntity<ApiResponseData<CreateMenuResponseDto>> createMenu(@RequestBody CreateMenuRequestDto requestDto){
 
-        CreateMenuResponseDto menu = menuService.createMenu(requestDto, request);
+        CreateMenuResponseDto menu = menuService.createMenu(requestDto);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponseData.success(menu));
@@ -55,18 +52,16 @@ public class MenuController {
     // 7.4 메뉴 수정
     @PutMapping("/menus/{menuId}")
     public ResponseEntity<ApiResponseData<CreateMenuResponseDto>> updateMenu(@PathVariable UUID menuId,
-                                                            @RequestBody CreateMenuRequestDto requestDto,
-                                                            HttpServletRequest request) {
-        CreateMenuResponseDto menuUpdate = menuService.updateMenu(menuId, requestDto, request);
+                                                            @RequestBody CreateMenuRequestDto requestDto) {
+        CreateMenuResponseDto menuUpdate = menuService.updateMenu(menuId, requestDto);
 
         return ResponseEntity.ok().body(ApiResponseData.success(menuUpdate));
     }
 
     // 7.5 메뉴 삭제
     @DeleteMapping("/menus/{menuId}")
-    public ResponseEntity<ApiResponseData<Void>> deleteMenu(@PathVariable UUID menuId,
-                                                            HttpServletRequest request) {
-        menuService.deleteMenu(menuId, request);
+    public ResponseEntity<ApiResponseData<Void>> deleteMenu(@PathVariable UUID menuId) {
+        menuService.deleteMenu(menuId);
 
         return ResponseEntity.ok().body(ApiResponseData.success(null, "메뉴가 삭제되었습니다."));
     }

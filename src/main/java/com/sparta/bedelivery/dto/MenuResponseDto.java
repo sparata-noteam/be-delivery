@@ -12,23 +12,25 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class CreateMenuResponseDto {
+// 특정 매장 상세 조회를 위한 메뉴 및 리뷰 dto
+public class MenuResponseDto {
 
     private UUID menuId;
-    private UUID storeId;
     private String name;
-    private List<String> imageUrl;
     private BigDecimal price;
     private String description;
+    private List<String> imageUrl;
     private Boolean isHidden;
+    private List<ReviewResponseDto> reviews;
 
-    public CreateMenuResponseDto(Menu menu) {
+    public MenuResponseDto(Menu menu) {
         this.menuId = menu.getId();
-        this.storeId = menu.getStore().getId();
         this.name = menu.getName();
         this.imageUrl = menu.getImageList().stream().map(MenuImage::getImageUrl).collect(Collectors.toList());
         this.price = menu.getPrice();
         this.description = menu.getDescription();
         this.isHidden = menu.getIsHidden();
+        this.reviews = menu.getReviewList()
+                .stream().map(ReviewResponseDto::new).collect(Collectors.toList());
     }
 }

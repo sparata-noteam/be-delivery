@@ -9,5 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface MenuRepository extends JpaRepository<Menu, UUID> {
-    List<Menu> findByStore_Id(UUID storeId);
+    List<Menu> findByStore_Id(UUID storeId); // store_id 찾아오기
 }

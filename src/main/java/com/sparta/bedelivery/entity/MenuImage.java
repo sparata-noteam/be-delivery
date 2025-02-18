@@ -25,5 +25,8 @@ public class MenuImage extends BaseSystemFieldEntity {
 
     @Column(nullable = false)
     private Integer orderIndex = 0;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Menu menu;
 }
 
