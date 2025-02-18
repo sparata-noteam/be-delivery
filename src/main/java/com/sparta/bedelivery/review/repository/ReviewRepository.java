@@ -10,4 +10,7 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
     // 해당 매장의 모든 리뷰 조회
     List<Review> findByStoreId(UUID storeId);
+
+    // 유저가 작성한 모든 리뷰 조회
+    List<Review> findByUserId(Long userId);
 }

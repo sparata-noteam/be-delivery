@@ -1,5 +1,6 @@
 package com.sparta.bedelivery.config;
 
+import com.sparta.bedelivery.entity.User.Role;
 import com.sparta.bedelivery.security.JwtAuthenticationFilter;
 import com.sparta.bedelivery.security.JwtAuthorizationFilter;
 import com.sparta.bedelivery.security.JwtUtil;
@@ -50,6 +51,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/login", "/api/users/register").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("MASTER") // URL 패턴에서도 권한 설정
+                        .requestMatchers("/api/reviews/**").hasRole(Role.CUSTOMER.name())
+                        .requestMatchers("/api/reviews/{storeId}").permitAll()
                         .anyRequest().authenticated()
                 )
                 // 인증 필터를 UsernamePasswordAuthenticationFilter 전에 추가 (로그인 필터 역할)
