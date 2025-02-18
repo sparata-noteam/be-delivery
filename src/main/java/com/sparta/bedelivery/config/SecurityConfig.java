@@ -1,23 +1,32 @@
 package com.sparta.bedelivery.config;
 
+import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.security.JwtAuthenticationFilter;
 import com.sparta.bedelivery.security.JwtAuthorizationFilter;
 import com.sparta.bedelivery.security.JwtUtil;
+import com.sparta.bedelivery.global.response.ApiResponseData;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
@@ -40,8 +49,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil,authenticationManager());
-        jwtAuthenticationFilter.setFilterProcessesUrl("/api/users/login"); // 로그인 요청 URL 설정
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil, authenticationManager());
+        jwtAuthenticationFilter.setFilterProcessesUrl("/api/users/login");
 
         JwtAuthorizationFilter jwtAuthorizationFilter = new JwtAuthorizationFilter(jwtUtil, userDetailsService, authenticationManager());
 
@@ -49,14 +58,44 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/login", "/api/users/register").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("MASTER") // URL 패턴에서도 권한 설정
+                        .requestMatchers("/api/admin/**").hasRole("MASTER")
+                        .requestMatchers("/error").permitAll() // 404 처리를 위해 Spring Boot의 기본 예외 처리 허용
                         .anyRequest().authenticated()
                 )
-                // 인증 필터를 UsernamePasswordAuthenticationFilter 전에 추가 (로그인 필터 역할)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint())  // 401 처리
+                        .accessDeniedHandler(customAccessDeniedHandler())  // 403 처리
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                // 권한 필터를 인증 필터 뒤에 추가
                 .addFilterAfter(jwtAuthorizationFilter, JwtAuthenticationFilter.class);
+                // 필터 순서 조정: Spring Boot가 404를 먼저 처리할 수 있도록 필터를 변경
+//                .addFilterAfter(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(jwtAuthenticationFilter, JwtAuthorizationFilter.class);
 
         return http.build();
+    }
+
+    // 401 Unauthorized - 인증되지 않은 요청
+    @Bean
+    public AuthenticationEntryPoint customAuthenticationEntryPoint() {
+        return (request, response,
+                authException) -> sendJsonResponse(response, 401, "인증이 필요합니다.");
+    }
+
+    // 403 Forbidden - 권한이 부족한 요청
+    @Bean
+    public AccessDeniedHandler customAccessDeniedHandler() {
+        return (request, response,
+                accessDeniedException) -> sendJsonResponse(response, 403, "접근 권한이 없습니다.");
+    }
+
+    private void sendJsonResponse(HttpServletResponse response, int status, String message) throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json; charset=UTF-8");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name()); // UTF-8 설정
+
+        ApiResponseData<String> responseData = ApiResponseData.failure(status, message);
+
+        response.getWriter().write(new ObjectMapper().writeValueAsString(responseData));
     }
 }
