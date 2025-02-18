@@ -14,9 +14,6 @@ public class ReviewCreateRequest {
     @NotNull(message = "주문 정보를 전달해 주세요.")
     UUID orderId;
 
-//    @NotNull(message = "매장 정보를 전달해 주세요.")
-//    UUID storeID;
-
     @NotNull
     @Min(value = 0, message = "별접은 0~5정이어야 합니다.")
     @Max(value = 5, message = "별접은 0~5정이어야 합니다.")

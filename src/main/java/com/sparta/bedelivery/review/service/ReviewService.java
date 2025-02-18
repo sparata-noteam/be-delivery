@@ -7,8 +7,12 @@ import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.repository.OrderRepository;
 import com.sparta.bedelivery.repository.UserRepository;
 import com.sparta.bedelivery.review.dto.ReviewCreateRequest;
-import com.sparta.bedelivery.review.dto.ReviewCreateResponse;
+import com.sparta.bedelivery.review.dto.ReviewResponse;
+import com.sparta.bedelivery.review.dto.StoreReviewResponse;
 import com.sparta.bedelivery.review.repository.ReviewRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +26,7 @@ public class ReviewService {
     private final OrderRepository orderRepository;
 
     @Transactional
-    public ReviewCreateResponse createReview(String userId, ReviewCreateRequest reviewCreateRequest) {
+    public ReviewResponse createReview(String userId, ReviewCreateRequest reviewCreateRequest) {
 
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
@@ -46,7 +50,20 @@ public class ReviewService {
         Review review = reviewRepository.save(new Review(reviewCreateRequest, user, order, store));
 
         // 응답할 리뷰 정보를 생성후 return한다.
-        return new ReviewCreateResponse(review);
+        return new ReviewResponse(review);
     }
 
+    @Transactional(readOnly = true)
+    public List<StoreReviewResponse> getStoreReivews(UUID storeId) {
+
+        List<Review> storeReivews = reviewRepository.findByStoreId(storeId);
+
+        List<StoreReviewResponse> reviewResponseList=new ArrayList<>(); //응답할 review들을 담은 리스트
+
+        // Review -> ReviewResponseDTO로 변환 후 리스트에 추가
+        for (Review storeReivew : storeReivews) {
+            reviewResponseList.add(new StoreReviewResponse(storeReivew));
+        }
+        return reviewResponseList;
+    }
 }
