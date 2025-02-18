@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class UserAddressController {
     private final UserAddressService userAddressService;
 
     //2.1 배송지 추가
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(summary = "배송지 추가", description = "사용자의 배송지를 추가합니다.")
     @ApiResponse(responseCode = "200", description = "배송지가 성공적으로 추가되었습니다.")
     @PostMapping
@@ -31,6 +33,7 @@ public class UserAddressController {
     }
 
     //2.2 배송지 목록 조회
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(summary = "배송지 목록 조회", description = "현재 로그인한 사용자의 모든 배송지를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "배송지 목록이 성공적으로 조회되었습니다.")
     @GetMapping
@@ -39,6 +42,7 @@ public class UserAddressController {
     }
 
     //2.3 배송지 수정
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(summary = "배송지 수정", description = "사용자의 특정 배송지를 수정합니다.")
     @ApiResponse(responseCode = "200", description = "배송지가 성공적으로 수정되었습니다.")
     @PutMapping("/{addressId}")
@@ -48,6 +52,7 @@ public class UserAddressController {
     }
 
     //2.4 배송지 삭제
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(summary = "배송지 삭제", description = "사용자의 특정 배송지를 삭제합니다.")
     @ApiResponse(responseCode = "200", description = "배송지가 성공적으로 삭제되었습니다.")
     @DeleteMapping("/{addressId}")
@@ -57,6 +62,7 @@ public class UserAddressController {
     }
 
     //2.5 배송지 단건 조회
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(summary = "배송지 단건 조회", description = "사용자의 특정 배송지를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "배송지 정보가 성공적으로 조회되었습니다.")
     @GetMapping("/{addressId}")
