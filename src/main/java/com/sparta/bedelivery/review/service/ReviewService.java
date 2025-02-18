@@ -8,16 +8,15 @@ import com.sparta.bedelivery.repository.OrderRepository;
 import com.sparta.bedelivery.repository.UserRepository;
 import com.sparta.bedelivery.review.dto.ReviewCreateRequest;
 import com.sparta.bedelivery.review.dto.ReviewModifyRequest;
-import com.sparta.bedelivery.review.dto.ReviewResponse;
+import com.sparta.bedelivery.review.dto.ReviewCreateResponse;
+import com.sparta.bedelivery.review.dto.ReviewModifyResponse;
 import com.sparta.bedelivery.review.dto.StoreReviewResponse;
 import com.sparta.bedelivery.review.dto.UserReviewResponse;
 import com.sparta.bedelivery.review.repository.ReviewRepository;
-import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +30,7 @@ public class ReviewService {
 
     // 6.1 리뷰 생성
     @Transactional
-    public ReviewResponse createReview(String userId, ReviewCreateRequest reviewCreateRequest) {
+    public ReviewCreateResponse createReview(String userId, ReviewCreateRequest reviewCreateRequest) {
 
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
@@ -55,19 +54,19 @@ public class ReviewService {
         Review review = reviewRepository.save(new Review(reviewCreateRequest, user, order, store));
 
         // 응답할 리뷰 정보를 생성후 return한다.
-        return new ReviewResponse(review);
+        return new ReviewCreateResponse(review);
     }
 
     // 6.2 매장의 모든 리뷰 조회
     @Transactional(readOnly = true)
     public List<StoreReviewResponse> getStoreReivews(UUID storeId) {
 
-        List<Review> storeReivews = reviewRepository.findByStoreId(storeId);
+        List<Review> storeReviews = reviewRepository.findByStoreId(storeId);
 
         List<StoreReviewResponse> reviewResponseList=new ArrayList<>(); //응답할 review들을 담은 리스트
 
         // Review -> ReviewResponseDTO로 변환 후 리스트에 추가
-        for (Review storeReivew : storeReivews) {
+        for (Review storeReivew : storeReviews) {
             reviewResponseList.add(new StoreReviewResponse(storeReivew));
         }
         return reviewResponseList;
@@ -95,7 +94,7 @@ public class ReviewService {
 
     //6.4 리뷰 수정
     @Transactional
-    public ReviewResponse modifyReview(String userId, UUID reviewId, ReviewModifyRequest reviewModifyRequest) {
+    public ReviewModifyResponse modifyReview(String userId, UUID reviewId, ReviewModifyRequest reviewModifyRequest) {
         // 리뷰 존재 여부 확인
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
@@ -110,7 +109,7 @@ public class ReviewService {
         review.setComment(reviewModifyRequest.getComment());
         reviewRepository.save(review);
 
-        return new ReviewResponse(review);
+        return new ReviewModifyResponse(review);
     }
 
     // 6.5 리뷰 삭제(사용자용)
@@ -126,8 +125,7 @@ public class ReviewService {
         }
 
         // 소프트 삭제 처리
-        String deletedBy = SecurityContextHolder.getContext().getAuthentication().getName();
-        review.delete(deletedBy);
+        review.delete(userId);
         reviewRepository.save(review);
     }
 }

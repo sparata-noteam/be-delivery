@@ -3,12 +3,12 @@ package com.sparta.bedelivery.review.controller;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.review.dto.ReviewCreateRequest;
 import com.sparta.bedelivery.review.dto.ReviewModifyRequest;
-import com.sparta.bedelivery.review.dto.ReviewResponse;
+import com.sparta.bedelivery.review.dto.ReviewCreateResponse;
+import com.sparta.bedelivery.review.dto.ReviewModifyResponse;
 import com.sparta.bedelivery.review.dto.StoreReviewResponse;
 import com.sparta.bedelivery.review.dto.UserReviewResponse;
 import com.sparta.bedelivery.review.service.ReviewService;
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +33,10 @@ public class ReviewController {
 
     // 6.1 리뷰 작성
     @PostMapping
-    public ResponseEntity<ApiResponseData<ReviewResponse>> createReview(
+    public ResponseEntity<ApiResponseData<ReviewCreateResponse>> createReview(
             @AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody ReviewCreateRequest reviewCreateRequest){
-        ReviewResponse reviewResponse = reviewService.createReview(userDetails.getUsername(), reviewCreateRequest);
-        return ResponseEntity.ok(ApiResponseData.success(reviewResponse,"리뷰가 작성 되었습니다."));
+        ReviewCreateResponse reviewCreateResponse = reviewService.createReview(userDetails.getUsername(), reviewCreateRequest);
+        return ResponseEntity.ok(ApiResponseData.success(reviewCreateResponse,"리뷰가 작성 되었습니다."));
     }
 
     //6.2 매장 리뷰 조회
@@ -46,7 +46,7 @@ public class ReviewController {
     }
 
 
-    //6.3 사용자 리뷰 조회
+    //6.3 사용자 리뷰 조회(사용자가 작성한 리뷰 전체 조회)
     @GetMapping
     public ResponseEntity<ApiResponseData<List<UserReviewResponse>>> getUserReviews(@AuthenticationPrincipal UserDetails userDetails){
         return ResponseEntity.ok(ApiResponseData.success(reviewService.getUserReviews(userDetails.getUsername()),"정상저긍로 조회 되었습니다."));
@@ -54,12 +54,12 @@ public class ReviewController {
 
     //6.4 사용자 리뷰 수정
     @PutMapping("/{reviewId}")
-    public ResponseEntity<ApiResponseData<ReviewResponse>> modifyReview(
+    public ResponseEntity<ApiResponseData<ReviewModifyResponse>> modifyReview(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable UUID reviewId,
             @Valid @RequestBody ReviewModifyRequest reviewModifyRequest) {
-        ReviewResponse reviewResponse = reviewService.modifyReview(userDetails.getUsername(), reviewId, reviewModifyRequest);
-        return ResponseEntity.ok(ApiResponseData.success(reviewResponse, "리뷰가 수정되었습니다."));
+        ReviewModifyResponse reviewModifyResponse = reviewService.modifyReview(userDetails.getUsername(), reviewId, reviewModifyRequest);
+        return ResponseEntity.ok(ApiResponseData.success(reviewModifyResponse, "리뷰가 수정되었습니다."));
     }
 
     //6.5 리뷰 삭제(사용자용)

@@ -2,19 +2,20 @@ package com.sparta.bedelivery.review.dto;
 
 import com.sparta.bedelivery.entity.Review;
 import java.util.UUID;
-import lombok.Getter;
 
-@Getter
-public class StoreReviewResponse {
+public class AdminReviewResponse {
     UUID reviewId;
     Integer rating;
     String comment;
-    String writerNickname;
+    UUID storeId; //매장 ID
+    String storeName; //매장 이름
+    Long writerId; //작성자 ID(PK값)
 
-    public StoreReviewResponse(Review review) {
+    public AdminReviewResponse(Review review) {
         this.reviewId = review.getId();
         this.rating = review.getRating();
         this.comment = review.getComment();
-        this.writerNickname = review.getUser().getNickname();
+        this.storeId = review.getStore().getId();
+        this.storeName = review.getStore().getName();
     }
 }
