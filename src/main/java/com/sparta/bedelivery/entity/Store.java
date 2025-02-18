@@ -39,41 +39,55 @@ public class Store extends BaseSystemFieldEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private Status status;
+    private Status status = Status.PENDING;
 
     public enum Status {
-        OPEN, CLOSED, SUSPENDED
+        PENDING, OPEN, CLOSED, SUSPENDED, HIDDEN, DELETE_REQUESTED, DELETE, UPDATED, COMPLETED, UPDATE_REQUESTED
+    }
+
+    // 매장이 삭제 처리했을 때 숨김처리.
+    public void hidden(String deleteBy){
+        this.status = Status.HIDDEN;
+        super.delete(deleteBy);
     }
 
     @Builder
-    public Store(String name, String address, String phone, String imageUrl, List<StoreIndustryCategory> storeIndustryCategories) {
+    public Store(User userId, String name, LocationCategory locationCategory,
+                 String address, String phone, String imageUrl, List<StoreIndustryCategory> storeIndustryCategories,
+                 Status status) {
+        this.user = userId;  // 변수명은 userId지만 실제로는 User 객체를 받음
+        this.name = name;
+        this.locationCategory = locationCategory;
+        this.address = address;
+        this.phone = phone;
+        this.imageUrl = imageUrl;
+        this.storeIndustryCategories = storeIndustryCategories != null ? storeIndustryCategories : new ArrayList<>();
+        this.status = status;
+    }
+
+    // 수정 요청 승인 데이터 저장용
+    public void update(String name, String address, String phone, String imageUrl) {
         this.name = name;
         this.address = address;
         this.phone = phone;
         this.imageUrl = imageUrl;
-        this.storeIndustryCategories = storeIndustryCategories;
     }
 
-    @OneToMany(mappedBy = "store")
+    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
     private List<StoreIndustryCategory> storeIndustryCategories = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "location_category_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_category_id")
     private LocationCategory locationCategory;
 
-    @OneToMany
-    @JoinColumn(name = "menu_id", nullable = false)
+    @OneToMany(mappedBy = "store")
     private List<Menu> menuList = new ArrayList<>(); // 매장 테이블에서만 메뉴 테이블을 참조할 수 있게 단방향 관계로 설정함.
-
-    @OneToMany
-    @JoinColumn(name = "p_stores_id") // 외래 키의 주인은 나 지만 너가 갖고있어 관리는 내가 할 거야
-    // 1의 관계
-    private List<Review> reviewList = new ArrayList<>();
 
     @OneToMany(mappedBy = "store") // store 와 order 는 1 : N 양방향 관계
     private List<Order> orderList = new ArrayList<>();
+
 }

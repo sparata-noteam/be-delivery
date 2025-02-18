@@ -21,7 +21,8 @@ public class LocationCategory extends BaseSystemFieldEntity {
     @Column(columnDefinition = "UUID", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 255)
+    // 시, 구, 동 이 UNIQUE 옵션이 들어가 있어서 여러 데이터를 넣지 못함.
+    @Column(nullable = false,length = 255)
     private String type;
 
     @Column(nullable = false, unique = true, length = 255)
