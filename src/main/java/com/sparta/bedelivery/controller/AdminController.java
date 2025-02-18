@@ -25,8 +25,6 @@ import java.util.UUID;
 public class AdminController {
 
     private final AdminService adminService;
-    private final OrderService orderService;
-    private final PaymentService paymentService;
 //    1. Spring Security가 SecurityContextHolder에서 현재 사용자의 Authentication 정보 확인
 //    2. getAuthorities()에서 ROLE_ADMIN이 있는지 체크
 //    3. 없으면 AccessDeniedException 발생 (403 Forbidden)
@@ -66,37 +64,5 @@ public class AdminController {
         return ResponseEntity.ok("{\"message\": \"User role updated successfully\"}");
     }
 
-
-    //4.8 전체 주문 목록 조회(관리자용)
-    @GetMapping("/orders")
-    public ResponseEntity<ApiResponseData<List<AdminOrderListResponse>>> getOrders() {
-        return ResponseEntity.ok(ApiResponseData.success(orderService.getOrderList()));
-    }
-
-    // 4.9 주문 상태 강제 변경 (관리자)
-    @PutMapping("/{orderId}/status")
-    public ResponseEntity<ApiResponseData<?>> updateOrderStatus(@PathVariable String orderId,
-                                                                @RequestBody OrderChangeStatus status) {
-        return ResponseEntity.ok(ApiResponseData.success(orderService.status(UUID.fromString(orderId), status.getStatus())));
-    }
-
-
-    //    5.4 전체 결제 목록 조회
-    @GetMapping("/payments")
-    public ResponseEntity<ApiResponseData<List<AdminPaymentResponse>>> getPayments() {
-        return ResponseEntity.ok(ApiResponseData.success(paymentService.adminPaymentList()));
-    }
-
-    //5.5 특정 결제 상세 조회
-    @GetMapping("/payments/{paymentId}")
-    public ResponseEntity<ApiResponseData<AdminPaymentDetailResponse>> getPaymentDetail(@PathVariable String paymentId) {
-        return ResponseEntity.ok(ApiResponseData.success(paymentService.paymentDetail(UUID.fromString(paymentId))));
-    }
-
-    //5.6 사용자 환불 요청 승인(관리자)
-    @PutMapping("/payments/{paymentId}/refund")
-    public ResponseEntity<ApiResponseData<?>> refundOk(@PathVariable String paymentId) {
-        return ResponseEntity.ok(ApiResponseData.success(paymentService.refundSuccess(UUID.fromString(paymentId)), "환불처리 승인하였습니다"));
-    }
 
 }
