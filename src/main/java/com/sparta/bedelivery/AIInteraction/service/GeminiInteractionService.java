@@ -72,15 +72,17 @@ public class GeminiInteractionService {
     }
 
     // 응답에서 텍스트만 추출하는 메서드
-    protected String extractTextFromResponse(String jsonResponse) {
+    private String extractTextFromResponse(String jsonResponse) {
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             GeminiResponse geminiResponse = objectMapper.readValue(jsonResponse, GeminiResponse.class);
             String responseText = geminiResponse.getResponseText();
+
             if(responseText==null){
-                throw new ResourceAccessException("Gemini로부터 적절한 메세지를 응답받지 못하였습니다.");
+                throw new ResourceAccessException("Gemini로부터 메세지 추출에 실패하였습니다.");
             }
+
             return responseText;
         } catch (JsonProcessingException e) {
             throw new ResourceAccessException("Gemini로부터 적절한 메세지를 응답받지 못하였습니다.");
@@ -88,7 +90,7 @@ public class GeminiInteractionService {
     }
 
     // 상호작용을 DB에 저장하는 메서드
-    protected AIInteraction saveInteraction(User user, String queryText, String responseText) {
+    private AIInteraction saveInteraction(User user, String queryText, String responseText) {
         return aiInteractionRepository.save(new AIInteraction(user, queryText, responseText));
     }
 
