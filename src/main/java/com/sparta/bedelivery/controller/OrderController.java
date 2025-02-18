@@ -42,7 +42,7 @@ public class OrderController {
     @PutMapping("/{orderId}/status")
     public ResponseEntity<OrderStatusResponse> status(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable String orderId,인
+            @PathVariable String orderId,
             @RequestBody OrderChangeStatus changeStatus) {
         LoginUser loginUser = new LoginUser(userDetails);
         if (loginUser.getRole() == User.Role.CUSTOMER) {
