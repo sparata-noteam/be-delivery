@@ -4,6 +4,8 @@ import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.AdminService;
 import com.sparta.bedelivery.service.StoreService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +27,6 @@ import java.util.UUID;
 public class AdminController {
 
     private final AdminService adminService;
-
     private final StoreService storeService;
 
 //    1. Spring Security가 SecurityContextHolder에서 현재 사용자의 Authentication 정보 확인
@@ -33,6 +34,8 @@ public class AdminController {
 //    3. 없으면 AccessDeniedException 발생 (403 Forbidden)
 
     // 1.8 사용자 목록 조회
+    @Operation(summary = "사용자 목록 조회", description = "삭제되지 않은 사용자 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "사용자 목록 조회 성공")
     @GetMapping("/users")
     public ResponseEntity<ApiResponseData<Page<UserResponse>>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
@@ -50,6 +53,8 @@ public class AdminController {
     }
 
     // 1.9 특정 사용자 상세 조회
+    @Operation(summary = "특정 사용자 상세 조회", description = "특정 사용자의 상세 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "사용자 상세 조회 성공")
     @GetMapping("/users/{userId}")
     public ResponseEntity<ApiResponseData<UserResponse>> getUserById(@PathVariable Long userId) {
         UserResponse user = adminService.getUserById(userId);
@@ -57,6 +62,8 @@ public class AdminController {
     }
 
     // 1.10 특정 사용자 강제 탈퇴
+    @Operation(summary = "특정 사용자 강제 탈퇴", description = "관리자가 사용자를 강제 탈퇴시킵니다.")
+    @ApiResponse(responseCode = "200", description = "사용자 탈퇴 성공")
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<ApiResponseData<Void>> deleteUserByAdmin(@PathVariable Long userId) {
         adminService.deleteUserByAdmin(userId);
@@ -64,6 +71,8 @@ public class AdminController {
     }
 
     // 1.11 사용자 권한 변경
+    @Operation(summary = "사용자 권한 변경", description = "관리자가 특정 사용자의 권한을 변경합니다.")
+    @ApiResponse(responseCode = "200", description = "사용자 권한 변경 성공")
     @PatchMapping("/users/{userId}/role")
     public ResponseEntity<ApiResponseData<Void>> updateUserRole(@PathVariable Long userId, @RequestBody RoleUpdateRequest request) {
         adminService.updateUserRole(userId, request);
