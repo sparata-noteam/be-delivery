@@ -61,7 +61,7 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public List<StoreReviewResponse> getStoreReivews(UUID storeId) {
 
-        List<Review> storeReviews = reviewRepository.findByStoreId(storeId);
+        List<Review> storeReviews = reviewRepository.findByStoreIdAndDeleteAtIsNull(storeId);
 
         List<StoreReviewResponse> reviewResponseList=new ArrayList<>(); //응답할 review들을 담은 리스트
 
@@ -78,7 +78,7 @@ public class ReviewService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        List<Review> userReviews = reviewRepository.findByUserId(user.getId());
+        List<Review> userReviews = reviewRepository.findByUserIdAndDeleteAtIsNull(user.getId());
         List<UserReviewResponse> userReviewResponseList = new ArrayList<>();
 
         //Review-> userReviewResponse로 변환후 리스트에 추가
@@ -96,7 +96,7 @@ public class ReviewService {
     @Transactional
     public ReviewModifyResponse modifyReview(String userId, UUID reviewId, ReviewModifyRequest reviewModifyRequest) {
         // 리뷰 존재 여부 확인
-        Review review = reviewRepository.findById(reviewId)
+        Review review = reviewRepository.findByIdAndDeleteAtIsNull(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
 
         // 리뷰 작성자가 맞는지 확인
