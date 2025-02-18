@@ -140,9 +140,16 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderStatusResponse status(String orderId, Order.OrderStatus status) {
-        Order order = orderRepository.findById(UUID.fromString(orderId))
+    //결제 진행중인 경우에만 사용가능 -> 배달 진행, 배달 완료만 표기가능
+    public OrderStatusResponse status(UUID orderId, Order.OrderStatus status) {
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다."));
+
+        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제가 존재하지 않습니다."));
+
+        if(payment.getStatus() != Payment.Status.PAID) {
+            throw new IllegalArgumentException("주문 상태는 결제 진행중인 경우에만 변경이 가능합니다.");
+        }
 
         order.changeStatus(status);
 

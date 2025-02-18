@@ -52,11 +52,7 @@ public class OrderController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String orderId,
             @RequestBody OrderChangeStatus changeStatus) {
-        LoginUser loginUser = new LoginUser(userDetails);
-        if (loginUser.getRole() == User.Role.CUSTOMER) {
-            throw new IllegalArgumentException("고객은 이 API를 사용할 수 없습니다.");
-        }
-        return ResponseEntity.ok(orderService.status(orderId, changeStatus.getStatus()));
+        return ResponseEntity.ok(orderService.status(UUID.fromString(orderId), changeStatus.getStatus()));
     }
 
     // 목록 조회 (사용자용)
