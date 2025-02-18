@@ -1,5 +1,6 @@
 package com.sparta.bedelivery.AIInteraction.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.bedelivery.AIInteraction.dto.AIInteractionRequest;
 import com.sparta.bedelivery.AIInteraction.dto.AIInteractionResponse;
@@ -28,6 +29,7 @@ public class GeminiInteractionService {
 
     private static final String PROMPT_TEMPLATE = "50자 이내로 답변하세요. \"%s\"";
 
+    // 생성자 메서드
     public GeminiInteractionService(WebClient.Builder webClientBuilder, AIInteractionRepository aiInteractionRepository,
                                     UserRepository userRepository){
         this.webClient = webClientBuilder.baseUrl("https://generativelanguage.googleapis.com/v1beta").build();
@@ -71,12 +73,16 @@ public class GeminiInteractionService {
 
     // 응답에서 텍스트만 추출하는 메서드
     protected String extractTextFromResponse(String jsonResponse) {
+
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             GeminiResponse geminiResponse = objectMapper.readValue(jsonResponse, GeminiResponse.class);
-            return geminiResponse.getResponseText();
-        } catch (Exception e){
-            System.out.println("에러발생");
+            String responseText = geminiResponse.getResponseText();
+            if(responseText==null){
+                throw new ResourceAccessException("Gemini로부터 적절한 메세지를 응답받지 못하였습니다.");
+            }
+            return responseText;
+        } catch (JsonProcessingException e) {
             throw new ResourceAccessException("Gemini로부터 적절한 메세지를 응답받지 못하였습니다.");
         }
     }

@@ -37,9 +37,6 @@ public class AIInteraction extends BaseSystemFieldEntity {
         this.user=user;
         this.queryText=queryText;
         this.responseText=responseText;
-        System.out.println("로그: " + this.getCreateBy());
-        System.out.println("로그: " + this.getCreateAt());
-
     }
 
 }

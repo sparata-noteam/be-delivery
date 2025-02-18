@@ -31,24 +31,24 @@ public class GeminiResponse {
 
     public String getResponseText() {
         if (candidates == null || candidates.isEmpty()) {
-            return "응답을 처리할 수 없습니다.";
+            return null;
         }
 
         Candidate candidate = candidates.get(0);
         if (candidate == null || candidate.getContent() == null) {
-            return "응답을 처리할 수 없습니다.";
+            return null;
         }
 
         Content content = candidate.getContent();
         List<Part> parts = content.getParts();
 
         if (parts == null || parts.isEmpty()) {
-            return "응답을 처리할 수 없습니다.";
+            return null;
         }
 
         Part part = parts.get(0);
         if (part == null || part.getText() == null) {
-            return "응답을 처리할 수 없습니다.";
+            return null;
         }
 
         return part.getText().replaceAll("\\n$","");
