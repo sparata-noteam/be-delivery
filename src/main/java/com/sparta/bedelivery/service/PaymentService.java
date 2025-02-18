@@ -53,6 +53,11 @@ public class PaymentService {
             throw new IllegalArgumentException("완료상태인 주문만 환불이 가능합니다.");
         }
 
+        // 결제가 진행중인 경우에만 환불이 가능하다.
+        if(payment.getStatus() != Payment.Status.PAID) {
+            throw new IllegalArgumentException("결제를 진행중인 경우에만 환불이 가능합니다.");
+        }
+
         payment.refund();
         return new PaymentRefundResponse(order.getStatus(), payment);
     }
