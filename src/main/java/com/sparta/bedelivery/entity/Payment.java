@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -34,6 +35,18 @@ public class Payment extends BaseSystemFieldEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
+    private PaymentDetail.Method method;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal amount;
+
+//    @Column(nullable = false, unique = true, length = 255)
+//    private String transactionId;
+
+    private LocalDateTime paidAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
     private Status status;
 
     public Payment(User user, Order order) {
@@ -54,6 +67,9 @@ public class Payment extends BaseSystemFieldEntity {
         PENDING, PAID, FAILED, CANCELLED, REFUNDED
     }
 
+    public enum Method {
+        CREDIT_CARD, KAKAO_PAY, NAVER_PAY, BANK_TRANSFER, POINTS
+    }
 
 }
 
