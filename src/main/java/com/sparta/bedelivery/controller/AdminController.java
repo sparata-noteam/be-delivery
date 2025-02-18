@@ -2,7 +2,11 @@ package com.sparta.bedelivery.controller;
 
 import com.sparta.bedelivery.dto.RoleUpdateRequest;
 import com.sparta.bedelivery.dto.UserResponse;
+import com.sparta.bedelivery.global.response.ApiResponseData;
+import com.sparta.bedelivery.review.dto.StoreReviewResponse;
+import com.sparta.bedelivery.security.CustomUserDetails;
 import com.sparta.bedelivery.service.AdminService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,4 +67,16 @@ public class AdminController {
         adminService.updateUserRole(userId, request);
         return ResponseEntity.ok("{\"message\": \"User role updated successfully\"}");
     }
+
+    //6.6 전체 리뷰 조회
+
+    //6.7 특정 리뷰 삭제
+    @DeleteMapping("/admin/{reviewId}")
+    public ResponseEntity<ApiResponseData<String>> deleteReviewByAdmin(@PathVariable UUID reviewId) {
+        adminService.deleteReviewByAdmin(reviewId);
+        return ResponseEntity.ok(ApiResponseData.success(null, "관리자가 리뷰를 삭제했습니다."));
+    }
+
+
+
 }
