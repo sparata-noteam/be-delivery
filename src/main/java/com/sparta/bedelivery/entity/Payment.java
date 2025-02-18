@@ -29,14 +29,14 @@ public class Payment extends BaseSystemFieldEntity {
     private Order order;
 
 
-    @Column(nullable = false, length = 255)
-    private String  userId;
+    @Column(length = 255)
+    private String userId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private Payment.Method method;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     private BigDecimal amount;
 
 //    @Column(nullable = false, unique = true, length = 255)
@@ -63,14 +63,14 @@ public class Payment extends BaseSystemFieldEntity {
 
     public void checkAmount(BigDecimal totalPrice) {
         BigDecimal buyAmount = this.getAmount();
-        if(totalPrice.compareTo(buyAmount) < 0) {
+        if (buyAmount.compareTo(totalPrice) < 0) {
             throw new IllegalArgumentException("주문 금액보다 낮은 금액으로 결제가 불가능합니다.");
         }
 
     }
 
     // 결제 상태 변경, 결제 수단 등록, 결제 시작!
-    public void start(String userId ,CreatePaymentRequest createPaymentRequest) {
+    public void start(String userId, CreatePaymentRequest createPaymentRequest) {
         this.userId = userId;
         this.method = createPaymentRequest.getMethod();
         this.amount = createPaymentRequest.getAmount();

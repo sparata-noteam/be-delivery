@@ -23,23 +23,22 @@ public class PaymentService {
 
     @Transactional
     public CreatePaymentResponse create(LoginUser loginUser, CreatePaymentRequest createPaymentRequest) {
-        UUID paymentId = createPaymentRequest.getPaymentId();
+        UUID orderId = createPaymentRequest.getOrderId();
 
         User user = userRepository.findByUserId(loginUser.getUserId()).orElseThrow(() -> new IllegalArgumentException("계정이 존재하지 않습니다."));
 
-        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제는 진행중이 아닙니다."));
-
-        UUID orderId = payment.getOrder().getId();
+        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제는 진행중이 아닙니다."));
 
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문은 존재하지 않습니다."));
-        BigDecimal totalPrice = order.getTotalPrice();
-        payment.checkAmount(totalPrice);
 
         // 결제 시작
         // 과금 추가
         payment.start(user.getUserId(), createPaymentRequest);
+
+        BigDecimal totalPrice = order.getTotalPrice();
+        payment.checkAmount(totalPrice);
+        BigDecimal reminder = createPaymentRequest.getAmount().subtract(order.getTotalPrice());
         //TODO 각 결제 API 를 통해 실 결제를 진핸한다.
-        BigDecimal reminder = order.getTotalPrice().subtract(createPaymentRequest.getAmount());
 
         return new CreatePaymentResponse(payment, reminder);
     }
