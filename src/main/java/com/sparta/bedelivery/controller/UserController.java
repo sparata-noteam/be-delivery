@@ -27,7 +27,7 @@ public class UserController {
     @PutMapping("/me")
     public ResponseEntity<UserResponse> updateUser(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                    @RequestBody UserUpdateRequest request) {
-        System.out.println("User Authorities: " + userDetails.getAuthorities());
+//        System.out.println("User Authorities: " + userDetails.getAuthorities());
         return ResponseEntity.ok(userService.updateUser(userDetails.getUsername(), request));
     }
 

@@ -6,6 +6,7 @@ import com.sparta.bedelivery.repository.UserAddressRepository;
 import com.sparta.bedelivery.repository.UserRepository;
 import com.sparta.bedelivery.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,6 +33,10 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
+        // 이미 존재하는 phone 값인지 확인
+        if (userRepository.existsByPhone(request.getPhone())) {
+            throw new DataIntegrityViolationException("해당 전화번호는 이미 사용 중입니다.");
+        }
         user.updateInfo(request);
         return new UserResponse(user);
     }
