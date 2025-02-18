@@ -44,7 +44,12 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // querydsl
+//    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    // QueryDsl 설정
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    implementation "com.querydsl:querydsl-codegen:5.0.0" // QueryDSL 코드 생성
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    //Jakarta 설정 어노테이션에 사용된다.
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 }
@@ -52,6 +57,7 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
 
 
 def querydslSrcDir = 'build/generated'
