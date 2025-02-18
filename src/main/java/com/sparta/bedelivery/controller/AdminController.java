@@ -34,7 +34,7 @@ public class AdminController {
 
     // 1.8 사용자 목록 조회
     @GetMapping("/users")
-    public ResponseEntity<Page<UserResponse>> getAllUsers(
+    public ResponseEntity<ApiResponseData<Page<UserResponse>>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createAt") String sortBy,
@@ -45,27 +45,29 @@ public class AdminController {
 //        System.out.println("🔍 현재 SecurityContext 사용자: " + authentication.getPrincipal());
 //        System.out.println("🔍 현재 SecurityContext 권한: " + authentication.getAuthorities());
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(direction), sortBy));
-        return ResponseEntity.ok(adminService.getAllUsers(pageable));
+        Page<UserResponse> users = adminService.getAllUsers(pageable);
+        return ResponseEntity.ok(ApiResponseData.success(users));
     }
 
     // 1.9 특정 사용자 상세 조회
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long userId) {
-        return ResponseEntity.ok(adminService.getUserById(userId));
+    public ResponseEntity<ApiResponseData<UserResponse>> getUserById(@PathVariable Long userId) {
+        UserResponse user = adminService.getUserById(userId);
+        return ResponseEntity.ok(ApiResponseData.success(user));
     }
 
     // 1.10 특정 사용자 강제 탈퇴
     @DeleteMapping("/users/{userId}")
-    public ResponseEntity<?> deleteUserByAdmin(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponseData<Void>> deleteUserByAdmin(@PathVariable Long userId) {
         adminService.deleteUserByAdmin(userId);
-        return ResponseEntity.ok("{\"message\": \"사용자가 삭제되었습니다.\"}");
+        return ResponseEntity.ok(ApiResponseData.success(null, "사용자가 삭제되었습니다."));
     }
 
     // 1.11 사용자 권한 변경
     @PatchMapping("/users/{userId}/role")
-    public ResponseEntity<?> updateUserRole(@PathVariable Long userId, @RequestBody RoleUpdateRequest request) {
+    public ResponseEntity<ApiResponseData<Void>> updateUserRole(@PathVariable Long userId, @RequestBody RoleUpdateRequest request) {
         adminService.updateUserRole(userId, request);
-        return ResponseEntity.ok("{\"message\": \"User role updated successfully\"}");
+        return ResponseEntity.ok(ApiResponseData.success(null, "User role updated successfully"));
     }
 
 
