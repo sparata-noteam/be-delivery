@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -54,7 +55,7 @@ public class PaymentService {
         }
 
         // 결제가 진행중인 경우에만 환불이 가능하다.
-        if(payment.getStatus() != Payment.Status.PAID) {
+        if (payment.getStatus() != Payment.Status.PAID) {
             throw new IllegalArgumentException("결제를 진행중인 경우에만 환불이 가능합니다.");
         }
 
@@ -75,5 +76,27 @@ public class PaymentService {
         payment.cancel();
 
         return new PaymentCancelResponse(payment);
+    }
+
+    public List<AdminPaymentResponse> adminPaymentList() {
+        return paymentRepository.findAll().stream().map(AdminPaymentResponse::new).toList();
+
+    }
+
+    public AdminPaymentDetailResponse paymentDetail(UUID paymentId) {
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제 정보가 존재하지 않습니다."));
+
+        return new AdminPaymentDetailResponse(payment);
+
+    }
+
+    @Transactional
+    public Payment refundSuccess(UUID paymentId) {
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제가 존재하지 않습니다."));
+        if(payment.getStatus() != Payment.Status.REFUNDED_CALL) {
+            throw new IllegalArgumentException("환불 요청인 경우에만 환불이 가능합니다.");
+        }
+        payment.refundDone();
+        return payment;
     }
 }

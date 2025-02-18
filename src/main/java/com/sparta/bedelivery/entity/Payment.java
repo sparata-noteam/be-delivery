@@ -54,7 +54,7 @@ public class Payment extends BaseSystemFieldEntity {
     }
 
     public void refund() {
-        this.status = Status.REFUNDED;
+        this.status = Status.REFUNDED_CALL;
     }
 
     public void cancel() {
@@ -77,9 +77,13 @@ public class Payment extends BaseSystemFieldEntity {
         this.status = Status.PAID;
     }
 
+    public void refundDone() {
+        this.status = Status.REFUNDED;
+    }
+
     //실패시 결재 대기로 돌아간다.
     public enum Status {
-        PENDING, PAID, REFUNDED
+        PENDING, PAID, REFUNDED_CALL, REFUNDED
     }
 
     public enum Method {

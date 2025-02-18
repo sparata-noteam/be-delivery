@@ -178,4 +178,9 @@ public class OrderService {
 
         return new OrderCancelResponse(order);
     }
+
+    public List<AdminOrderListResponse> getOrderList() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream().map(order -> new AdminOrderListResponse(order)).toList();
+    }
 }
