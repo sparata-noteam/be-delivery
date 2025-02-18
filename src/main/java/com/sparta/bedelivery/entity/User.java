@@ -77,7 +77,7 @@ public class User extends BaseSystemFieldEntity {
 
 
     public void updateInfo(UserUpdateRequest request) {
-        this.name = request.getNickName();
+        this.nickname = request.getNickName();
         this.phone = request.getPhone();
     }
 
