@@ -29,23 +29,20 @@ public class OrderController {
     }
 
 
-    //o,m
+    //o,m 주문 확인
     @PutMapping("/{orderId}/accept")
     public ResponseEntity<OrderAcceptResponse> accept(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String orderId) {
         LoginUser loginUser = new LoginUser(userDetails);
-        if (loginUser.getRole() == User.Role.CUSTOMER) {
-            throw new IllegalArgumentException("고객은 이 API를 사용할 수 없습니다.");
-        }
-        return ResponseEntity.ok(orderService.accept(orderId));
+        return ResponseEntity.ok(orderService.accept(UUID.fromString(orderId)));
     }
 
     //상태 변경 o m
     @PutMapping("/{orderId}/status")
     public ResponseEntity<OrderStatusResponse> status(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable String orderId,
+            @PathVariable String orderId,인
             @RequestBody OrderChangeStatus changeStatus) {
         LoginUser loginUser = new LoginUser(userDetails);
         if (loginUser.getRole() == User.Role.CUSTOMER) {

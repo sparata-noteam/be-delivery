@@ -104,17 +104,26 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderAcceptResponse accept(String orderId) {
-        Order order = orderRepository.findById(UUID.fromString(orderId)).orElseThrow(() -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다."));
+    public OrderAcceptResponse accept(UUID orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다."));
+        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 결재가 존재하지 않습니다."));
+
         Order.OrderStatus status = order.getStatus();
         //주문 확인이 완료된 경우
         if (status == Order.OrderStatus.CONFIRMED) {
             throw new IllegalArgumentException("주문 확인이 완료되었습니다.");
         }
+
         //취소가된 경우
         if (status == Order.OrderStatus.CANCELLED) {
             throw new IllegalArgumentException("취소된 주문입니다.");
         }
+
+        // 결제 대기 상태가 아닌경우
+        if(payment.getStatus() != Payment.Status.PAID) {
+            throw new IllegalArgumentException("결제 대기인 상태인 주문만 취소가 가능합니다.");
+        }
+
         //배달중인 경우
         if (status == Order.OrderStatus.DELIVERING) {
             throw new IllegalArgumentException("이미 배달 중인 주문입니다.");
