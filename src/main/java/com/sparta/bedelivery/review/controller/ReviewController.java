@@ -43,7 +43,7 @@ public class ReviewController {
     }
 
     //6.2 매장 리뷰 조회
-    @GetMapping("/{storeId}")
+    @GetMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponseData<Page<StoreReviewResponse>>> getStoreReviews(
             @PathVariable UUID storeId,
             @RequestParam(defaultValue = "0") int page,
