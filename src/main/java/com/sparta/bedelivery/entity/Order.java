@@ -56,6 +56,9 @@ public class Order extends BaseSystemFieldEntity {
     @JoinColumn(name = "order_Id")
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "order")
+    private Payment payment;
+
     public Order() {
     }
 
@@ -93,8 +96,6 @@ public class Order extends BaseSystemFieldEntity {
     public void addMenu(List<OrderItem> prepareOrderItems) {
         this.orderItems.addAll(prepareOrderItems);
     }
-
-
 
 
     public enum OrderStatus {

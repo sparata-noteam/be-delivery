@@ -1,6 +1,7 @@
 package com.sparta.bedelivery.dto;
 
 import com.sparta.bedelivery.entity.Order;
+import com.sparta.bedelivery.entity.Payment;
 import lombok.Getter;
 
 import java.math.BigDecimal;
@@ -35,6 +36,6 @@ public class OrderDetailResponse {
 
         this.items = order.getOrderItems().stream().map(OrderItemResponse::new).toList();
         //작업전
-        this.payment = null;
+        this.payment = new PaymentResponse(order.getPayment());
     }
 }
