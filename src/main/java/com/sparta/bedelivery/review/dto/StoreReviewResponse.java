@@ -9,12 +9,12 @@ public class StoreReviewResponse {
     UUID reviewId;
     Integer rating;
     String comment;
-    String writerNickname;
+    String userNickname;
 
     public StoreReviewResponse(Review review) {
         this.reviewId = review.getId();
         this.rating = review.getRating();
         this.comment = review.getComment();
-        this.writerNickname = review.getUser().getNickname();
+        this.userNickname = review.getUser().getNickname();
     }
 }

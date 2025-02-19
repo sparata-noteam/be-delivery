@@ -18,5 +18,9 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
     // 유저가 작성한 모든 리뷰 조회
     Page<Review> findByUserIdAndDeleteAtIsNull(Long userId, Pageable pageable);
 
+    // 특정 리뷰 조회
     Optional<Review> findByIdAndDeleteAtIsNull(UUID id);
+
+    // 관리자가 전체 리뷰 조회
+    Page<Review> findAllByDeleteAtIsNull(Pageable pageable);
 }

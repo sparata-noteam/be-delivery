@@ -3,6 +3,7 @@ package com.sparta.bedelivery.controller;
 import com.sparta.bedelivery.dto.RoleUpdateRequest;
 import com.sparta.bedelivery.dto.UserResponse;
 import com.sparta.bedelivery.global.response.ApiResponseData;
+import com.sparta.bedelivery.review.dto.AdminReviewResponse;
 import com.sparta.bedelivery.review.dto.StoreReviewResponse;
 import com.sparta.bedelivery.security.CustomUserDetails;
 import com.sparta.bedelivery.service.AdminService;
@@ -69,7 +70,15 @@ public class AdminController {
     }
 
     //6.6 전체 리뷰 조회
+    @GetMapping("/admin/reviews")
+    public ResponseEntity<ApiResponseData<Page<AdminReviewResponse>>> getAllReviews(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
 
+        Page<AdminReviewResponse> reviews = adminService.getAllReviews(page, size);
+        return ResponseEntity.ok(ApiResponseData.success(reviews, "전체 리뷰가 조회되었습니다."));
+    }
+    
     //6.7 특정 리뷰 삭제
     @DeleteMapping("/admin/{reviewId}")
     public ResponseEntity<ApiResponseData<String>> deleteReviewByAdmin(@PathVariable UUID reviewId) {

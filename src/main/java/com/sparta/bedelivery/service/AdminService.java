@@ -5,11 +5,14 @@ import com.sparta.bedelivery.dto.UserResponse;
 import com.sparta.bedelivery.entity.Review;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.repository.UserRepository;
+import com.sparta.bedelivery.review.dto.AdminReviewResponse;
 import com.sparta.bedelivery.review.repository.ReviewRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +61,14 @@ public class AdminService {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("잘못된 역할 값입니다: " + request.getRole());
         }
+    }
+
+    // 리뷰 전체 조회
+    @Transactional(readOnly = true)
+    public Page<AdminReviewResponse> getAllReviews(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Review> reviews = reviewRepository.findAllByDeleteAtIsNull(pageable);
+        return reviews.map(AdminReviewResponse::new);
     }
 
     // 특정 리뷰 삭제
