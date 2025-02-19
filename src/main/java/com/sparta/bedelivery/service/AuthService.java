@@ -1,9 +1,12 @@
 package com.sparta.bedelivery.service;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.bedelivery.dto.AuthRequest;
 import com.sparta.bedelivery.dto.AuthResponse;
 import com.sparta.bedelivery.dto.ChangePasswordRequest;
 import com.sparta.bedelivery.dto.UserRegisterRequest;
+import com.sparta.bedelivery.entity.QUser;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.repository.UserRepository;
 import com.sparta.bedelivery.security.JwtUtil;
@@ -24,14 +27,16 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final JPAQueryFactory queryFactory;
+
 
     // 회원가입
     @Transactional
     public User registerUser(UserRegisterRequest request) {
-        if (userRepository.findByUserId(request.getUserId()).isPresent()) {
+        if (userRepository.existsByUserIdAndDeleteAtIsNull(request.getUserId())) {
             throw new IllegalArgumentException("이미 가입된 이메일입니다.");
         }
-        if (userRepository.findByNickname(request.getNickName()).isPresent()) {
+        if (userRepository.existsByNicknameAndDeleteAtIsNull(request.getNickName())) {
             throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
         }
 
@@ -39,29 +44,11 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    // 로그인
-    public AuthResponse login(AuthRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUserId(), request.getPassword())
-        );
-        // UserDetails에서 userId 가져오기
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-        // Role 정보 추출 (첫 번째 Role 가져오기)
-        String role = userDetails.getAuthorities().stream()
-                .findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .orElseThrow(() -> new RuntimeException("사용자의 역할이 설정되지 않았습니다."));
-
-        // JWT 생성 (Role 포함)
-        String token = jwtUtil.generateAccessToken(userDetails.getUsername(), role);
-        return new AuthResponse(token, role);
-    }
 
     // 비밀번호 변경
     @Transactional
     public void changePassword(String userId, ChangePasswordRequest request) {
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findByUserIdAndDeleteAtIsNull(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {

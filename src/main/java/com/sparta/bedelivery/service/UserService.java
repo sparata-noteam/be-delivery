@@ -6,6 +6,7 @@ import com.sparta.bedelivery.repository.UserAddressRepository;
 import com.sparta.bedelivery.repository.UserRepository;
 import com.sparta.bedelivery.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,8 +21,9 @@ public class UserService implements UserDetailsService {
     private final UserAddressRepository userAddressRepository;
 
     // 사용자 정보 조회
+// 사용자 정보 조회
     public UserResponse getUserInfo(String userId) {
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findByUserIdAndDeleteAtIsNull(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         return new UserResponse(user);
     }
@@ -29,9 +31,13 @@ public class UserService implements UserDetailsService {
     // 사용자 정보 수정
     @Transactional
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findByUserIdAndDeleteAtIsNull(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
+        // 이미 존재하는 phone 값인지 확인
+        if (userRepository.existsByPhone(request.getPhone())) {
+            throw new DataIntegrityViolationException("해당 전화번호는 이미 사용 중입니다.");
+        }
         user.updateInfo(request);
         return new UserResponse(user);
     }
@@ -39,7 +45,7 @@ public class UserService implements UserDetailsService {
     // 사용자 탈퇴
     @Transactional
     public void deleteUser(String userId) {
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findByUserIdAndDeleteAtIsNull(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         String deletedBy = SecurityContextHolder.getContext().getAuthentication().getName();

@@ -43,7 +43,7 @@ public class ApiResponseData<T> {
     }
 
     // of 메서드를 사용하여 ApiResponseData 객체를 생성하는 메서드
-    public static <T> ApiResponseData<T> of(Integer code, String message, T data) {
+    public static <T> ApiResponseData<T> failure(Integer code, String message, T data) {
         return ApiResponseData.<T>builder()
                 .code(code)
                 .message(message)

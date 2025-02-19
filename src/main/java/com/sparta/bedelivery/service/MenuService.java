@@ -3,14 +3,18 @@ package com.sparta.bedelivery.service;
 import com.sparta.bedelivery.dto.CreateMenuRequestDto;
 import com.sparta.bedelivery.dto.CreateMenuResponseDto;
 import com.sparta.bedelivery.entity.Menu;
+import com.sparta.bedelivery.entity.MenuImage;
 import com.sparta.bedelivery.entity.Store;
+import com.sparta.bedelivery.repository.MenuImageRepository;
 import com.sparta.bedelivery.repository.MenuRepository;
 import com.sparta.bedelivery.repository.StoreRepository;
 import com.sparta.bedelivery.security.JwtUtil;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,20 +26,11 @@ public class MenuService {
 
     private final StoreRepository storeRepository;
 
+    private final MenuImageRepository menuImageRepository;
+
     private final JwtUtil jwtUtil;
 
-    public Menu createMenu(CreateMenuRequestDto requestDto, HttpServletRequest request) {
-        // 토큰 검증
-        String token = request.getHeader("Authorization");
-        if (token == null || !token.startsWith("Bearer ")) {
-            throw new RuntimeException("유효한 인증 토큰이 필요합니다.");
-        }
-        String tokenValue = token.substring(7);
-        String role = jwtUtil.extractRole(tokenValue);
-        // 권한 체크
-        if (!("OWNER".equals(role) || "MANAGER".equals(role))) {
-            throw new RuntimeException("매장 운영 권한이 필요합니다.");
-        }
+    public CreateMenuResponseDto createMenu(CreateMenuRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())
                 .orElseThrow(() -> new RuntimeException("매장을 찾을 수 없습니다."));
 
@@ -48,66 +43,77 @@ public class MenuService {
                 .store(store)  // Store 객체 설정
                 .build();
 
-        Menu savedMenu = menuRepository.save(menu);
+        menu = menuRepository.save(menu);
 
-        return savedMenu;
+        List<MenuImage> menuImages = new ArrayList<>();
+        int orderIndex = 0;
+        for (String imageUrl : requestDto.getImageUrl()) {
+            MenuImage menuImage = new MenuImage();
+            menuImage.setImageUrl(imageUrl);
+            menuImage.setOrderIndex(orderIndex++);
+            menuImage.setMenu(menu);
+            menuImages.add(menuImage);
+        }
+
+        menuImageRepository.saveAll(menuImages);
+
+        menu.setImageList(menuImages);
+        menuRepository.save(menu);  // 변경 사항 저장
+
+        return new CreateMenuResponseDto(menu);
     }
 
     public List<CreateMenuResponseDto> findAllMenus(UUID storeId) {
         List<Menu> menus = menuRepository.findByStore_Id(storeId);
 
-        // 메뉴 엔티티를 CreateMenuResponseDto로 변환
-        return menus.stream().map(CreateMenuResponseDto::new)
-                .toList();
+        return menus.stream().filter(
+                menu -> !menu.getIsHidden()
+        ).map(CreateMenuResponseDto::new).toList();
     }
 
     public CreateMenuResponseDto findMenus(UUID menuId) {
         Menu menu = menuRepository.findById(menuId).orElseThrow(RuntimeException::new);
+
         if (!menu.getIsHidden()) {
             return new CreateMenuResponseDto(menu);
         }
         throw new RuntimeException("해당 메뉴는 없습니다.");
     }
 
-    public Menu updateMenu(UUID menuId, CreateMenuRequestDto requestDto, HttpServletRequest request) {
-        Menu menu = menuRepository.findById(menuId).orElseThrow(RuntimeException::new);
+    public CreateMenuResponseDto updateMenu(UUID menuId, CreateMenuRequestDto requestDto) {
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new EntityNotFoundException("Menu not found with ID: " + menuId));
 
-        String token = request.getHeader("Authorization");
-        if (token == null || !token.startsWith("Bearer ")) {
-            throw new RuntimeException("유효한 인증 토큰이 필요합니다.");
-        }
-        String tokenValue = token.substring(7);
-        String role = jwtUtil.extractRole(tokenValue);
-        // 권한 체크
-        if (!("OWNER".equals(role) || "MANAGER".equals(role))) {
-            throw new RuntimeException("매장 운영 권한이 필요합니다.");
-        }
+
         menu.setName(requestDto.getName());
         menu.setPrice(requestDto.getPrice());
         menu.setDescription(requestDto.getDescription());
         menu.setIsHidden(requestDto.getIsHidden());
 
-        menuRepository.save(menu);
+        menu = menuRepository.save(menu);
 
-        return menu;
-    }
-
-    public CreateMenuResponseDto deleteMenu(UUID menuId, HttpServletRequest request) {
-        Menu menu = menuRepository.findById(menuId).orElseThrow(RuntimeException::new);
-
-        String token = request.getHeader("Authorization");
-        if (token == null || !token.startsWith("Bearer ")) {
-            throw new RuntimeException("유효한 인증 토큰이 필요합니다.");
+        List<MenuImage> menuImages = new ArrayList<>();
+        int orderIndex = 0;
+        for (String imageUrl : requestDto.getImageUrl()) {
+            MenuImage menuImage = new MenuImage();
+            menuImage.setImageUrl(imageUrl);
+            menuImage.setOrderIndex(orderIndex++);
+            menuImage.setMenu(menu);
+            menuImages.add(menuImage);
         }
-        String tokenValue = token.substring(7);
-        String role = jwtUtil.extractRole(tokenValue);
-        // 권한 체크
-        if (!("OWNER".equals(role) || "MANAGER".equals(role))) {
-            throw new RuntimeException("매장 운영 권한이 필요합니다.");
-        }
-        menu.setIsHidden(true);
+
+        menuImageRepository.saveAll(menuImages);
+
+        menu.setImageList(menuImages);
         menuRepository.save(menu);
 
         return new CreateMenuResponseDto(menu);
+    }
+
+    public void deleteMenu(UUID menuId) {
+        Menu menu = menuRepository.findById(menuId).orElseThrow(RuntimeException::new);
+
+        menu.setIsHidden(true);
+        menuRepository.save(menu);
     }
 }
