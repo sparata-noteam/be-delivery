@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
                 .map(fieldError -> fieldError.getDefaultMessage())  // 디폴트 메시지 추출
                 .findFirst()  // 첫 번째 메시지만 추출
                 .orElse("유효성 검사 실패");  // 만약 메시지가 없다면 기본 메시지
-        return ApiResponseData.failure(400, errorMessage);
+        return ApiResponseData.failure(400, errorMessage, ex.getMessage());
     }
 
     // 공통적인 500 Internal Server Error 처리
