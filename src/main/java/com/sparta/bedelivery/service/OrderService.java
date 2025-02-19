@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Vector;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class OrderService {
         // 해당하는 메뉴를 찾는다.
         List<OrderItemRequest> items = createOrderRequest.getItem();
         List<UUID> allMenuIdList = items.stream().map(OrderItemRequest::getMenuId).toList();
-        
+
         List<Menu> allMenuList = menuRepository.findAllById(allMenuIdList);
 
         OrderCalculateSystem calculate = new OrderCalculateSystem(allMenuList);
@@ -161,51 +162,42 @@ public class OrderService {
 
     @Transactional
     public ChangeForceStatusResponse forceChange(UUID orderId, Order.OrderStatus nextStatus) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문은 존재하지 않습니다."));
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 주문은 존재하지 않습니다."));
 
-        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제는 존재하지 않습니다."));
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 결제는 존재하지 않습니다."));
 
-        Order.OrderStatus currentStatus = order.getStatus();
+        List<Order.OrderStatus> orderStatusList = List.of(
+                Order.OrderStatus.PENDING,
+                Order.OrderStatus.CONFIRMED,
+                Order.OrderStatus.DELIVERING,
+                Order.OrderStatus.COMPLETED);
 
-        // 주문상태는 초기화가 가능합니다.
-        // 다만 결제 상태가 발생한 이후에는 배달과 배달 처리만 가능합니다.
-        LinkedList<Order.OrderStatus> orderStatusLinkedList = new LinkedList<>();
-        // 결제 이전에 바꿀 수 있음
-        orderStatusLinkedList.add(0, Order.OrderStatus.PENDING);
-        orderStatusLinkedList.add(1, Order.OrderStatus.CONFIRMED);
-        // 결제 이후 진행이 되어야 함
-        orderStatusLinkedList.add(2, Order.OrderStatus.DELIVERING);
-        orderStatusLinkedList.add(3, Order.OrderStatus.COMPLETED);
+        Order.OrderStatus orderStatus = order.getStatus();
+        Payment.Status status = payment.getStatus();
 
-
-        Payment.Status currentPaymentStatus = payment.getStatus();
-        // 결제 대기상태 && 주문 대기, 주문확인으로 바꾸는게 가능합니다.
-        if (currentPaymentStatus == Payment.Status.PENDING && orderStatusLinkedList.indexOf(currentStatus) < 2) {
-            order.changeStatus(nextStatus);
-            return new ChangeForceStatusResponse(nextStatus);
+        // 결제 완료 상태에서 강제적으로 PENDING이나 CONFIRMED로 변경하려는 경우
+        // 관리자 API이므로 강제로 처리하지만, 그로 인한 부작용을 관리해야 한다.
+        if (status == Payment.Status.PAID && orderStatusList.indexOf(nextStatus) < 2) {
+            payment.initStatus();  // 결제 상태 초기화
+            // 추가적으로 환불 처리 로직이 필요하다면 여기서 처리
         }
 
-        // 결제 상태 && 배달중, 완료상태인 경우에만 변경할 수 있습니다.
-        if (currentPaymentStatus == Payment.Status.PAID && orderStatusLinkedList.indexOf(currentStatus) > 1) {
-            order.changeStatus(nextStatus);
-            return new ChangeForceStatusResponse(nextStatus);
+        // 무조건 비즈니스 흐름을 타도록 한다. 배달완료에서 주문대기로 바꿀 수는 없다.
+        // 순차적으로 변경해야 된다.
+        int currentIndex = orderStatusList.indexOf(orderStatus);
+        int nextIndex = orderStatusList.indexOf(nextStatus);
+
+        if (Math.abs(currentIndex - nextIndex) != 1) {
+            throw new IllegalArgumentException(
+                    String.format("'%s' 상태에서는 '%s' 상태로 변경할 수 없습니다. 상태 변경은 순차적으로만 가능합니다.", orderStatus, nextStatus));
         }
 
-        // 결제 상태가 진행중인데 주문대기로 초기화하는 경우
-        // TODO: 실제 환불처리는 일어나지 않습니다.
-        if (currentPaymentStatus == Payment.Status.PENDING && orderStatusLinkedList.indexOf(currentStatus) > 1) {
-            order.changeStatus(nextStatus);
-            payment.initStatus();
-            return new ChangeForceStatusResponse(nextStatus);
-        }
-
-        //그 이외의 조건은 주문 상태값은 비즈니스 플로우가 적용되어집니다.
-        if (orderStatusLinkedList.indexOf(nextStatus) - orderStatusLinkedList.indexOf(currentStatus) != 1) {
-            throw new IllegalArgumentException("변경할 수 없는 주문 상태입니다. 주문을 다시 확인해주세요.");
-        }
-
+        order.changeStatus(nextStatus);  // 상태 변경 수행
         return new ChangeForceStatusResponse(nextStatus);
     }
+
 
     @Transactional
     public Object deleteOrder(LoginUser loginUser, UUID orderId) {
