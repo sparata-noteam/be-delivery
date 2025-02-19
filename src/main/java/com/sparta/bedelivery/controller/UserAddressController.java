@@ -20,6 +20,9 @@ public class UserAddressController {
 
     //2.1 배송지 추가
     @PostMapping
+    // AuthenticationPrincipal 를 사용하려면 AutorizationFilter 에서 userdetails 를 만들어줘야 controller 에서 사용가능.
+    // AuthenticationPrincipal 이 있다는 의미는 securityfilter에서 userdetails 가 컨트롤러에 들어오기 전에 생성됐다.
+    // 인증이 된 사용자를 controller에 들어가기 전에
     public ResponseEntity<UserAddressResponse> addUserAddress(@AuthenticationPrincipal UserDetails userDetails,
                                                               @RequestBody UserAddressRequest request) {
         return ResponseEntity.ok(userAddressService.addUserAddress(userDetails.getUsername(), request));

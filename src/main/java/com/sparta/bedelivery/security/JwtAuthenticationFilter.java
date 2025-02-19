@@ -43,6 +43,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     /**
      * 인증 성공 시 JWT 생성 후 응답
      */
+    // controller 에서 로그인을 안쓰는 경우에 사용
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult) throws IOException, ServletException {

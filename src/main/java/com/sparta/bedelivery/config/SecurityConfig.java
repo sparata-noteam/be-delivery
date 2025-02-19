@@ -1,11 +1,13 @@
 package com.sparta.bedelivery.config;
 
+import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.security.JwtAuthenticationFilter;
 import com.sparta.bedelivery.security.JwtAuthorizationFilter;
 import com.sparta.bedelivery.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -41,15 +43,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil,authenticationManager());
-        jwtAuthenticationFilter.setFilterProcessesUrl("/api/users/login"); // 로그인 요청 URL 설정
+//        jwtAuthenticationFilter.setFilterProcessesUrl("/api/users/login"); // 로그인 요청 URL 설정 login 컨트롤러 역할과 같다.
 
         JwtAuthorizationFilter jwtAuthorizationFilter = new JwtAuthorizationFilter(jwtUtil, userDetailsService, authenticationManager());
 
         http.csrf(csrf -> csrf.disable())
+                // usedetails 정보는 응답 이후에 날라감. stateless
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/login", "/api/users/register").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("MASTER") // URL 패턴에서도 권한 설정
+                        .requestMatchers("/api/admin/**").hasRole(User.Role.MASTER.name()) // URL 패턴에서도 권한 설정
+                        .requestMatchers("/api/stores/**").permitAll() // 매장 상세 조회의 권한을 ALL 로 설정
+                        .requestMatchers("/api/menus/**").permitAll() // 메뉴 조회의 권한을 ALL 로 설정
                         .anyRequest().authenticated()
                 )
                 // 인증 필터를 UsernamePasswordAuthenticationFilter 전에 추가 (로그인 필터 역할)

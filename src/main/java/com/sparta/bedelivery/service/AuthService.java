@@ -41,20 +41,21 @@ public class AuthService {
 
     // 로그인
     public AuthResponse login(AuthRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUserId(), request.getPassword())
-        );
-        // UserDetails에서 userId 가져오기
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        // 1. 요청한 UserId로 User 엔티티 조회
+        User user = userRepository.findByUserId(request.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // Role 정보 추출 (첫 번째 Role 가져오기)
-        String role = userDetails.getAuthorities().stream()
-                .findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .orElseThrow(() -> new RuntimeException("사용자의 역할이 설정되지 않았습니다."));
+        // 2. 비밀번호 비교
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("아이디 또는 비밀번호가 잘못되었습니다.");
+        }
+        // 3. UserDetails 대신 User 엔티티를 사용하여 Role 추출
+        String role = user.getRole().name(); // User 엔티티의 Role을 직접 가져옵니다.
 
-        // JWT 생성 (Role 포함)
-        String token = jwtUtil.generateAccessToken(userDetails.getUsername(), role);
+        // 4. JWT 토큰 생성 (Role 포함)
+        String token = jwtUtil.generateAccessToken(user.getUserId(), role);
+
+        // 5. 생성된 토큰과 Role을 응답으로 반환
         return new AuthResponse(token, role);
     }
 

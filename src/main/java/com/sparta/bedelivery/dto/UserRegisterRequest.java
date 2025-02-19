@@ -31,4 +31,5 @@ public class UserRegisterRequest { //회원가입 요청
     )
     private String phone;
 
+    private String role;
 }

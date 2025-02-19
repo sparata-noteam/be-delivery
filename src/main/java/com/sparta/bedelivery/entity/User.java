@@ -28,7 +28,7 @@ public class User extends BaseSystemFieldEntity {
     @Column(nullable = false, unique = true, length = 255)
     private String userId; //로그인 id
 
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(name="nickname", nullable = false, unique = true, length = 255)
     private String nickname;
 
     @Column(nullable = false, length = 255)
@@ -42,7 +42,7 @@ public class User extends BaseSystemFieldEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private Role role= Role.CUSTOMER;
+    private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAddress> addresses;
@@ -53,7 +53,7 @@ public class User extends BaseSystemFieldEntity {
         this.password = passwordEncoder.encode(request.getPassword());
         this.name = request.getName();
         this.phone = request.getPhone();
-        this.role = Role.fromString(null);
+        this.role = Role.fromString(request.getRole());
     }
 
 //    public User(String username, String email, String encode, String name, String phone, String role) {
@@ -97,6 +97,5 @@ public class User extends BaseSystemFieldEntity {
     private List<Order> orderList = new ArrayList<>();
 
     @OneToMany
-    @JoinColumn(name = "store_id")
     private List<Store> storeList = new ArrayList<>();
 }

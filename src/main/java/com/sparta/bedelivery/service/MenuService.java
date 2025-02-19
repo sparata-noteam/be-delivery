@@ -8,9 +8,7 @@ import com.sparta.bedelivery.entity.Store;
 import com.sparta.bedelivery.repository.MenuImageRepository;
 import com.sparta.bedelivery.repository.MenuRepository;
 import com.sparta.bedelivery.repository.StoreRepository;
-import com.sparta.bedelivery.security.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +25,6 @@ public class MenuService {
     private final StoreRepository storeRepository;
 
     private final MenuImageRepository menuImageRepository;
-
-    private final JwtUtil jwtUtil;
 
     public CreateMenuResponseDto createMenu(CreateMenuRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())

@@ -13,8 +13,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.ErrorResponse;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
@@ -34,7 +36,8 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         try {
             AuthResponse response = authService.login(request);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+                    .body(response);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("로그인 실패: 아이디 또는 비밀번호가 일치하지 않습니다.");
@@ -61,4 +64,5 @@ public class AuthController {
         authService.changePassword(userDetails.getUsername(), request);
         return ResponseEntity.ok("{\"message\": \"비밀번호가 성공적으로 변경되었습니다.\"}");
     }
+
 }
