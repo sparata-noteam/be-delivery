@@ -1,10 +1,15 @@
 package com.sparta.bedelivery.controller;
 
 import com.sparta.bedelivery.dto.*;
+import com.sparta.bedelivery.entity.Order;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -57,16 +62,22 @@ public class OrderController {
 
     // 목록 조회 (사용자용)
     @GetMapping()
-    public ResponseEntity<List<CustomerOrderResponse>> getList(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ApiResponseData<CustomerOrderResponse>> getList(@AuthenticationPrincipal UserDetails userDetails,
+                                                                          @RequestParam(defaultValue = "0") int page,
+                                                                          @RequestParam(defaultValue = "10") int size,
+                                                                          @RequestParam(required = false) String storeId,
+                                                                          @RequestParam(required = false) Order.OrderStatus status) {
         LoginUser loginUser = new LoginUser(userDetails);
-        return ResponseEntity.ok(orderService.getCustomerOrderList(loginUser.getUserId()));
+        Pageable pageable = PageRequest.of(page, size);
+        CustomerOrderRequest request = new CustomerOrderRequest(loginUser.getUserId(), storeId, status);
+        return ResponseEntity.ok(ApiResponseData.success(orderService.getCustomerOrderList(pageable, request)));
     }
 
     // 목록 조회 (점주용)
     @GetMapping("/store/{storeId}")
     public ResponseEntity<List<OwnerOrderResponse>> getForOwner(@AuthenticationPrincipal UserDetails userDetails, @PathVariable String storeId) {
         LoginUser loginUser = new LoginUser(userDetails);
-        return ResponseEntity.ok(orderService.getOwnerOrderList(storeId));
+        return ResponseEntity.ok(orderService.getOwnerOrderList(UUID.fromString(storeId)));
     }
 
     // 상세 조회 (점주용)

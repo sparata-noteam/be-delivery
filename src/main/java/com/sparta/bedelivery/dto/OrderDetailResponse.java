@@ -12,7 +12,7 @@ import java.util.UUID;
 public class OrderDetailResponse {
     private UUID id;
     private String userId;
-    private String storeId;
+    private UUID storeId;
     private String storeName;
     private String userName;
     private Order.OrderStatus status;

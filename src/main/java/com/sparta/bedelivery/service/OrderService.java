@@ -7,6 +7,8 @@ import com.sparta.bedelivery.repository.OrderRepository;
 import com.sparta.bedelivery.repository.PaymentRepository;
 import com.sparta.bedelivery.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,14 +82,14 @@ public class OrderService {
     }
 
 
-    public List<CustomerOrderResponse> getCustomerOrderList(String userId) {
-        User user = userRepository.findByUserId(userId).orElseThrow(() -> new IllegalArgumentException("해당하는 계정이 존재하지 않습니다."));
-        List<Order> orders = orderRepository.findByUserId(user.getUserId());
-        return orders.stream().map(CustomerOrderResponse::new).toList();
+    public CustomerOrderResponse getCustomerOrderList(Pageable pageable, CustomerOrderRequest condition) {
+        User user = userRepository.findByUserId(condition.getUserId()).orElseThrow(() -> new IllegalArgumentException("해당하는 계정이 존재하지 않습니다."));
+        Page<Order> allUsers = orderRepository.findAllUsers(pageable, condition);
+        return new CustomerOrderResponse(allUsers);
     }
 
 
-    public List<OwnerOrderResponse> getOwnerOrderList(String storeId) {
+    public List<OwnerOrderResponse> getOwnerOrderList(UUID storeId) {
         List<Order> orders = orderRepository.findByStore(storeId);
         return orders.stream().map(OwnerOrderResponse::new).toList();
     }

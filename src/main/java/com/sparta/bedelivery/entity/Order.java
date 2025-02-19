@@ -28,7 +28,7 @@ public class Order extends BaseSystemFieldEntity {
     private String userId;
 
     @Column
-    private String store;
+    private UUID store;
 
 
     @Column(nullable = false, length = 255)
@@ -62,7 +62,7 @@ public class Order extends BaseSystemFieldEntity {
     public Order(CreateOrderRequest createOrderRequest, BigDecimal totalPrice) {
         this.address = createOrderRequest.getAddress();
         this.totalPrice = totalPrice;
-        this.store = "248f20b9-6c9b-48e1-ba45-45959c10504e";
+        this.store = UUID.fromString("248f20b9-6c9b-48e1-ba45-45959c10504e");
         this.status = OrderStatus.PENDING;
         this.orderType = OrderType.DELIVERY;
         this.orderedAt = LocalDateTime.now();

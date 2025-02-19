@@ -8,14 +8,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-public class OwnerOrderResponse {
+public class CustomOrderList {
     private final UUID id;
     private final UUID storeId;
     private final Order.OrderStatus status;
     private final BigDecimal totalPrice;
     private final LocalDateTime orderedAt;
 
-    public OwnerOrderResponse(Order order) {
+    public CustomOrderList(Order order) {
         this.id = order.getId();
         this.storeId = order.getStore();
         this.status = order.getStatus();

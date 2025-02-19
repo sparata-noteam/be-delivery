@@ -2,28 +2,27 @@ package com.sparta.bedelivery.dto;
 
 
 import com.sparta.bedelivery.entity.Order;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.List;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class CustomerOrderResponse {
-    private UUID id;
-    private String storeId;
-    private Order.OrderStatus status;
-    private BigDecimal totalPrice;
-    private LocalDateTime orderedAt;
 
-    public CustomerOrderResponse(Order order) {
-        this.id = order.getId();
-        this.storeId = order.getStore();
-        this.status = order.getStatus();
-        this.totalPrice = order.getTotalPrice();
-        this.orderedAt = order.getOrderedAt();
+
+    private List<CustomOrderList> orders;
+    private long totalCount;
+    private int current;
+
+    public CustomerOrderResponse(Page<Order> orderPage) {
+        this.totalCount = orderPage.getTotalElements();
+        this.current = orderPage.getNumberOfElements();
+        this.orders = orderPage.getContent().stream().map(or ->  new CustomOrderList(or)).toList();
 
     }
 }
