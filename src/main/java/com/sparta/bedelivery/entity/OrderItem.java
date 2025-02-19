@@ -1,7 +1,9 @@
 package com.sparta.bedelivery.entity;
 
+import com.sparta.bedelivery.dto.OrderCalculate;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -12,6 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "p_order_items")
+@NoArgsConstructor
 public class OrderItem extends BaseSystemFieldEntity {
 
     @Id
@@ -26,8 +29,19 @@ public class OrderItem extends BaseSystemFieldEntity {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    @ManyToOne // 어떤 사용자가 주문을 한 건지 알아야 한다.
-    @JoinColumn(name = "menu_id", nullable = false)
-    private Menu menu;
+    @Column
+    private String menuId;
+
+    @Column
+    private String menuName;
+
+    public OrderItem(OrderCalculate orderCalculate) {
+        this.quantity = orderCalculate.getAmount();
+        this.menuId = orderCalculate.getMenuId();
+        this.menuName = orderCalculate.getMenuName();
+        this.price = orderCalculate.getPrice();
+    }
+
+
 }
 

@@ -1,0 +1,25 @@
+package com.sparta.bedelivery.dto;
+
+import com.sparta.bedelivery.entity.Order;
+import lombok.Getter;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Getter
+public class OwnerOrderResponse {
+    private final UUID id;
+    private final String storeId;
+    private final Order.OrderStatus status;
+    private final BigDecimal totalPrice;
+    private final LocalDateTime orderedAt;
+
+    public OwnerOrderResponse(Order order) {
+        this.id = order.getId();
+        this.storeId = order.getStore();
+        this.status = order.getStatus();
+        this.totalPrice = order.getTotalPrice();
+        this.orderedAt = order.getOrderedAt();
+    }
+}
