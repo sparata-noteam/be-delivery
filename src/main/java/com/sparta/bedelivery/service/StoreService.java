@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static java.lang.String.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -40,6 +42,9 @@ public class StoreService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException("UserId not found"));
 
+        if (user.getRole() != User.Role.OWNER){ // 토큰 값으로만 등록이 가능해서 추가 수정
+            throw new IllegalArgumentException("매장을 등록할 권한이 필요합니다.");
+        }
         Store savedStore = Store.builder()
                 .userId(user)
                 .name(requestDto.getName())
@@ -103,7 +108,7 @@ public class StoreService {
 
         List<StoreUpdateRequest> updateId = storeUpdateRequestRepository.findByStore_Id(storeId);
 
-        if ((status.getStatus() == Store.Status.OPEN) || (status.getStatus() == Store.Status.PENDING)) {
+        if (status.getStatus() == Store.Status.PENDING) {
             if (updateId.isEmpty()) {
                 StoreUpdateRequest updateRequest = StoreUpdateRequest.builder()
                         .storeId(status)
@@ -121,12 +126,17 @@ public class StoreService {
 
             return new StoreStatusResponseDto(status);
         }
-        throw new EntityNotFoundException("Store not found with ID: " + storeId);
+        throw new EntityNotFoundException("해당 매장은 오픈 준비중인 매장이 아닙니다.");
     }
 
 
     // 전체 매장 목록 조회 (관리자용)
     public List<StoreStatusResponseDto> findAllStores(String userId) {
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        if (user.getRole() != User.Role.MASTER) {
+            throw new IllegalArgumentException("관리자 권한을 가진 계정이 아닙니다.");
+        }
 
         List<Store> store = storeRepository.findAll();
 
@@ -140,15 +150,16 @@ public class StoreService {
     public void deleteStore(UUID storeId) {
         Store store_id = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("Store not found with ID: " + storeId));
-
+        if (store_id.getStatus() != Store.Status.DELETE) {
+            throw new RuntimeException("이미 삭제된 매장입니다.");
+        }
         StoreRequestDto requestDto = new StoreRequestDto();
         requestDto.setName(store_id.getName());
         requestDto.setAddress(store_id.getAddress());
         requestDto.setPhone(store_id.getPhone());
         requestDto.setImageUrl(store_id.getImageUrl());
 
-        User.Role role = store_id.getUser().getRole();
-        store_id.getUser().setRole(role);
+        store_id.delete(String.valueOf(User.Role.MASTER));
         store_id.setStatus(Store.Status.DELETE);
 
         storeRepository.save(store_id);
@@ -162,12 +173,12 @@ public class StoreService {
         Store.Status currentStatus = current_status.getStatus(); // 현재 상태 확인
         // 매장 등록 승인
         if (Store.Status.PENDING.equals(currentStatus)) {
+            current_status.setCreateBy(valueOf(User.Role.MASTER));
             current_status.setStatus(Store.Status.OPEN);
         }
         // 매장 삭제 승인
         else if (Store.Status.DELETE_REQUESTED.equals(currentStatus)) {
-            User.Role role = current_status.getUser().getRole();
-            current_status.getUser().setRole(role);
+            current_status.delete(String.valueOf(User.Role.MASTER));// 매장을 삭제한 deleteBy 가 저장이 안되는 사항 수정해야 함
             current_status.setStatus(Store.Status.DELETE);
         }
         // 유효하지 않은 상태
@@ -182,24 +193,30 @@ public class StoreService {
 
     public StoreStatusResponseDto updateStore(UUID storeId) {
 
-        List<StoreUpdateRequest> updateRequests = storeUpdateRequestRepository.findByStore_Id(storeId);
+        List<StoreUpdateRequest> updateRequests = storeUpdateRequestRepository.findByStore_IdOrderByCreateAtDesc(storeId);
 
-        for (StoreUpdateRequest updateRequest : updateRequests) {
-            if (updateRequest.getStore().getId().equals(storeId)) {
-
-                Store updateStore = updateRequest.getStore();
-                updateStore.update(
-                        updateRequest.getName(), updateRequest.getAddress(),
-                        updateRequest.getPhone(), updateRequest.getImageUrl()
-                );
-                updateRequest.setStatus(Store.Status.COMPLETED);
-                updateStore.setStatus(Store.Status.UPDATED);
-                storeRepository.save(updateStore);
-                return new StoreStatusResponseDto(updateStore);
-            }
+        if (updateRequests.isEmpty()) {
+            throw new RuntimeException("수정 요청을 시도한 매장이 존재하지 않습니다.");
         }
-        throw new RuntimeException("수정 요청을 시도한 매장이 존재하지 않습니다.");
+        StoreUpdateRequest latestUpdateRequest = updateRequests.get(0);
+        Store updateStore = latestUpdateRequest.getStore();
+
+        updateStore.update(
+                latestUpdateRequest.getName(),
+                latestUpdateRequest.getAddress(),
+                latestUpdateRequest.getPhone(),
+                latestUpdateRequest.getImageUrl()
+        );
+        latestUpdateRequest.setStatus(Store.Status.COMPLETED);
+
+        updateStore.setStatus(Store.Status.UPDATED);
+
+        storeRepository.save(updateStore);
+        storeUpdateRequestRepository.save(latestUpdateRequest);
+
+        return new StoreStatusResponseDto(updateStore);
     }
+
 
     public CreateStoreResponseDto createStore(CreateStoreRequestDto requestDto) {
         // 1. IndustryCategory 조회
@@ -212,7 +229,7 @@ public class StoreService {
 
         // 3. User 조회 및 OWNER 권한 체크
         User owner = userRepository.findByUserId(requestDto.getUserId())
-                .orElseThrow(()-> new RuntimeException("권한을 찾지 못했습니다." + requestDto.getUserId()));
+                .orElseThrow(() -> new RuntimeException("권한을 찾지 못했습니다." + requestDto.getUserId()));
 
         if (!"OWNER".equals(owner.getRole().toString())) {
             throw new RuntimeException("매장 등록은 OWNER 권한을 가진 사용자만 가능합니다.");

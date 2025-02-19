@@ -1,10 +1,10 @@
 package com.sparta.bedelivery.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.security.JwtAuthenticationFilter;
 import com.sparta.bedelivery.security.JwtAuthorizationFilter;
 import com.sparta.bedelivery.security.JwtUtil;
-import com.sparta.bedelivery.global.response.ApiResponseData;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,11 +21,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
@@ -68,7 +66,7 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(jwtAuthorizationFilter, JwtAuthenticationFilter.class);
-                // 필터 순서 조정: Spring Boot가 404를 먼저 처리할 수 있도록 필터를 변경
+        // 필터 순서 조정: Spring Boot가 404를 먼저 처리할 수 있도록 필터를 변경
 //                .addFilterAfter(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
 //                .addFilterBefore(jwtAuthenticationFilter, JwtAuthorizationFilter.class);
 
@@ -84,7 +82,7 @@ public class SecurityConfig {
 
     // 403 Forbidden - 권한이 부족한 요청
     @Bean
-    public AccessDeniedHandler customAccessDeniedHandler() {
+    public AccessDeniedHandler customAccessDeniedHandler() { //ADMIN 페이지에서 MASTER 권한이 아닌경우
         return (request, response,
                 accessDeniedException) -> sendJsonResponse(response, 403, "접근 권한이 없습니다.");
     }

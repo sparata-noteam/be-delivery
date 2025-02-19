@@ -77,6 +77,7 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponseData.success(null, "User role updated successfully"));
     }
 
+// ================================================= 매 장 ==========================================================
 
     // 3.6 전체 매장 목록 조회 (관리자용)
     @GetMapping("/stores/{userId}")

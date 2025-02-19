@@ -1,6 +1,5 @@
 package com.sparta.bedelivery.dto;
 
-import com.sparta.bedelivery.entity.IndustryCategory;
 import com.sparta.bedelivery.entity.Store;
 import lombok.Getter;
 import lombok.Setter;

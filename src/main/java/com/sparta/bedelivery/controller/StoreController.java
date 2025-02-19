@@ -5,6 +5,7 @@ import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class StoreController {
     private final StoreService storeService;
 
     // 3.1 매장 등록 요청
+    @PreAuthorize("hasRole('OWNER')")
     @PostMapping("/stores/{userId}")
     public ResponseEntity<ApiResponseData<StoreResponseDto>> createStoreRequest(@RequestBody StoreRequestDto requestDto
     , @PathVariable String userId) {  // UserDetails 대신 User 엔티티를 직접 받음
@@ -27,6 +29,7 @@ public class StoreController {
     }
 
     // 3.2 전체 매장 목록 조회 OPEN 상태의 매장만 조회 가능.
+    @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/stores")
     public ResponseEntity<ApiResponseData<List<StoreResponseDto>>> findOpenStores() {
 
@@ -44,6 +47,7 @@ public class StoreController {
     }
 
     // 3.4 매장 삭제 요청
+    @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponseData<StoreStatusResponseDto>> deleteStoreRequest(@PathVariable UUID storeId) {
         StoreStatusResponseDto deleteStore = storeService.deleteStoreRequest(storeId);
@@ -52,6 +56,7 @@ public class StoreController {
     }
 
     // 3.5 매장 수정 요청
+    @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponseData<StoreStatusResponseDto>> updateStoreRequest(@PathVariable UUID storeId,
                                                                      @RequestBody StoreUpdateRequestDto requestDto) {
