@@ -1,13 +1,26 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/bedelivery
+    url: jdbc:postgresql://localhost:5432/beadelivery
     username: postgres
-    password: root
+    password: 1234
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true
     database: postgresql
     hibernate:
       ddl-auto: update
+  mvc:
+    problemdetails:
+      enabled: true  # Spring Boot 3.x에서 기본 에러 핸들링 활성화
+  web:
+    resources:
+      add-mappings: false  # 정적 리소스 매핑 비활성화 (404 처리를 위해)
 jwt:
   secret: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+

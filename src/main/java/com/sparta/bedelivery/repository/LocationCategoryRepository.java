@@ -1,4 +1,4 @@
-package com.sparta.bedelivery.entity.repository;
+package com.sparta.bedelivery.repository;
 
 import com.sparta.bedelivery.entity.LocationCategory;
 import org.springframework.data.jpa.repository.JpaRepository;

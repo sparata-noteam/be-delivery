@@ -25,7 +25,7 @@ public class UserAddressService {
     // 배송지 추가
     @Transactional
     public UserAddressResponse addUserAddress(String userId, UserAddressRequest request) {
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findByUserIdAndDeleteAtIsNull(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         UserAddress address = new UserAddress(user, request.getAddressName(), request.getRecipientName(),
@@ -37,7 +37,7 @@ public class UserAddressService {
 
     // 특정 사용자의 배송지 목록 조회
     public List<UserAddressResponse> getUserAddresses(String userId) {
-        List<UserAddress> addresses = userAddressRepository.findByUser_UserId(userId);
+        List<UserAddress> addresses = userAddressRepository.findByUser_UserIdAndDeleteAtIsNull(userId);  // 삭제되지 않은 주소만 조회
         return addresses.stream()
                 .map(UserAddressResponse::new)
                 .collect(Collectors.toList());
@@ -45,7 +45,7 @@ public class UserAddressService {
 
     // 배송지 단건 조회
     public UserAddressResponse getUserAddress(UUID addressId) {
-        UserAddress address = userAddressRepository.findById(addressId)
+        UserAddress address = userAddressRepository.findByIdAndDeleteAtIsNull(addressId)  // 삭제되지 않은 주소만 조회
                 .orElseThrow(() -> new IllegalArgumentException("배송지를 찾을 수 없습니다."));
         return new UserAddressResponse(address);
     }
@@ -53,7 +53,7 @@ public class UserAddressService {
     // 배송지 수정
     @Transactional
     public UserAddressResponse updateUserAddress(UUID  addressId, UserAddressRequest request) {
-        UserAddress address = userAddressRepository.findById(addressId)
+        UserAddress address = userAddressRepository.findByIdAndDeleteAtIsNull(addressId)  // 삭제되지 않은 주소만 조회
                 .orElseThrow(() -> new IllegalArgumentException("배송지를 찾을 수 없습니다."));
 
         address.updateAddress(request.getAddressName(), request.getRecipientName(),
@@ -65,7 +65,7 @@ public class UserAddressService {
     // 배송지 삭제
     @Transactional
     public void deleteUserAddress(UUID  addressId) {
-        UserAddress address = userAddressRepository.findById(addressId)
+        UserAddress address = userAddressRepository.findByIdAndDeleteAtIsNull(addressId)  // 삭제되지 않은 주소만 조회
                 .orElseThrow(() -> new IllegalArgumentException("배송지를 찾을 수 없습니다."));
         String deletedBy = SecurityContextHolder.getContext().getAuthentication().getName();
         address.delete(deletedBy); // 소프트 삭제 처리
