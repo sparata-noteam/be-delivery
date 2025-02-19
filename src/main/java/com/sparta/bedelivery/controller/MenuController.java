@@ -7,6 +7,7 @@ import com.sparta.bedelivery.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class MenuController {
     private final MenuService menuService;
 
     // 7.1 메뉴 등록
+    @PreAuthorize("hasRole('OWNER')")
     @PostMapping("/menus")
     public ResponseEntity<ApiResponseData<CreateMenuResponseDto>> createMenu(@RequestBody CreateMenuRequestDto requestDto){
 
@@ -50,6 +52,7 @@ public class MenuController {
     }
 
     // 7.4 메뉴 수정
+    @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/menus/{menuId}")
     public ResponseEntity<ApiResponseData<CreateMenuResponseDto>> updateMenu(@PathVariable UUID menuId,
                                                             @RequestBody CreateMenuRequestDto requestDto) {
@@ -59,6 +62,7 @@ public class MenuController {
     }
 
     // 7.5 메뉴 삭제
+    @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/menus/{menuId}")
     public ResponseEntity<ApiResponseData<Void>> deleteMenu(@PathVariable UUID menuId) {
         menuService.deleteMenu(menuId);

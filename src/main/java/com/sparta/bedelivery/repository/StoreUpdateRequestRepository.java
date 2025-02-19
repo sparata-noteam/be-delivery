@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface StoreUpdateRequestRepository extends JpaRepository<StoreUpdateRequest, UUID> {
 
     List<StoreUpdateRequest> findByStore_Id(UUID storeId);
+
+    List<StoreUpdateRequest> findByStore_IdOrderByCreateAtDesc(UUID storeId);
 }

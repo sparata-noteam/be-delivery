@@ -150,6 +150,7 @@ public class StoreService {
         User.Role role = store_id.getUser().getRole();
         store_id.getUser().setRole(role);
         store_id.setStatus(Store.Status.DELETE);
+        store_id.delete("MASTER");
 
         storeRepository.save(store_id);
     }
