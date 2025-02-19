@@ -90,7 +90,7 @@ public class AdminControllerTest {
         // 로그인 후 Bearer Token 추출
         String token = loginResult.getResponse().getHeader("Authorization");
 
-        long userId = 13L;
+        long userId = 1L;
         mockMvc.perform(get("/api/admin/users/{userId}", userId)
                         .header("Authorization", token))  // 인증된 토큰 추가
                 .andExpect(status().isOk())
@@ -115,7 +115,7 @@ public class AdminControllerTest {
 
         // 로그인 후 Bearer Token 추출
         String token = loginResult.getResponse().getHeader("Authorization");
-        long userId = 13L;
+        long userId = 1L;
         mockMvc.perform(delete("/api/admin/users/{userId}", userId)
                         .header("Authorization", token))  // 인증된 토큰 추가
                 .andExpect(status().isOk())
@@ -139,7 +139,7 @@ public class AdminControllerTest {
         // 로그인 후 Bearer Token 추출
         String token = loginResult.getResponse().getHeader("Authorization");
 
-        long userId = 9L;
+        long userId = 1L;
         RoleUpdateRequest request = new RoleUpdateRequest();
         request.setRole("OWNER");
 

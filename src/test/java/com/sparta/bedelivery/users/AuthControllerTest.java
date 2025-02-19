@@ -33,19 +33,19 @@ public class AuthControllerTest {
 
     @BeforeEach
     public void setUp() {
-        userRegisterRequest = new UserRegisterRequest();
-        userRegisterRequest.setUserId("testuser1");
-        userRegisterRequest.setPassword("Password123@");
-        userRegisterRequest.setName("TestName");
-        userRegisterRequest.setNickName("testnick");
-        userRegisterRequest.setPhone("01012345679");
-
 //        userRegisterRequest = new UserRegisterRequest();
-//        userRegisterRequest.setUserId("admin");
-//        userRegisterRequest.setPassword("adminPassword1@");
-//        userRegisterRequest.setName("admin");
-//        userRegisterRequest.setNickName("admin");
-//        userRegisterRequest.setPhone("01012345688");
+//        userRegisterRequest.setUserId("testuser1");
+//        userRegisterRequest.setPassword("Password123@");
+//        userRegisterRequest.setName("TestName");
+//        userRegisterRequest.setNickName("testnick");
+//        userRegisterRequest.setPhone("01012345679");
+
+        userRegisterRequest = new UserRegisterRequest();
+        userRegisterRequest.setUserId("admin");
+        userRegisterRequest.setPassword("adminPassword1@");
+        userRegisterRequest.setName("admin");
+        userRegisterRequest.setNickName("admin");
+        userRegisterRequest.setPhone("01012345688");
     }
 
     @Test
