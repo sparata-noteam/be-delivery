@@ -175,13 +175,18 @@ public class OrderService {
                 Order.OrderStatus.COMPLETED);
 
         Order.OrderStatus orderStatus = order.getStatus();
-        Payment.Status status = payment.getStatus();
+        Payment.Status paymentStatus = payment.getStatus();
 
         // 결제 완료 상태에서 강제적으로 PENDING이나 CONFIRMED로 변경하려는 경우
         // 관리자 API이므로 강제로 처리하지만, 그로 인한 부작용을 관리해야 한다.
-        if (status == Payment.Status.PAID && orderStatusList.indexOf(nextStatus) < 2) {
+        if (paymentStatus == Payment.Status.PAID && orderStatusList.indexOf(nextStatus) < 2) {
             payment.initStatus();  // 결제 상태 초기화
             // 추가적으로 환불 처리 로직이 필요하다면 여기서 처리
+        }
+
+        // 결제 상태가 팬딩 상태이고 배달중인 경우에는 강제로 변경할 수 없다.
+        if (paymentStatus == Payment.Status.PENDING && nextStatus == Order.OrderStatus.DELIVERING) {
+            throw new IllegalArgumentException("결제 대기인 상태에서는 배달중으로 상태를 변경할 수 없습니다.");
         }
 
         // 무조건 비즈니스 흐름을 타도록 한다. 배달완료에서 주문대기로 바꿀 수는 없다.
