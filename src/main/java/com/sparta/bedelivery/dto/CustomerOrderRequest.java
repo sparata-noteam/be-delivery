@@ -1,12 +1,7 @@
 package com.sparta.bedelivery.dto;
 
 import com.sparta.bedelivery.entity.Order;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 public class CustomerOrderRequest {

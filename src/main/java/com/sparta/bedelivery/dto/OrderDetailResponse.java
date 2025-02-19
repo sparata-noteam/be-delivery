@@ -11,29 +11,28 @@ import java.util.UUID;
 
 @Getter
 public class OrderDetailResponse {
-    private UUID id;
-    private String userId;
-    private UUID storeId;
-    private String storeName;
-    private String userName;
-    private Order.OrderStatus status;
-    private BigDecimal totalPrice;
-    private String description;
-    private LocalDateTime orderedAt;
-    private List<OrderItemResponse> items;
-    private PaymentResponse payment;
+    private final UUID id;
+    private final String userId;
+    private final UUID storeId;
+    private final String storeName;
+    private final String userName;
+    private final Order.OrderStatus status;
+    private final BigDecimal totalPrice;
+    private final String description;
+    private final LocalDateTime orderedAt;
+    private final List<OrderItemResponse> items;
+    private final PaymentResponse payment;
 
     public OrderDetailResponse(Order order, Payment payment) {
         this.id = order.getId();
         this.userId = order.getUserId();
-        this.storeId = order.getStore();
-        this.storeName = "아무거나";
+        this.storeId = order.getStore().getId();
+        this.storeName = order.getStore().getName();
         this.userName = order.getUserId();
         this.status = order.getStatus();
         this.totalPrice = order.getTotalPrice();
         this.description = order.getDescription();
         this.orderedAt = order.getOrderedAt();
-
         this.items = order.getOrderItems().stream().map(OrderItemResponse::new).toList();
         this.payment = new PaymentResponse(payment);
     }

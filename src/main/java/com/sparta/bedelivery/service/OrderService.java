@@ -2,10 +2,7 @@ package com.sparta.bedelivery.service;
 
 import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.entity.*;
-import com.sparta.bedelivery.repository.MenuRepository;
-import com.sparta.bedelivery.repository.OrderRepository;
-import com.sparta.bedelivery.repository.PaymentRepository;
-import com.sparta.bedelivery.repository.UserRepository;
+import com.sparta.bedelivery.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -24,14 +20,13 @@ import java.util.UUID;
 public class OrderService {
     private final UserRepository userRepository;
     private final MenuRepository menuRepository;
+    private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
 
 
     @Transactional
     public CreateOrderResponse create(LoginUser loginUser, CreateOrderRequest createOrderRequest) {
-        BigDecimal totalPrice = BigDecimal.ZERO;
-
         // 계정찾기
         User user = userRepository.findByUserId(loginUser.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 계정은 존재하지 않습니다."));
@@ -39,32 +34,16 @@ public class OrderService {
         // 해당하는 메뉴를 찾는다.
         List<OrderItemRequest> items = createOrderRequest.getItem();
         List<UUID> allMenuIdList = items.stream().map(OrderItemRequest::getMenuId).toList();
+
+
         List<Menu> allMenuList = menuRepository.findAllById(allMenuIdList);
 
-        List<OrderCalculate> calculates = new ArrayList<>();
+        OrderCalculateSystem calculate = new OrderCalculateSystem(allMenuList);
+        List<OrderCalculate> calculates = calculate.start(items);
 
-        // 가격정보를 가져온뒤에 반영시킨다.
-        // 히든 처리된 상품은 가져오지 않는다.
-        for (OrderItemRequest orderItemRequest : createOrderRequest.getItem()) {
-            Menu menu = allMenuList.stream().filter(m ->
-                            m.getId().equals(orderItemRequest.getMenuId()))
-                    .filter(m -> !m.getIsHidden())
-                    .findFirst().orElse(null);
-
-            // 메뉴가 존재하지 않는 경우에는 무시한다.
-            if (menu == null) continue;
-
-            BigDecimal multiply = menu.getPrice().multiply(BigDecimal.valueOf(orderItemRequest.getAmount()));
-
-            // 메뉴를 넣는다.
-            calculates.add(new OrderCalculate(menu.getId().toString(),
-                    menu.getName(),
-                    multiply,
-                    orderItemRequest.getAmount()));
-            totalPrice = totalPrice.add(multiply);
-        }
-
-        Order order = new Order(createOrderRequest, totalPrice);
+        Order order = new Order(createOrderRequest, calculate.getTotalPrice());
+        Store store = storeRepository.findById(createOrderRequest.getStoreId()).orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
+        order.addStore(store);
         order.who(user.getUserId());
 
         order.addMenu(calculates.stream().map(OrderItem::new).toList());
@@ -78,32 +57,23 @@ public class OrderService {
 
         paymentRepository.save(new Payment(order));
 
-        return new CreateOrderResponse(orderResponse, "대충 아무거나");
+        return new CreateOrderResponse(orderResponse, store.getName());
     }
 
 
     public CustomerOrderResponse getCustomerOrderList(Pageable pageable, CustomerOrderRequest condition) {
         User user = userRepository.findByUserId(condition.getUserId()).orElseThrow(() -> new IllegalArgumentException("해당하는 계정이 존재하지 않습니다."));
-        Page<Order> allUsers = orderRepository.findAllUsers(pageable, condition);
+        Page<Order> allUsers = orderRepository.findAllOrdersByCustomer(pageable, condition);
         return new CustomerOrderResponse(allUsers);
     }
 
     public OwnerOrderListResponse getOwnerOrderList(Pageable pageable, OwnerOrderRequest condition) {
-
         Page<Order> allOrderForOwnerList = orderRepository.findAllOwner(pageable, condition);
-
         return new OwnerOrderListResponse(allOrderForOwnerList);
     }
 
 
-    public List<OwnerOrderResponse> getOwnerOrderList(UUID storeId) {
-        List<Order> orders = orderRepository.findByStore(storeId);
-        return orders.stream().map(OwnerOrderResponse::new).toList();
-    }
-
-
     public OrderDetailResponse getDetails(String orderId) {
-
         Order order = orderRepository.findById(UUID.fromString(orderId)).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다.")
         );
@@ -111,7 +81,7 @@ public class OrderService {
         Payment payment = paymentRepository.findByOrderId(UUID.fromString(orderId)).orElseThrow(() ->
                 new IllegalArgumentException("해당하는 결제가 존재하지 않습니다."));
 
-        return new OrderDetailResponse(order,payment);
+        return new OrderDetailResponse(order, payment);
     }
 
     @Transactional

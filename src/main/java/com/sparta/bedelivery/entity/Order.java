@@ -27,9 +27,9 @@ public class Order extends BaseSystemFieldEntity {
     @Column(nullable = false, length = 255)
     private String userId;
 
-    @Column
-    private UUID store;
-
+    @ManyToOne
+    @JoinColumn(name = "store_id")
+    private Store store;
 
     @Column(nullable = false, length = 255)
     private String address;
@@ -53,7 +53,7 @@ public class Order extends BaseSystemFieldEntity {
 
 
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_Id")
+    @JoinColumn(name = "order_id")
     private List<OrderItem> orderItems = new ArrayList<>();
 
     public Order() {
@@ -62,7 +62,6 @@ public class Order extends BaseSystemFieldEntity {
     public Order(CreateOrderRequest createOrderRequest, BigDecimal totalPrice) {
         this.address = createOrderRequest.getAddress();
         this.totalPrice = totalPrice;
-        this.store = UUID.fromString("248f20b9-6c9b-48e1-ba45-45959c10504e");
         this.status = OrderStatus.PENDING;
         this.orderType = OrderType.DELIVERY;
         this.orderedAt = LocalDateTime.now();
@@ -73,6 +72,9 @@ public class Order extends BaseSystemFieldEntity {
         this.userId = user;
     }
 
+    public void addStore(Store store) {
+        this.store = store;
+    }
     public void confirmOrder() {
         this.status = OrderStatus.CONFIRMED;
         this.orderType = OrderType.TAKEOUT;

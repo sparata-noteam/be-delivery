@@ -1,27 +1,19 @@
 package com.sparta.bedelivery.repository;
 
-import com.querydsl.core.QueryFactory;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.bedelivery.dto.AdminOrderCondition;
 import com.sparta.bedelivery.dto.CustomerOrderRequest;
-import com.sparta.bedelivery.dto.CustomerOrderResponse;
 import com.sparta.bedelivery.dto.OwnerOrderRequest;
 import com.sparta.bedelivery.entity.Order;
 import com.sparta.bedelivery.entity.QOrder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.query.JpaQueryCreator;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.BitSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +25,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
     private final JPAQueryFactory query;
 
     @Override
-    public Page<Order> findAllUsers(Pageable pageable, CustomerOrderRequest request) {
+    public Page<Order> findAllOrdersByCustomer(Pageable pageable, CustomerOrderRequest request) {
         String userId = request.getUserId();
 
 
@@ -42,6 +34,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         if (request.getStoreId() != null) {
             storeId = UUID.fromString(request.getStoreId());
         }
+
         List<Order> content = query.select(qOrder)
                 .where(qOrder.userId.eq(userId)
                         .and(qOrder.deleteAt.isNull())
@@ -127,6 +120,6 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
     }
 
     private Predicate checkStore(UUID storeId) {
-        return storeId == null ? null : qOrder.store.eq(storeId);
+        return storeId == null ? null : qOrder.store.id.eq(storeId);
     }
 }

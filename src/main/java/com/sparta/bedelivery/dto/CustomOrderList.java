@@ -17,7 +17,7 @@ public class CustomOrderList {
 
     public CustomOrderList(Order order) {
         this.id = order.getId();
-        this.storeId = order.getStore();
+        this.storeId = order.getStore().getId();
         this.status = order.getStatus();
         this.totalPrice = order.getTotalPrice();
         this.orderedAt = order.getOrderedAt();
