@@ -34,8 +34,7 @@ public class OrderService {
         // 해당하는 메뉴를 찾는다.
         List<OrderItemRequest> items = createOrderRequest.getItem();
         List<UUID> allMenuIdList = items.stream().map(OrderItemRequest::getMenuId).toList();
-
-
+        
         List<Menu> allMenuList = menuRepository.findAllById(allMenuIdList);
 
         OrderCalculateSystem calculate = new OrderCalculateSystem(allMenuList);
