@@ -5,13 +5,17 @@ import com.sparta.bedelivery.global.response.Code;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
@@ -59,6 +63,16 @@ public class GlobalExceptionHandler {
             return ApiResponseData.failure(500, "서버 내부 오류가 발생했습니다.");
         }
     }
+
+    // GlobalExceptionHandler 수정
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiResponseData<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ApiResponseData.failure(404, ex.getMessage());  // 예외 메시지 그대로 반환
+    }
+
+
+
 
 }
 

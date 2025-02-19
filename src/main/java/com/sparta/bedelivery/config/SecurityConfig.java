@@ -59,6 +59,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/login", "/api/users/register").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("MASTER")
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Swagger 경로에 대한 인증 허용
                         .requestMatchers("/error").permitAll() // 404 처리를 위해 Spring Boot의 기본 예외 처리 허용
                         .anyRequest().authenticated()
                 )
