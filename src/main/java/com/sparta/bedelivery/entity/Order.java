@@ -56,9 +56,6 @@ public class Order extends BaseSystemFieldEntity {
     @JoinColumn(name = "order_Id")
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "order")
-    private Payment payment;
-
     public Order() {
     }
 

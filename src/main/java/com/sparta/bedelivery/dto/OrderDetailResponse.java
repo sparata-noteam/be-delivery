@@ -23,7 +23,7 @@ public class OrderDetailResponse {
     private List<OrderItemResponse> items;
     private PaymentResponse payment;
 
-    public OrderDetailResponse(Order order) {
+    public OrderDetailResponse(Order order, Payment payment) {
         this.id = order.getId();
         this.userId = order.getUserId();
         this.storeId = order.getStore();
@@ -35,7 +35,6 @@ public class OrderDetailResponse {
         this.orderedAt = order.getOrderedAt();
 
         this.items = order.getOrderItems().stream().map(OrderItemResponse::new).toList();
-        //작업전
-        this.payment = new PaymentResponse(order.getPayment());
+        this.payment = new PaymentResponse(payment);
     }
 }

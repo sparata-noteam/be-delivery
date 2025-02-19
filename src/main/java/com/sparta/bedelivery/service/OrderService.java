@@ -111,7 +111,7 @@ public class OrderService {
         Payment payment = paymentRepository.findByOrderId(UUID.fromString(orderId)).orElseThrow(() ->
                 new IllegalArgumentException("해당하는 결제가 존재하지 않습니다."));
 
-        return new OrderDetailResponse(order);
+        return new OrderDetailResponse(order,payment);
     }
 
     @Transactional
