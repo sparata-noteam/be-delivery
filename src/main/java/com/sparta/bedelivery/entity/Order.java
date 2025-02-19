@@ -52,7 +52,7 @@ public class Order extends BaseSystemFieldEntity {
     private LocalDateTime orderedAt;
 
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "order_id")
     private List<OrderItem> orderItems = new ArrayList<>();
 
@@ -75,6 +75,7 @@ public class Order extends BaseSystemFieldEntity {
     public void addStore(Store store) {
         this.store = store;
     }
+
     public void confirmOrder() {
         this.status = OrderStatus.CONFIRMED;
         this.orderType = OrderType.TAKEOUT;
