@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -30,7 +31,9 @@ public class GlobalExceptionHandler {
 
 
     // 403 Forbidden 예외 처리
-    @ExceptionHandler(SecurityException.class)
+    //SecurityException : SECURITYCONFIG에서 처리하면 떨어짐
+    //AuthorizationDeniedException : 컨트롤러에서 @PreAuthorize 사용하면 떨어짐
+    @ExceptionHandler({SecurityException.class, AuthorizationDeniedException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiResponseData<String> handleAccessDeniedException() {
         return ApiResponseData.failure(403, "접근 권한이 없습니다.");
