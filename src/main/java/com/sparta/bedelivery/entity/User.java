@@ -55,6 +55,7 @@ public class User extends BaseSystemFieldEntity {
         this.name = request.getName();
         this.phone = request.getPhone();
         this.role = Role.fromString(null);
+        this.setCreateBy(request.getUserId());
     }
 
     public User(String userId) {
