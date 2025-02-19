@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,10 +24,10 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     // 404 Not Found 예외 처리
-    @ExceptionHandler(NoHandlerFoundException.class)
+    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponseData<String> handleNotFoundException() {
-        return ApiResponseData.failure(404, "요청한 API를 찾을 수 없습니다.");
+    public ApiResponseData<String> handleNotFoundException(Exception ex) {
+        return ApiResponseData.failure(404, "요청한 API를 찾을 수 없습니다.",ex.getMessage());
     }
 
 
