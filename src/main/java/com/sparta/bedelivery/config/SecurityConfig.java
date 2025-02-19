@@ -1,6 +1,5 @@
 package com.sparta.bedelivery.config;
 
-import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.security.JwtAuthenticationFilter;
 import com.sparta.bedelivery.security.JwtAuthorizationFilter;
 import com.sparta.bedelivery.security.JwtUtil;

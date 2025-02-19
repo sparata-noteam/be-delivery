@@ -24,9 +24,8 @@ public class Order extends BaseSystemFieldEntity {
     @Column(columnDefinition = "UUID", updatable = false, nullable = false)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false, length = 255)
+    private String userId;
 
     @Column
     private String store;
@@ -70,8 +69,8 @@ public class Order extends BaseSystemFieldEntity {
         this.description = createOrderRequest.getDescription();
     }
 
-    public void who(User user) {
-        this.user = user;
+    public void who(String user) {
+        this.userId = user;
     }
 
     public void confirmOrder() {
@@ -94,6 +93,8 @@ public class Order extends BaseSystemFieldEntity {
     public void addMenu(List<OrderItem> prepareOrderItems) {
         this.orderItems.addAll(prepareOrderItems);
     }
+
+
 
 
     public enum OrderStatus {

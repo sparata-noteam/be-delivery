@@ -28,7 +28,6 @@ public class AdminController {
 
     private final AdminService adminService;
     private final StoreService storeService;
-
 //    1. Spring Security가 SecurityContextHolder에서 현재 사용자의 Authentication 정보 확인
 //    2. getAuthorities()에서 ROLE_ADMIN이 있는지 체크
 //    3. 없으면 AccessDeniedException 발생 (403 Forbidden)
@@ -42,8 +41,7 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createAt") String sortBy,
             @RequestParam(defaultValue = "desc") String direction
-    )
-    {
+    ) {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        System.out.println("🔍 현재 SecurityContext 사용자: " + authentication.getPrincipal());
 //        System.out.println("🔍 현재 SecurityContext 권한: " + authentication.getAuthorities());
@@ -122,4 +120,6 @@ public class AdminController {
 
         return ResponseEntity.ok().body(ApiResponseData.success(createStore, "매장이 성공적으로 등록되었습니다."));
     }
+
+
 }

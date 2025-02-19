@@ -24,16 +24,16 @@ public class OrderDetailResponse {
 
     public OrderDetailResponse(Order order) {
         this.id = order.getId();
-        this.userId = order.getUser().getUserId();
+        this.userId = order.getUserId();
         this.storeId = order.getStore();
         this.storeName = "아무거나";
-        this.userName = order.getUser().getName();
+        this.userName = order.getUserId();
         this.status = order.getStatus();
         this.totalPrice = order.getTotalPrice();
         this.description = order.getDescription();
         this.orderedAt = order.getOrderedAt();
 
-        this.items = order.getOrderItems().stream().map(it -> new OrderItemResponse(it)).toList();
+        this.items = order.getOrderItems().stream().map(OrderItemResponse::new).toList();
         //작업전
         this.payment = null;
     }

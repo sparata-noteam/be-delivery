@@ -105,8 +105,8 @@ public class User extends BaseSystemFieldEntity {
     @JoinColumn(name = "user_address_id") // 한 명의 사용자는 여러 개의 주소를 관리한다.
     private List<UserAddress> userAddressList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<Order> orderList = new ArrayList<>();
+//    @OneToMany(mappedBy = "user")
+//    private List<Order> orderList = new ArrayList<>();
 
     @OneToMany
     @JoinColumn(name = "store_id")

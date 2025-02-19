@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
-    List<Order> findByUserId(Long userId);
+    List<Order> findByUserId(String userId);
 
     List<Order> findByStore(String store);
 }
