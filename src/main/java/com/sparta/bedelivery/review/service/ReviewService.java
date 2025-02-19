@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,37 +61,27 @@ public class ReviewService {
         return new ReviewCreateResponse(review);
     }
 
-    // 6.2 매장의 모든 리뷰 조회
-    @Transactional(readOnly = true)
-    public List<StoreReviewResponse> getStoreReivews(UUID storeId) {
+        // 6.2 매장의 모든 리뷰 조회
+        @Transactional(readOnly = true)
+        public Page<StoreReviewResponse> getStoreReviews(UUID storeId, int page, int size) {
 
-        List<Review> storeReviews = reviewRepository.findByStoreIdAndDeleteAtIsNull(storeId);
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+            Page<Review> storeReviews = reviewRepository.findByStoreIdAndDeleteAtIsNull(storeId, pageable);
 
-        List<StoreReviewResponse> reviewResponseList=new ArrayList<>(); //응답할 review들을 담은 리스트
-
-        // Review -> ReviewResponseDTO로 변환 후 리스트에 추가
-        for (Review storeReivew : storeReviews) {
-            reviewResponseList.add(new StoreReviewResponse(storeReivew));
+            return storeReviews.map(StoreReviewResponse::new);
         }
-        return reviewResponseList;
-    }
 
     // 6.3 사용자 리뷰 조회 - 유저가 작성한 모든 리뷰 조회
-    public List<UserReviewResponse> getUserReviews(String userId) {
-
+    @Transactional(readOnly = true)
+    public Page<UserReviewResponse> getUserReviews(String userId, int page, int size) {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        List<Review> userReviews = reviewRepository.findByUserIdAndDeleteAtIsNull(user.getId());
-        List<UserReviewResponse> userReviewResponseList = new ArrayList<>();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        //Review-> userReviewResponse로 변환후 리스트에 추가
-        for (Review userReview : userReviews) {
-            userReviewResponseList.add(new UserReviewResponse (userReview));
-        }
+        Page<Review> userReviews = reviewRepository.findByUserIdAndDeleteAtIsNull(user.getId(), pageable);
 
-        //리스트 반환
-        return userReviewResponseList;
+        return userReviews.map(UserReviewResponse::new);
     }
 
 

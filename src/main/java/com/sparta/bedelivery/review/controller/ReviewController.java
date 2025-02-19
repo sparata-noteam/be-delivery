@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,23 +36,35 @@ public class ReviewController {
     // 6.1 리뷰 작성
     @PostMapping
     public ResponseEntity<ApiResponseData<ReviewCreateResponse>> createReview(
-            @AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody ReviewCreateRequest reviewCreateRequest){
+            @AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody ReviewCreateRequest reviewCreateRequest)
+    {
         ReviewCreateResponse reviewCreateResponse = reviewService.createReview(userDetails.getUsername(), reviewCreateRequest);
         return ResponseEntity.ok(ApiResponseData.success(reviewCreateResponse,"리뷰가 작성 되었습니다."));
     }
 
     //6.2 매장 리뷰 조회
     @GetMapping("/{storeId}")
-    public ResponseEntity<ApiResponseData<List<StoreReviewResponse>>> getStoreReviews(@PathVariable UUID storeId){
-        return ResponseEntity.ok(ApiResponseData.success(reviewService.getStoreReivews(storeId),"정상적으로 조회 되었습니디ㅏ."));
+    public ResponseEntity<ApiResponseData<Page<StoreReviewResponse>>> getStoreReviews(
+            @PathVariable UUID storeId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size)
+    {
+        Page<StoreReviewResponse> reviews = reviewService.getStoreReviews(storeId, page, size);
+        return ResponseEntity.ok(ApiResponseData.success(reviews, "정상적으로 리뷰가 조회되었습니다."));
     }
 
 
     //6.3 사용자 리뷰 조회(사용자가 작성한 리뷰 전체 조회)
     @GetMapping
-    public ResponseEntity<ApiResponseData<List<UserReviewResponse>>> getUserReviews(@AuthenticationPrincipal UserDetails userDetails){
-        return ResponseEntity.ok(ApiResponseData.success(reviewService.getUserReviews(userDetails.getUsername()),"정상저긍로 조회 되었습니다."));
+    public ResponseEntity<ApiResponseData<Page<UserReviewResponse>>> getUserReviews(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+
+        Page<UserReviewResponse> reviews = reviewService.getUserReviews(userDetails.getUsername(), page, size);
+        return ResponseEntity.ok(ApiResponseData.success(reviews, "정상적으로 리뷰가 조회되었습니다."));
     }
+
 
     //6.4 사용자 리뷰 수정
     @PutMapping("/{reviewId}")
