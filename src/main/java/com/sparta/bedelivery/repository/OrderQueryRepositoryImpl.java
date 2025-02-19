@@ -6,8 +6,10 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.bedelivery.dto.AdminOrderCondition;
 import com.sparta.bedelivery.dto.CustomerOrderRequest;
 import com.sparta.bedelivery.dto.CustomerOrderResponse;
+import com.sparta.bedelivery.dto.OwnerOrderRequest;
 import com.sparta.bedelivery.entity.Order;
 import com.sparta.bedelivery.entity.QOrder;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.BitSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,6 +44,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         }
         List<Order> content = query.select(qOrder)
                 .where(qOrder.userId.eq(userId)
+                        .and(qOrder.deleteAt.isNull())
                         .and(checkStore(storeId))
                         .and(checkStatus(request.getStatus())))
                 .from(qOrder)
@@ -50,6 +54,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 
         JPAQuery<Long> countQuery = query.select(qOrder.count())
                 .where(qOrder.userId.eq(userId)
+                        .and(qOrder.deleteAt.isNull())
                         .and(checkStore(storeId))
                         .and(checkStatus(request.getStatus())))
                 .from(qOrder)
@@ -59,6 +64,62 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 
 
+    }
+
+    @Override
+    public Page<Order> findAllOwner(Pageable pageable, OwnerOrderRequest condition) {
+        UUID storeId = condition.getStoreId();
+        Order.OrderStatus status = condition.getStatus();
+        List<Order> content = query.select(qOrder)
+                .where(
+                        qOrder.deleteAt.isNull()
+                                .and(checkStore(storeId))
+                                .and(checkStatus(status)))
+                .from(qOrder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = query.select(qOrder.count())
+                .where(qOrder.deleteAt.isNull()
+                        .and(checkStore(storeId))
+                        .and(checkStatus(status)))
+                .from(qOrder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public Page<Order> findByAdmin(Pageable pageable, AdminOrderCondition condition) {
+        UUID storeId = null;
+
+        if (condition.getStoreId() != null) {
+            storeId = UUID.fromString(condition.getStoreId());
+        }
+
+        Order.OrderStatus status = condition.getStatus();
+        List<Order> content = query.select(qOrder)
+                .where(deletedCheck(condition.getIsDeleted()), checkStore(storeId), checkStatus(status))
+                .from(qOrder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = query.select(qOrder.count())
+                .where(deletedCheck(condition.getIsDeleted()), checkStore(storeId), checkStatus(status))
+                .from(qOrder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    private Predicate deletedCheck(Boolean isDeleted) {
+        return isDeleted == null ? null : isDeleted.equals(Boolean.TRUE)
+                ? qOrder.deleteAt.isNotNull()
+                : qOrder.deleteAt.isNull();
     }
 
     private Predicate checkStatus(Order.OrderStatus status) {

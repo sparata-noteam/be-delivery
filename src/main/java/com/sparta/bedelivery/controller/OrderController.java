@@ -75,9 +75,15 @@ public class OrderController {
 
     // 목록 조회 (점주용)
     @GetMapping("/store/{storeId}")
-    public ResponseEntity<List<OwnerOrderResponse>> getForOwner(@AuthenticationPrincipal UserDetails userDetails, @PathVariable String storeId) {
+    public ResponseEntity<ApiResponseData<OwnerOrderListResponse>> getForOwner(@AuthenticationPrincipal UserDetails userDetails, @PathVariable String storeId,
+                                                                @RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "10") int size,
+                                                                @RequestParam(required = false) Order.OrderStatus status) {
         LoginUser loginUser = new LoginUser(userDetails);
-        return ResponseEntity.ok(orderService.getOwnerOrderList(UUID.fromString(storeId)));
+        Pageable pageable = PageRequest.of(page, size);
+        OwnerOrderRequest request = new OwnerOrderRequest(storeId, status);
+
+        return ResponseEntity.ok(ApiResponseData.success(orderService.getOwnerOrderList(pageable, request)));
     }
 
     // 상세 조회 (점주용)

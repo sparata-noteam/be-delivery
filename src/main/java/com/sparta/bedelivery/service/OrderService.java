@@ -88,6 +88,13 @@ public class OrderService {
         return new CustomerOrderResponse(allUsers);
     }
 
+    public OwnerOrderListResponse getOwnerOrderList(Pageable pageable, OwnerOrderRequest condition) {
+
+        Page<Order> allOrderForOwnerList = orderRepository.findAllOwner(pageable, condition);
+
+        return new OwnerOrderListResponse(allOrderForOwnerList);
+    }
+
 
     public List<OwnerOrderResponse> getOwnerOrderList(UUID storeId) {
         List<Order> orders = orderRepository.findByStore(storeId);
@@ -230,11 +237,6 @@ public class OrderService {
         return new ChangeForceStatusResponse(nextStatus);
     }
 
-    public List<AdminOrderListResponse> getOrderList() {
-        List<Order> orders = orderRepository.findAll();
-        return orders.stream().map(AdminOrderListResponse::new).toList();
-    }
-
     @Transactional
     public Object deleteOrder(LoginUser loginUser, UUID orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문은 존재하지 않습니다."));
@@ -251,5 +253,8 @@ public class OrderService {
         return null;
     }
 
-
+    public AdminOrderListResponse getOrderList(Pageable pageable, AdminOrderCondition condition) {
+        Page<Order> orders = orderRepository.findByAdmin(pageable, condition);
+        return new AdminOrderListResponse(orders);
+    }
 }

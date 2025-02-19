@@ -8,6 +8,8 @@ import com.sparta.bedelivery.repository.OrderRepository;
 import com.sparta.bedelivery.repository.PaymentRepository;
 import com.sparta.bedelivery.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,8 +80,10 @@ public class PaymentService {
         return new PaymentCancelResponse(payment);
     }
 
-    public List<AdminPaymentResponse> adminPaymentList() {
-        return paymentRepository.findAll().stream().map(AdminPaymentResponse::new).toList();
+    public AdminPaymentListResponse adminPaymentList(Pageable pageable, AdminPaymentCondition condition) {
+
+        Page<Payment> payments = paymentRepository.findAllCondition(pageable, condition);
+        return new AdminPaymentListResponse(payments);
 
     }
 

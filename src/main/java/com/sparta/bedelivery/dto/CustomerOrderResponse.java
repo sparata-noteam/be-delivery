@@ -22,7 +22,7 @@ public class CustomerOrderResponse {
     public CustomerOrderResponse(Page<Order> orderPage) {
         this.totalCount = orderPage.getTotalElements();
         this.current = orderPage.getNumberOfElements();
-        this.orders = orderPage.getContent().stream().map(or ->  new CustomOrderList(or)).toList();
+        this.orders = orderPage.getContent().stream().map(CustomOrderList::new).toList();
 
     }
 }
