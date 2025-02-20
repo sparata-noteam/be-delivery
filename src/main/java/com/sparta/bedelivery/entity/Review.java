@@ -1,6 +1,6 @@
 package com.sparta.bedelivery.entity;
 
-import com.sparta.bedelivery.review.dto.ReviewCreateRequest;
+import com.sparta.bedelivery.dto.ReviewCreateRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,6 +39,11 @@ public class Review extends BaseSystemFieldEntity {
 
     @Column(columnDefinition = "TEXT")
     private String comment;
+
+    //todo- 필요한지 확인해보아야함
+    @ManyToOne
+    private Menu menu;
+
 
     public Review(ReviewCreateRequest reviewCreateRequest, User user, Order order, Store store) {
         this.user = user;

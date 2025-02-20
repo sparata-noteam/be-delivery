@@ -1,4 +1,4 @@
-package com.sparta.bedelivery.AIInteraction.dto;
+package com.sparta.bedelivery.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

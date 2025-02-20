@@ -1,6 +1,6 @@
-package com.sparta.bedelivery.AIInteraction.repository;
+package com.sparta.bedelivery.repository;
 
-import com.sparta.bedelivery.AIInteraction.entity.AIInteraction;
+import com.sparta.bedelivery.entity.AIInteraction;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 

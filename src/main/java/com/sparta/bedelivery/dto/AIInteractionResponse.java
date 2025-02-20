@@ -1,4 +1,4 @@
-package com.sparta.bedelivery.AIInteraction.dto;
+package com.sparta.bedelivery.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

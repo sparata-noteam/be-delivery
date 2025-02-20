@@ -1,14 +1,8 @@
-package com.sparta.bedelivery.AIInteraction.entity;
+package com.sparta.bedelivery.entity;
 
-import com.sparta.bedelivery.entity.BaseSystemFieldEntity;
-import com.sparta.bedelivery.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.util.UUID;
 import org.hibernate.annotations.UuidGenerator;

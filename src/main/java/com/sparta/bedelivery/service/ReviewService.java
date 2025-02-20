@@ -1,20 +1,18 @@
-package com.sparta.bedelivery.review.service;
+package com.sparta.bedelivery.service;
 
 import com.sparta.bedelivery.entity.Order;
 import com.sparta.bedelivery.entity.Review;
 import com.sparta.bedelivery.entity.Store;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.repository.OrderRepository;
+import com.sparta.bedelivery.repository.ReviewRepository;
 import com.sparta.bedelivery.repository.UserRepository;
-import com.sparta.bedelivery.review.dto.ReviewCreateRequest;
-import com.sparta.bedelivery.review.dto.ReviewModifyRequest;
-import com.sparta.bedelivery.review.dto.ReviewCreateResponse;
-import com.sparta.bedelivery.review.dto.ReviewModifyResponse;
-import com.sparta.bedelivery.review.dto.StoreReviewResponse;
-import com.sparta.bedelivery.review.dto.UserReviewResponse;
-import com.sparta.bedelivery.review.repository.ReviewRepository;
-import java.util.ArrayList;
-import java.util.List;
+import com.sparta.bedelivery.dto.ReviewCreateRequest;
+import com.sparta.bedelivery.dto.ReviewModifyRequest;
+import com.sparta.bedelivery.dto.ReviewCreateResponse;
+import com.sparta.bedelivery.dto.ReviewModifyResponse;
+import com.sparta.bedelivery.dto.StoreReviewResponse;
+import com.sparta.bedelivery.dto.UserReviewResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -50,7 +48,8 @@ public class ReviewService {
         Store store = order.getStore();
 
         // 주문 정보에 있는 유저와 요청하는 유저가 일치하지 않을 경우 예외 처리한다.
-        if(!order.getUser().equals(user)){
+
+        if(!order.getUserId().equals(user.getUserId())){
             throw new IllegalArgumentException("주문정보의 유자와 일치하지 않습니다.");
         }
 

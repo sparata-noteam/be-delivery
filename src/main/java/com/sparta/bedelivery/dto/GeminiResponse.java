@@ -1,4 +1,4 @@
-package com.sparta.bedelivery.AIInteraction.dto;
+package com.sparta.bedelivery.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;

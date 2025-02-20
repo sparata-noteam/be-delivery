@@ -1,15 +1,14 @@
-package com.sparta.bedelivery.review.controller;
+package com.sparta.bedelivery.controller;
 
 import com.sparta.bedelivery.global.response.ApiResponseData;
-import com.sparta.bedelivery.review.dto.ReviewCreateRequest;
-import com.sparta.bedelivery.review.dto.ReviewModifyRequest;
-import com.sparta.bedelivery.review.dto.ReviewCreateResponse;
-import com.sparta.bedelivery.review.dto.ReviewModifyResponse;
-import com.sparta.bedelivery.review.dto.StoreReviewResponse;
-import com.sparta.bedelivery.review.dto.UserReviewResponse;
-import com.sparta.bedelivery.review.service.ReviewService;
+import com.sparta.bedelivery.dto.ReviewCreateRequest;
+import com.sparta.bedelivery.dto.ReviewModifyRequest;
+import com.sparta.bedelivery.dto.ReviewCreateResponse;
+import com.sparta.bedelivery.dto.ReviewModifyResponse;
+import com.sparta.bedelivery.dto.StoreReviewResponse;
+import com.sparta.bedelivery.dto.UserReviewResponse;
+import com.sparta.bedelivery.service.ReviewService;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

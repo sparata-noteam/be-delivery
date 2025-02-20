@@ -1,4 +1,4 @@
-package com.sparta.bedelivery.review.dto;
+package com.sparta.bedelivery.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

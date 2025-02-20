@@ -1,4 +1,4 @@
-package com.sparta.bedelivery.review.dto;
+package com.sparta.bedelivery.dto;
 
 import com.sparta.bedelivery.entity.Review;
 import java.util.UUID;
