@@ -27,9 +27,9 @@ public class Order extends BaseSystemFieldEntity {
     @Column(nullable = false, length = 255)
     private String userId;
 
-    @Column
-    private String store;
-
+    @ManyToOne
+    @JoinColumn(name = "store_id")
+    private Store store;
 
     @Column(nullable = false, length = 255)
     private String address;
@@ -52,8 +52,8 @@ public class Order extends BaseSystemFieldEntity {
     private LocalDateTime orderedAt;
 
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_Id")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "order_id")
     private List<OrderItem> orderItems = new ArrayList<>();
 
     public Order() {
@@ -62,15 +62,18 @@ public class Order extends BaseSystemFieldEntity {
     public Order(CreateOrderRequest createOrderRequest, BigDecimal totalPrice) {
         this.address = createOrderRequest.getAddress();
         this.totalPrice = totalPrice;
-        this.store = "248f20b9-6c9b-48e1-ba45-45959c10504e";
         this.status = OrderStatus.PENDING;
-        this.orderType = OrderType.DELIVERY;
+        this.orderType = createOrderRequest.getType();
         this.orderedAt = LocalDateTime.now();
         this.description = createOrderRequest.getDescription();
     }
 
     public void who(String user) {
         this.userId = user;
+    }
+
+    public void addStore(Store store) {
+        this.store = store;
     }
 
     public void confirmOrder() {
@@ -88,13 +91,15 @@ public class Order extends BaseSystemFieldEntity {
 
     public void changeStatus(OrderStatus status) {
         this.status = status;
+        // 테이크 아웃인 경우에는 배달이 아닌 완료처리로 돌린다.
+        if (orderType == OrderType.TAKEOUT) {
+            this.status = OrderStatus.COMPLETED;
+        }
     }
 
     public void addMenu(List<OrderItem> prepareOrderItems) {
         this.orderItems.addAll(prepareOrderItems);
     }
-
-
 
 
     public enum OrderStatus {

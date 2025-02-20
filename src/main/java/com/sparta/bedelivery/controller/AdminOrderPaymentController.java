@@ -1,16 +1,19 @@
 package com.sparta.bedelivery.controller;
 
 import com.sparta.bedelivery.dto.*;
+import com.sparta.bedelivery.entity.Order;
+import com.sparta.bedelivery.entity.Payment;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.OrderService;
 import com.sparta.bedelivery.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,8 +25,16 @@ public class AdminOrderPaymentController {
 
     //4.8 전체 주문 목록 조회(관리자용)
     @GetMapping("/orders")
-    public ResponseEntity<ApiResponseData<List<AdminOrderListResponse>>> getOrders() {
-        return ResponseEntity.ok(ApiResponseData.success(orderService.getOrderList()));
+    public ResponseEntity<ApiResponseData<AdminOrderListResponse>> getOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Order.OrderStatus status,
+            @RequestParam(required = false) String storeId,
+            @RequestParam(required = false) Boolean isDeleted
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        AdminOrderCondition condition = new AdminOrderCondition(status, storeId, isDeleted);
+        return ResponseEntity.ok(ApiResponseData.success(orderService.getOrderList(pageable, condition)));
     }
 
     // 4.9 주문 상태 강제 변경 (관리자)
@@ -43,8 +54,16 @@ public class AdminOrderPaymentController {
 
     //    5.4 전체 결제 목록 조회
     @GetMapping("/payments")
-    public ResponseEntity<ApiResponseData<List<AdminPaymentResponse>>> getPayments() {
-        return ResponseEntity.ok(ApiResponseData.success(paymentService.adminPaymentList()));
+    public ResponseEntity<ApiResponseData<AdminPaymentListResponse>> getPayments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Payment.Status status,
+            @RequestParam(required = false) Payment.Method method,
+            @RequestParam(required = false) Boolean isDeleted
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        AdminPaymentCondition condition = new AdminPaymentCondition(status, method, isDeleted);
+        return ResponseEntity.ok(ApiResponseData.success(paymentService.adminPaymentList(pageable, condition)));
     }
 
     //5.5 특정 결제 상세 조회

@@ -2,18 +2,14 @@ package com.sparta.bedelivery.service;
 
 import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.entity.*;
-import com.sparta.bedelivery.repository.MenuRepository;
-import com.sparta.bedelivery.repository.OrderRepository;
-import com.sparta.bedelivery.repository.PaymentRepository;
-import com.sparta.bedelivery.repository.UserRepository;
+import com.sparta.bedelivery.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,14 +18,13 @@ import java.util.UUID;
 public class OrderService {
     private final UserRepository userRepository;
     private final MenuRepository menuRepository;
+    private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
 
 
     @Transactional
     public CreateOrderResponse create(LoginUser loginUser, CreateOrderRequest createOrderRequest) {
-        BigDecimal totalPrice = BigDecimal.ZERO;
-
         // 계정찾기
         User user = userRepository.findByUserId(loginUser.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("해당하는 계정은 존재하지 않습니다."));
@@ -37,32 +32,15 @@ public class OrderService {
         // 해당하는 메뉴를 찾는다.
         List<OrderItemRequest> items = createOrderRequest.getItem();
         List<UUID> allMenuIdList = items.stream().map(OrderItemRequest::getMenuId).toList();
+
         List<Menu> allMenuList = menuRepository.findAllById(allMenuIdList);
 
-        List<OrderCalculate> calculates = new ArrayList<>();
+        OrderCalculateSystem calculate = new OrderCalculateSystem(allMenuList);
+        List<OrderCalculate> calculates = calculate.start(items);
 
-        // 가격정보를 가져온뒤에 반영시킨다.
-        // 히든 처리된 상품은 가져오지 않는다.
-        for (OrderItemRequest orderItemRequest : createOrderRequest.getItem()) {
-            Menu menu = allMenuList.stream().filter(m ->
-                            m.getId().equals(orderItemRequest.getMenuId()))
-                    .filter(m -> !m.getIsHidden())
-                    .findFirst().orElse(null);
-
-            // 메뉴가 존재하지 않는 경우에는 무시한다.
-            if (menu == null) continue;
-
-            BigDecimal multiply = menu.getPrice().multiply(BigDecimal.valueOf(orderItemRequest.getAmount()));
-
-            // 메뉴를 넣는다.
-            calculates.add(new OrderCalculate(menu.getId().toString(),
-                    menu.getName(),
-                    multiply,
-                    orderItemRequest.getAmount()));
-            totalPrice = totalPrice.add(multiply);
-        }
-
-        Order order = new Order(createOrderRequest, totalPrice);
+        Order order = new Order(createOrderRequest, calculate.getTotalPrice());
+        Store store = storeRepository.findById(createOrderRequest.getStoreId()).orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
+        order.addStore(store);
         order.who(user.getUserId());
 
         order.addMenu(calculates.stream().map(OrderItem::new).toList());
@@ -76,32 +54,31 @@ public class OrderService {
 
         paymentRepository.save(new Payment(order));
 
-        return new CreateOrderResponse(orderResponse, "대충 아무거나");
+        return new CreateOrderResponse(orderResponse, store.getName());
     }
 
 
-    public List<CustomerOrderResponse> getCustomerOrderList(String userId) {
-        User user = userRepository.findByUserId(userId).orElseThrow(() -> new IllegalArgumentException("해당하는 계정이 존재하지 않습니다."));
-        List<Order> orders = orderRepository.findByUserId(user.getUserId());
-        return orders.stream().map(CustomerOrderResponse::new).toList();
+    public CustomerOrderResponse getCustomerOrderList(Pageable pageable, CustomerOrderRequest condition) {
+        User user = userRepository.findByUserId(condition.getUserId()).orElseThrow(() -> new IllegalArgumentException("해당하는 계정이 존재하지 않습니다."));
+        Page<Order> allUsers = orderRepository.findAllOrdersByCustomer(pageable, condition);
+        return new CustomerOrderResponse(allUsers);
     }
 
-
-    public List<OwnerOrderResponse> getOwnerOrderList(String storeId) {
-        List<Order> orders = orderRepository.findByStore(storeId);
-        return orders.stream().map(OwnerOrderResponse::new).toList();
+    public OwnerOrderListResponse getOwnerOrderList(Pageable pageable, OwnerOrderRequest condition) {
+        Page<Order> allOrderForOwnerList = orderRepository.findAllOwner(pageable, condition);
+        return new OwnerOrderListResponse(allOrderForOwnerList);
     }
 
 
     public OrderDetailResponse getDetails(String orderId) {
-
         Order order = orderRepository.findById(UUID.fromString(orderId)).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다.")
         );
 
-        //TODO: 결재 정보를 가져온다.
+        Payment payment = paymentRepository.findByOrderId(UUID.fromString(orderId)).orElseThrow(() ->
+                new IllegalArgumentException("해당하는 결제가 존재하지 않습니다."));
 
-        return new OrderDetailResponse(order);
+        return new OrderDetailResponse(order, payment);
     }
 
     @Transactional
@@ -158,80 +135,93 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderCancelResponse cancel(UUID orderId) {
+    public OrderCancelResponse cancel(LoginUser loginUser, UUID orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다."));
+        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new IllegalArgumentException("해단하는 결제는 존재하지 않습니다."));
         LocalDateTime orderTime = order.getOrderedAt().plusMinutes(5L);
         LocalDateTime now = LocalDateTime.now();
-        Order.OrderStatus status = order.getStatus();
 
-        if (status != Order.OrderStatus.PENDING) {
-            throw new IllegalArgumentException("주문은 대기 상태일때만 취소할 수 있습니다.");
+        // 고객은 결제대기 상태에서만 취소할수 있습니다.
+        if (loginUser.getRole() == User.Role.CUSTOMER &&
+            payment.getStatus() != Payment.Status.PENDING) {
+            throw new IllegalArgumentException("주문은 결제 대기 상태일때만 취소할 수 있습니다.");
         }
 
         if (now.isAfter(orderTime)) {
             throw new IllegalArgumentException("주문 생성후 5분이내에만 취소가 가능합니다.");
         }
 
+        //가게주인 or 직원이 주문 취소하는 경우
+        //환불처리한다.
+        if (List.of(User.Role.OWNER, User.Role.MANAGER).contains(loginUser.getRole())) {
+            payment.initStatus();
+        }
+
         // 주문 취소
         order.cancel();
 
         // 아이템 제거
-
         return new OrderCancelResponse(order);
     }
 
     @Transactional
     public ChangeForceStatusResponse forceChange(UUID orderId, Order.OrderStatus nextStatus) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문은 존재하지 않습니다."));
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 주문은 존재하지 않습니다."));
 
-        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제는 존재하지 않습니다."));
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 결제는 존재하지 않습니다."));
 
-        Order.OrderStatus currentStatus = order.getStatus();
+        List<Order.OrderStatus> orderStatusList = List.of(
+                Order.OrderStatus.PENDING,
+                Order.OrderStatus.CONFIRMED,
+                Order.OrderStatus.DELIVERING,
+                Order.OrderStatus.COMPLETED);
 
-        // 주문상태는 초기화가 가능합니다.
-        // 다만 결제 상태가 발생한 이후에는 배달과 배달 처리만 가능합니다.
-        LinkedList<Order.OrderStatus> orderStatusLinkedList = new LinkedList<>();
-        // 결제 이전에 바꿀 수 있음
-        orderStatusLinkedList.add(0, Order.OrderStatus.PENDING);
-        orderStatusLinkedList.add(1, Order.OrderStatus.CONFIRMED);
-        // 결제 이후 진행이 되어야 함
-        orderStatusLinkedList.add(2, Order.OrderStatus.DELIVERING);
-        orderStatusLinkedList.add(3, Order.OrderStatus.COMPLETED);
+        Order.OrderStatus orderStatus = order.getStatus();
+        Payment.Status paymentStatus = payment.getStatus();
 
-
-        Payment.Status currentPaymentStatus = payment.getStatus();
-        // 결제 대기상태 && 주문 대기, 주문확인으로 바꾸는게 가능합니다.
-        if (currentPaymentStatus == Payment.Status.PENDING && orderStatusLinkedList.indexOf(currentStatus) < 2) {
+        // 주문취소로 변경하고 싶은 경우
+        // 결제 상태가 아닐때
+        if (payment.getStatus() == Payment.Status.PENDING && nextStatus == Order.OrderStatus.CANCELLED) {
             order.changeStatus(nextStatus);
             return new ChangeForceStatusResponse(nextStatus);
         }
 
-        // 결제 상태 && 배달중, 완료상태인 경우에만 변경할 수 있습니다.
-        if (currentPaymentStatus == Payment.Status.PAID && orderStatusLinkedList.indexOf(currentStatus) > 1) {
-            order.changeStatus(nextStatus);
-            return new ChangeForceStatusResponse(nextStatus);
-        }
-
-        // 결제 상태가 진행중인데 주문대기로 초기화하는 경우
-        // TODO: 실제 환불처리는 일어나지 않습니다.
-        if (currentPaymentStatus == Payment.Status.PENDING && orderStatusLinkedList.indexOf(currentStatus) > 1) {
+        // 결제 상태일때 취소가 되어지는 경우
+        // 환불처리를 한다.
+        if (payment.getStatus() == Payment.Status.PAID && nextStatus == Order.OrderStatus.CANCELLED) {
             order.changeStatus(nextStatus);
             payment.initStatus();
             return new ChangeForceStatusResponse(nextStatus);
         }
 
-        //그 이외의 조건은 주문 상태값은 비즈니스 플로우가 적용되어집니다.
-        if (orderStatusLinkedList.indexOf(nextStatus) - orderStatusLinkedList.indexOf(currentStatus) != 1) {
-            throw new IllegalArgumentException("변경할 수 없는 주문 상태입니다. 주문을 다시 확인해주세요.");
+        // 결제 완료 상태에서 강제적으로 PENDING이나 CONFIRMED로 변경하려는 경우
+        // 관리자 API이므로 강제로 처리하지만, 그로 인한 부작용을 관리해야 한다.
+        if (paymentStatus == Payment.Status.PAID && orderStatusList.indexOf(nextStatus) < 2) {
+            payment.initStatus();  // 결제 상태 초기화
+            // 추가적으로 환불 처리 로직이 필요하다면 여기서 처리
         }
 
+        // 결제 상태가 팬딩 상태이고 배달중인 경우에는 강제로 변경할 수 없다.
+        if (paymentStatus == Payment.Status.PENDING && nextStatus == Order.OrderStatus.DELIVERING) {
+            throw new IllegalArgumentException("결제 대기인 상태에서는 배달중으로 상태를 변경할 수 없습니다.");
+        }
+
+        // 무조건 비즈니스 흐름을 타도록 한다. 배달완료에서 주문대기로 바꿀 수는 없다.
+        // 순차적으로 변경해야 된다.
+        int currentIndex = orderStatusList.indexOf(orderStatus);
+        int nextIndex = orderStatusList.indexOf(nextStatus);
+
+        if (Math.abs(currentIndex - nextIndex) != 1) {
+            throw new IllegalArgumentException(
+                    String.format("'%s' 상태에서는 '%s' 상태로 변경할 수 없습니다. 상태 변경은 순차적으로만 가능합니다.", orderStatus, nextStatus));
+        }
+
+        order.changeStatus(nextStatus);  // 상태 변경 수행
         return new ChangeForceStatusResponse(nextStatus);
     }
 
-    public List<AdminOrderListResponse> getOrderList() {
-        List<Order> orders = orderRepository.findAll();
-        return orders.stream().map(AdminOrderListResponse::new).toList();
-    }
 
     @Transactional
     public Object deleteOrder(LoginUser loginUser, UUID orderId) {
@@ -249,5 +239,8 @@ public class OrderService {
         return null;
     }
 
-
+    public AdminOrderListResponse getOrderList(Pageable pageable, AdminOrderCondition condition) {
+        Page<Order> orders = orderRepository.findByAdmin(pageable, condition);
+        return new AdminOrderListResponse(orders);
+    }
 }
