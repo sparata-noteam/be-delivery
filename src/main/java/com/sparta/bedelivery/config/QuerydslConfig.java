@@ -6,10 +6,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class QueryDslConfig {
+public class QuerydslConfig {
+
     private final EntityManager entityManager;
 
-    public QueryDslConfig(EntityManager entityManager) {
+    public QuerydslConfig(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
