@@ -1,32 +1,30 @@
+
 package com.sparta.bedelivery.global.exception;
 
 import com.sparta.bedelivery.global.response.ApiResponseData;
-import com.sparta.bedelivery.global.response.Code;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
     // 404 Not Found 예외 처리
-    @ExceptionHandler(NoHandlerFoundException.class)
+    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiResponseData<String> handleNotFoundException() {
-        return ApiResponseData.failure(404, "요청한 API를 찾을 수 없습니다.");
+    public ApiResponseData<String> handleNotFoundException(Exception ex) {
+        return ApiResponseData.failure(404, "요청한 API를 찾을 수 없습니다.",ex.getMessage());
     }
 
 
@@ -45,6 +43,19 @@ public class GlobalExceptionHandler {
     public ApiResponseData<String> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         String message = ex.getMessage();
         return ApiResponseData.failure(400, message);
+    }
+
+    // 데이터 무결성 오류 (잘못된 입력)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)  // HTTP 400 - 잘못된 요청
+    public ApiResponseData<String> handleDataIntegrityViolationException(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(fieldError -> fieldError.getDefaultMessage())  // 디폴트 메시지 추출
+                .findFirst()  // 첫 번째 메시지만 추출
+                .orElse("유효성 검사 실패");  // 만약 메시지가 없다면 기본 메시지
+        return ApiResponseData.failure(400, errorMessage, ex.getMessage());
     }
 
     // 공통적인 500 Internal Server Error 처리
@@ -78,4 +89,3 @@ public class GlobalExceptionHandler {
 
 
 }
-

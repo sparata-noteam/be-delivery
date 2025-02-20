@@ -1,6 +1,8 @@
 package com.sparta.bedelivery.controller;
 
-import com.sparta.bedelivery.dto.*;
+import com.sparta.bedelivery.dto.ChangePasswordRequest;
+import com.sparta.bedelivery.dto.UserRegisterRequest;
+import com.sparta.bedelivery.dto.UserResponse;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.AuthService;
@@ -10,12 +12,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.ErrorResponse;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
@@ -37,7 +39,6 @@ public class AuthController {
         ApiResponseData<UserResponse> response = ApiResponseData.success(userResponse);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
-
 
     // 1.3 로그아웃 (JWT 기반이라 서버에서 별도 로직 없음)
     @Operation(summary = "로그아웃", description = "JWT 기반 로그아웃 처리")

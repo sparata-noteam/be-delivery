@@ -1,42 +1,49 @@
 package com.sparta.bedelivery.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.bedelivery.dto.CreateMenuRequestDto;
 import com.sparta.bedelivery.dto.CreateMenuResponseDto;
 import com.sparta.bedelivery.repository.MenuImageRepository;
 import com.sparta.bedelivery.repository.MenuRepository;
 import com.sparta.bedelivery.repository.StoreRepository;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
+@Slf4j
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS) // 테스트 인스턴스의 생성 단위를 클래스로 변경
+@Transactional
 class MenuServiceTest {
 
-    @Mock
+    @Autowired
     private MenuRepository menuRepository;
-    @Mock
+    @Autowired
     private StoreRepository storeRepository;
-    @Mock
+    @Autowired
     private MenuImageRepository menuImageRepository;
-
-    @InjectMocks
+    @Autowired
     private MenuService menuService;
+
+    ObjectMapper objectMapper;
 
     @Test
     @DisplayName("메뉴 등록 하기")
     void createMenu() {
 
-        UUID storeId = UUID.fromString("61f38e8e-7373-4009-825e-3b5a7b32cd80");
+        UUID storeId = UUID.fromString("633f5edf-9602-4cf8-b5fd-e8b0dfacf175");
 
         CreateMenuRequestDto requestDto = new CreateMenuRequestDto();
         requestDto.setStoreId(storeId);
@@ -45,8 +52,6 @@ class MenuServiceTest {
         requestDto.setDescription("메뉴 설명");
         requestDto.setIsHidden(false);
         CreateMenuResponseDto responseDto = menuService.createMenu(requestDto);
-
-//        given(storeRepository.findById(storeId)).willReturn(Optional.of());
 
         System.out.printf("responseDto: %s\n", responseDto);
     }
