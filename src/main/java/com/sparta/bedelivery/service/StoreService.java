@@ -137,12 +137,6 @@ public class StoreService {
     // 전체 매장 목록 조회 (관리자용)
     public List<StoreStatusResponseDto> findAllStores(String userId) {
         User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        if (user.getRole() != User.Role.MASTER) {
-            throw new IllegalArgumentException("관리자 권한을 가진 계정이 아닙니다.");
-        }
-
-        User user = userRepository.findByUserId(userId)
                 .orElseThrow(()->new IllegalArgumentException("유저를 찾을 수 없습니다."));
         if(user.getRole()!= User.Role.MASTER){
             throw new IllegalArgumentException("권한이 없습니다.");
