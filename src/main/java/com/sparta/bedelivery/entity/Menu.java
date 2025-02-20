@@ -1,10 +1,7 @@
 package com.sparta.bedelivery.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
@@ -17,6 +14,7 @@ import java.util.UUID;
 @Setter
 @Table(name = "p_menus")
 @NoArgsConstructor
+@AllArgsConstructor
 public class Menu extends BaseSystemFieldEntity {
 
     @Id

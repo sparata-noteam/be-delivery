@@ -89,5 +89,4 @@ public class Store extends BaseSystemFieldEntity {
 
     @OneToMany(mappedBy = "store") // store 와 order 는 1 : N 양방향 관계
     private List<Order> orderList = new ArrayList<>();
-
 }

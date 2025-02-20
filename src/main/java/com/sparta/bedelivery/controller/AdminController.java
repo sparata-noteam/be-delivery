@@ -1,8 +1,12 @@
 package com.sparta.bedelivery.controller;
 
-import com.sparta.bedelivery.dto.*;
+import com.sparta.bedelivery.dto.RoleUpdateRequest;
+import com.sparta.bedelivery.dto.UserResponse;
 import com.sparta.bedelivery.global.response.ApiResponseData;
+import com.sparta.bedelivery.dto.AdminReviewResponse;
 import com.sparta.bedelivery.service.AdminService;
+import java.util.UUID;
+import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,13 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -77,6 +77,7 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponseData.success(null, "User role updated successfully"));
     }
 
+// ================================================= 매 장 ==========================================================
 
     // 3.6 전체 매장 목록 조회 (관리자용)
     @GetMapping("/stores/{userId}")
@@ -121,5 +122,25 @@ public class AdminController {
         return ResponseEntity.ok().body(ApiResponseData.success(createStore, "매장이 성공적으로 등록되었습니다."));
     }
 
+// ================================================= 리 뷰 ==========================================================
+
+    //6.6 전체 리뷰 조회
+    @Operation(summary = "전체 리뷰 조회(관리자)", description = "관리자가 전체 리뷰를 최신순으로 조회 합니다.")
+    @GetMapping("/admin/reviews")
+    public ResponseEntity<ApiResponseData<Page<AdminReviewResponse>>> getAllReviews(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+
+        Page<AdminReviewResponse> reviews = adminService.getAllReviews(page, size);
+        return ResponseEntity.ok(ApiResponseData.success(reviews, "전체 리뷰가 조회되었습니다."));
+    }
+
+    //6.7 특정 리뷰 삭제
+    @DeleteMapping("/admin/{reviewId}")
+    @Operation(summary = "특정 리뷰 삭제(관리자)", description = "관리자가 특정 리뷰를 삭제합니다.")
+    public ResponseEntity<ApiResponseData<String>> deleteReviewByAdmin(@PathVariable UUID reviewId) {
+        adminService.deleteReviewByAdmin(reviewId);
+        return ResponseEntity.ok(ApiResponseData.success(null, "관리자가 리뷰를 삭제했습니다."));
+    }
 
 }

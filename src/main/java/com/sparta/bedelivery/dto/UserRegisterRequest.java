@@ -27,7 +27,7 @@ public class UserRegisterRequest { //회원가입 요청
 
     @NotBlank(message = "닉네임은 필수 입력 값입니다.")
     private String nickName;
-//
+
     @NotBlank(message = "전화번호는 필수 입력 값입니다.")
     @Pattern(
             regexp = "^010\\d{8}$",

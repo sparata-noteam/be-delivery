@@ -2,21 +2,19 @@ package com.sparta.bedelivery.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Getter
-@Setter
+@NoArgsConstructor
 @Table(name = "p_ai_interactions")
 public class AIInteraction extends BaseSystemFieldEntity {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(columnDefinition = "UUID", updatable = false, nullable = false)
+    @UuidGenerator
     private UUID id;
 
     @ManyToOne
@@ -28,5 +26,12 @@ public class AIInteraction extends BaseSystemFieldEntity {
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String responseText;
+
+    public AIInteraction(User user, String queryText, String responseText){
+        this.user=user;
+        this.queryText=queryText;
+        this.responseText=responseText;
+    }
+
 }
 

@@ -1,33 +1,21 @@
 spring:
+  sql:
+    init:
+      mode: always
+      schema-locations: "classpath:db/schema.sql"
+
+#     data-locations: "classpath:db/data.sql"
   datasource:
     url: jdbc:postgresql://localhost:5432/bedelivery
     username: postgres
     password: root
     driver-class-name: org.postgresql.Driver
-  sql:
-    init:
-      mode: always
-      schema-locations: "classpath:db/schema.sql"
-      data-locations: "classpath:db/data.sql"
   jpa:
-    show-sql: true
-    database: postgresql
     hibernate:
       ddl-auto: update
-  mvc:
-    problemdetails:
-      enabled: true  # Spring Boot 3.x에서 기본 에러 핸들링 활성화
-  web:
-    resources:
-      add-mappings: false  # 정적 리소스 매핑 비활성화 (404 처리를 위해)
 jwt:
   secret: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==
 
-springdoc:
-  api-docs:
-    enabled: true
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
-
-
+gemini:
+  api:
+    key: AISyAKb8auABdpFsCf7qSoePJOPdZr8PkTmoM

@@ -27,7 +27,6 @@ public class MenuService {
 
     private final MenuImageRepository menuImageRepository;
 
-
     @Transactional
     public CreateMenuResponseDto createMenu(CreateMenuRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())
