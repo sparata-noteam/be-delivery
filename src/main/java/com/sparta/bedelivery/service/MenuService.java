@@ -11,6 +11,7 @@ import com.sparta.bedelivery.repository.StoreRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class MenuService {
 
     private final MenuImageRepository menuImageRepository;
 
+    @Transactional
     public CreateMenuResponseDto createMenu(CreateMenuRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())
                 .orElseThrow(() -> new RuntimeException("매장을 찾을 수 없습니다."));
@@ -76,6 +78,7 @@ public class MenuService {
         throw new RuntimeException("해당 메뉴는 없습니다.");
     }
 
+    @Transactional
     public CreateMenuResponseDto updateMenu(UUID menuId, CreateMenuRequestDto requestDto) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new EntityNotFoundException("Menu not found with ID: " + menuId));
@@ -106,6 +109,7 @@ public class MenuService {
         return new CreateMenuResponseDto(menu);
     }
 
+    @Transactional
     public void deleteMenu(UUID menuId) {
         Menu menu = menuRepository.findById(menuId).orElseThrow(RuntimeException::new);
 

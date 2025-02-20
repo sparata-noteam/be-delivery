@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class StoreService {
 
     private final StoreUpdateRequestRepository storeUpdateRequestRepository;
 
+    @Transactional
     public StoreResponseDto createStoreRequest(StoreRequestDto requestDto, String userId) {
         // 1. IndustryCategory 조회
         IndustryCategory industryCategory = industryCategoryRepository.findById(requestDto.getIndustryCategoryId())
@@ -78,7 +80,7 @@ public class StoreService {
                 .map(StoreResponseDto::new)
                 .toList();
     }
-
+//    @Transactional(readOnly = true)
     public List<StoreDetailsResponseDto> getAllStores(UUID storeId) {
 
         Store store = storeRepository.findById(storeId)
@@ -88,7 +90,7 @@ public class StoreService {
         }
         throw new EntityNotFoundException("영업 중인 매장이 없습니다.");
     }
-
+    @Transactional
     public StoreStatusResponseDto deleteStoreRequest(UUID storeId) {
         Store status = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("Store not found with ID: " + storeId));
@@ -96,12 +98,14 @@ public class StoreService {
         if (status.getStatus() == Store.Status.DELETE) {
             throw new EntityNotFoundException("Store is deleted");
         }
+        status.delete("MASTER");
         status.setStatus(Store.Status.DELETE_REQUESTED);
         storeRepository.save(status);
 
         return new StoreStatusResponseDto(status);
     }
 
+    @Transactional
     public StoreStatusResponseDto updateStoreRequest(UUID storeId, StoreUpdateRequestDto requestDto) {
         Store status = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("Store not found with ID: " + storeId));
@@ -138,15 +142,22 @@ public class StoreService {
             throw new IllegalArgumentException("관리자 권한을 가진 계정이 아닙니다.");
         }
 
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(()->new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        if(user.getRole()!= User.Role.MASTER){
+            throw new IllegalArgumentException("권한이 없습니다.");
+        }
+
         List<Store> store = storeRepository.findAll();
 
-        List<StoreStatusResponseDto> storeAll = store.stream()
+        List<StoreStatusResponseDto> responseDtoList = store.stream()
                 .map(StoreStatusResponseDto::new)
                 .toList();
 
-        return storeAll;
+        return responseDtoList;
     }
 
+    @Transactional
     public void deleteStore(UUID storeId) {
         Store store_id = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("Store not found with ID: " + storeId));
@@ -161,11 +172,13 @@ public class StoreService {
 
         store_id.delete(String.valueOf(User.Role.MASTER));
         store_id.setStatus(Store.Status.DELETE);
+        store_id.delete("MASTER");
 
         storeRepository.save(store_id);
     }
 
     // 매장 등록, 삭제 승인
+    @Transactional
     public StoreStatusResponseDto approveStore(UUID storeId) {
         Store current_status = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("Store not found with ID: " + storeId));
@@ -191,33 +204,29 @@ public class StoreService {
         return new StoreStatusResponseDto(current_status);
     }
 
+    @Transactional
     public StoreStatusResponseDto updateStore(UUID storeId) {
-
         List<StoreUpdateRequest> updateRequests = storeUpdateRequestRepository.findByStore_IdOrderByCreateAtDesc(storeId);
 
         if (updateRequests.isEmpty()) {
             throw new RuntimeException("수정 요청을 시도한 매장이 존재하지 않습니다.");
         }
-        StoreUpdateRequest latestUpdateRequest = updateRequests.get(0);
-        Store updateStore = latestUpdateRequest.getStore();
+        StoreUpdateRequest updateRequest = updateRequests.get(0); // 최신 요청만 처리
+        Store updateStore = updateRequest.getStore();
 
         updateStore.update(
-                latestUpdateRequest.getName(),
-                latestUpdateRequest.getAddress(),
-                latestUpdateRequest.getPhone(),
-                latestUpdateRequest.getImageUrl()
+                updateRequest.getName(), updateRequest.getAddress(),
+                updateRequest.getPhone(), updateRequest.getImageUrl()
         );
-        latestUpdateRequest.setStatus(Store.Status.COMPLETED);
-
+        updateRequest.setStatus(Store.Status.COMPLETED);
         updateStore.setStatus(Store.Status.UPDATED);
 
         storeRepository.save(updateStore);
-        storeUpdateRequestRepository.save(latestUpdateRequest);
 
         return new StoreStatusResponseDto(updateStore);
     }
 
-
+    @Transactional
     public CreateStoreResponseDto createStore(CreateStoreRequestDto requestDto) {
         // 1. IndustryCategory 조회
         IndustryCategory industryCategory = industryCategoryRepository.findById(requestDto.getIndustryCategoryId())

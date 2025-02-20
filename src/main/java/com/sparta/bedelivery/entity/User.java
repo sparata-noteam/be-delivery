@@ -109,6 +109,6 @@ public class User extends BaseSystemFieldEntity {
 //    private List<Order> orderList = new ArrayList<>();
 
     @OneToMany
-    @JoinColumn(name = "store_id")
+//    @JoinColumn(name = "store_id")
     private List<Store> storeList = new ArrayList<>();
 }
