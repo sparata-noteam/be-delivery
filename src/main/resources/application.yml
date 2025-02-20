@@ -3,7 +3,8 @@ spring:
     init:
       mode: always
       schema-locations: "classpath:db/schema.sql"
-#      data-locations: "classpath:db/data.sql"
+
+#     data-locations: "classpath:db/data.sql"
   datasource:
     url: jdbc:postgresql://localhost:5432/bedelivery
     username: postgres
@@ -14,3 +15,7 @@ spring:
       ddl-auto: update
 jwt:
   secret: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==
+
+gemini:
+  api:
+    key: AISyAKb8auABdpFsCf7qSoePJOPdZr8PkTmoM

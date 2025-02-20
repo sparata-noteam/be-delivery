@@ -1,5 +1,7 @@
 package com.sparta.bedelivery.config;
 
+
+import com.sparta.bedelivery.entity.User.Role;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.security.JwtAuthenticationFilter;
@@ -55,9 +57,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/login", "/api/users/register").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("MASTER")
+                        .requestMatchers("/api/admin/**").hasRole("MASTER") // URL 패턴에서도 권한 설정
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Swagger 경로에 대한 인증 허용
                         .requestMatchers("/error").permitAll() // 404 처리를 위해 Spring Boot의 기본 예외 처리 허용
+                        .requestMatchers("/api/reviews/**").hasRole(Role.CUSTOMER.name())
+                        .requestMatchers("/api/reviews/stores/**").permitAll()
+
+
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
