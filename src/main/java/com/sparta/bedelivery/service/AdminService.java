@@ -5,15 +5,20 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.bedelivery.dto.RoleUpdateRequest;
 import com.sparta.bedelivery.dto.UserResponse;
-import com.sparta.bedelivery.entity.QUser;
+import com.sparta.bedelivery.entity.Review;
 import com.sparta.bedelivery.entity.User;
+import com.sparta.bedelivery.repository.ReviewRepository;
 import com.sparta.bedelivery.repository.UserRepository;
-import jakarta.persistence.EntityManager;
+import com.sparta.bedelivery.dto.AdminReviewResponse;
+import java.util.UUID;
+import com.sparta.bedelivery.entity.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +32,8 @@ import java.util.stream.Collectors;
 public class AdminService {
 
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
     private final JPAQueryFactory queryFactory;
-
 
 
     // 사용자 목록 조회
@@ -90,6 +95,32 @@ public class AdminService {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("잘못된 역할 값입니다: " + request.getRole());
         }
+    }
+
+    // 리뷰 전체 조회
+    @Transactional(readOnly = true)
+    public Page<AdminReviewResponse> getAllReviews(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Review> reviews = reviewRepository.findAllByDeleteAtIsNull(pageable);
+        return reviews.map(AdminReviewResponse::new);
+    }
+
+    // 특정 리뷰 삭제
+    @Transactional
+    public void deleteReviewByAdmin(UUID reviewId) {
+        // 리뷰 존재 여부 확인
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다."));
+
+        // 이미 삭제된 리뷰인지 확인
+        if (review.getDeleteAt() != null) {
+            throw new IllegalArgumentException("이미 삭제된 리뷰입니다.");
+        }
+
+        // 소프트 삭제 처리
+        String deletedBy = SecurityContextHolder.getContext().getAuthentication().getName();
+        review.delete(deletedBy);
+        reviewRepository.save(review);
     }
 
 }
