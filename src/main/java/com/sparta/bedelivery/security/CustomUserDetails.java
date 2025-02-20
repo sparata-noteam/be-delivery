@@ -4,9 +4,7 @@ import com.sparta.bedelivery.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.management.relation.Relation;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
@@ -15,7 +13,7 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(User user) {
         this.user = user;
     }
-    public User  getUser() {
+    public User getUser() {
         return user;
     }
 

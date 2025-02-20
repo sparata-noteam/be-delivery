@@ -15,9 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -34,39 +31,36 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = getTokenFromRequest(request);
 
+        // 토큰이 유효하면 인증 정보 설정
         if (token != null && jwtUtil.validateToken(token)) {
             Claims claims = jwtUtil.parseToken(token);
-//            String username = claims.getSubject();
-//
-//            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-//            System.out.println("User Authorities: " + userDetails.getAuthorities());
-//            UsernamePasswordAuthenticationToken authenticationToken =
-//                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-//
-//            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             String role = jwtUtil.extractRole(token);
             String userId = claims.getSubject();
 
+            // 토큰에서 사용자 정보 또는 역할을 찾을 수 없으면 예외 처리
             if (role == null || userId == null) {
                 throw new RuntimeException("토큰에서 사용자 정보 또는 역할을 찾을 수 없습니다.");
             }
+
+            // UserDetails를 가져와서 권한 설정
             UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
             List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
-//            System.out.println("SecurityContext에 저장할 권한: " + authorities);
 
+            // 인증 정보 설정
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
         }
 
+        // 다음 필터로 요청을 전달
         filterChain.doFilter(request, response);
     }
 
+    // 요청에서 토큰 추출
     private String getTokenFromRequest(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);
+            return header.substring(7);  // "Bearer " 이후의 토큰만 추출
         }
         return null;
     }

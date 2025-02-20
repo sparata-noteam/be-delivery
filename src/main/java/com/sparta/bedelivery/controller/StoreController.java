@@ -29,6 +29,7 @@ public class StoreController {
     }
 
     // 3.2 전체 매장 목록 조회 OPEN 상태의 매장만 조회 가능.
+    @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/stores")
     public ResponseEntity<ApiResponseData<List<StoreResponseDto>>> findOpenStores() {
 

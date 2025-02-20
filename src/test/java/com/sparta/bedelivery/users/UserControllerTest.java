@@ -47,8 +47,8 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/me")
                         .header("Authorization", token))  // 인증된 토큰 추가
                 .andExpect(MockMvcResultMatchers.status().isOk())  // 200 OK
-                .andExpect(MockMvcResultMatchers.jsonPath("$.userId").value("testuser1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.role").value("CUSTOMER"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.userId").value("testuser1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.role").value("CUSTOMER"));
     }
 
     @Test
@@ -78,8 +78,8 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userUpdateRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())  // 200 OK
-                .andExpect(MockMvcResultMatchers.jsonPath("$.nickName").value("UpdatedNickname"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phone").value("01098745635"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickName").value("UpdatedNickname"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.phone").value("01098745635"));
     }
 
     @Test
@@ -102,6 +102,6 @@ public class UserControllerTest {
         mockMvc.perform(delete("/api/users/me")
                         .header("Authorization", token))  // 인증된 토큰 추가
                 .andExpect(MockMvcResultMatchers.status().isOk())  // 200 OK
-                .andExpect(MockMvcResultMatchers.jsonPath("$").value("testuser1 계정이 삭제되었습니다."));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").value("testuser1 계정이 삭제되었습니다."));
     }
 }
