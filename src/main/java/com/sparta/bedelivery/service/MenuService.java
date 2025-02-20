@@ -31,7 +31,7 @@ public class MenuService {
     @Transactional
     public CreateMenuResponseDto createMenu(CreateMenuRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())
-                .orElseThrow(() -> new RuntimeException("매장을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("매장을 찾을 수 없습니다."));
 
         // 메뉴 생성
         Menu menu = Menu.builder()
@@ -71,18 +71,18 @@ public class MenuService {
     }
 
     public CreateMenuResponseDto findMenus(UUID menuId) {
-        Menu menu = menuRepository.findById(menuId).orElseThrow(RuntimeException::new);
+        Menu menu = menuRepository.findById(menuId).orElseThrow(IllegalArgumentException::new);
 
         if (!menu.getIsHidden()) {
             return new CreateMenuResponseDto(menu);
         }
-        throw new RuntimeException("해당 메뉴는 없습니다.");
+        throw new IllegalArgumentException("해당 메뉴는 없습니다.");
     }
 
     @Transactional
     public CreateMenuResponseDto updateMenu(UUID menuId, CreateMenuRequestDto requestDto) {
         Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new EntityNotFoundException("Menu not found with ID: " + menuId));
+                .orElseThrow(() -> new IllegalArgumentException("Menu not found with ID: " + menuId));
 
 
         menu.setName(requestDto.getName());
@@ -112,7 +112,7 @@ public class MenuService {
 
     @Transactional
     public void deleteMenu(UUID menuId) {
-        Menu menu = menuRepository.findById(menuId).orElseThrow(RuntimeException::new);
+        Menu menu = menuRepository.findById(menuId).orElseThrow(IllegalArgumentException::new);
 
         menu.setIsHidden(true);
         menuRepository.save(menu);

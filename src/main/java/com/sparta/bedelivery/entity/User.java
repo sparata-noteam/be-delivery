@@ -54,7 +54,7 @@ public class User extends BaseSystemFieldEntity {
         this.password = passwordEncoder.encode(request.getPassword());
         this.name = request.getName();
         this.phone = request.getPhone();
-        this.role = Role.fromString(null);
+        this.role = Role.fromString(request.getRole());
         this.setCreateBy(request.getUserId());
     }
 

@@ -4,6 +4,11 @@ spring:
     username: postgres
     password: root
     driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: "classpath:db/schema.sql"
+      data-locations: "classpath:db/data.sql"
   jpa:
     show-sql: true
     database: postgresql
