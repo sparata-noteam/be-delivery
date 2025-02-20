@@ -8,6 +8,7 @@ import com.sparta.bedelivery.dto.ReviewModifyResponse;
 import com.sparta.bedelivery.dto.StoreReviewResponse;
 import com.sparta.bedelivery.dto.UserReviewResponse;
 import com.sparta.bedelivery.service.ReviewService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     // 6.1 리뷰 작성
+    @Operation(summary = "리뷰 작성", description = "주문정보를 바탕으로 리뷰를 작성합니디.")
     @PostMapping
     public ResponseEntity<ApiResponseData<ReviewCreateResponse>> createReview(
             @AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody ReviewCreateRequest reviewCreateRequest)
@@ -42,6 +44,7 @@ public class ReviewController {
     }
 
     //6.2 매장 리뷰 조회
+    @Operation(summary = "매장 리뷰 조회", description = "매장에 작성된 전체 리뷰를 조회합니다.")
     @GetMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponseData<Page<StoreReviewResponse>>> getStoreReviews(
             @PathVariable UUID storeId,
@@ -54,6 +57,7 @@ public class ReviewController {
 
 
     //6.3 사용자 리뷰 조회(사용자가 작성한 리뷰 전체 조회)
+    @Operation(summary = "사용자 리뷰 조회", description = "사용자가 작성한 리뷰 전체 조회합니다.")
     @GetMapping
     public ResponseEntity<ApiResponseData<Page<UserReviewResponse>>> getUserReviews(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -66,6 +70,7 @@ public class ReviewController {
 
 
     //6.4 사용자 리뷰 수정
+    @Operation(summary = "사용자 리뷰 수정", description = "사용자가 본인이 작성한 리뷰를 수정합니다.")
     @PutMapping("/{reviewId}")
     public ResponseEntity<ApiResponseData<ReviewModifyResponse>> modifyReview(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -76,6 +81,7 @@ public class ReviewController {
     }
 
     //6.5 리뷰 삭제(사용자용)
+    @Operation(summary = "리뷰 삭제", description = "사용자가 본인이 작성한 리뷰를 삭제합니다.")
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<ApiResponseData<String>> deleteReview(
             @AuthenticationPrincipal UserDetails userDetails,

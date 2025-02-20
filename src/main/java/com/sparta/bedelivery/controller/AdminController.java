@@ -125,6 +125,7 @@ public class AdminController {
 // ================================================= 리 뷰 ==========================================================
 
     //6.6 전체 리뷰 조회
+    @Operation(summary = "전체 리뷰 조회(관리자)", description = "관리자가 전체 리뷰를 최신순으로 조회 합니다.")
     @GetMapping("/admin/reviews")
     public ResponseEntity<ApiResponseData<Page<AdminReviewResponse>>> getAllReviews(
             @RequestParam(defaultValue = "0") int page,
@@ -136,6 +137,7 @@ public class AdminController {
 
     //6.7 특정 리뷰 삭제
     @DeleteMapping("/admin/{reviewId}")
+    @Operation(summary = "특정 리뷰 삭제(관리자)", description = "관리자가 특정 리뷰를 삭제합니다.")
     public ResponseEntity<ApiResponseData<String>> deleteReviewByAdmin(@PathVariable UUID reviewId) {
         adminService.deleteReviewByAdmin(reviewId);
         return ResponseEntity.ok(ApiResponseData.success(null, "관리자가 리뷰를 삭제했습니다."));
