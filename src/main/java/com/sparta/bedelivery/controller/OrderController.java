@@ -2,12 +2,14 @@ package com.sparta.bedelivery.controller;
 
 import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.entity.Order;
+import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +22,7 @@ import java.util.UUID;
 public class OrderController {
     private final OrderService orderService;
 
-    // c,o,m
+    @PreAuthorize("hasAnyRole('CUSTOMER','OWNER','MANAGER')")
     @PostMapping()
     public ResponseEntity<ApiResponseData<CreateOrderResponse>> create(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -31,6 +33,7 @@ public class OrderController {
 
 
     //o,m 주문 확인
+    @PreAuthorize("hasAnyRole('OWNER','MANAGER')")
     @PutMapping("/{orderId}/accept")
     public ResponseEntity<ApiResponseData<OrderAcceptResponse>> accept(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -40,7 +43,7 @@ public class OrderController {
     }
 
     //주문 취소
-    // c,o,m
+    @PreAuthorize("hasAnyRole('CUSTOMER','OWNER','MANAGER')")
     @PutMapping("/{orderId}/cancel")
     public ResponseEntity<ApiResponseData<OrderCancelResponse>> cancel(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -51,6 +54,7 @@ public class OrderController {
     }
 
     //상태 변경 o m
+    @PreAuthorize("hasAnyRole('OWNER','MANAGER')")
     @PutMapping("/{orderId}/status")
     public ResponseEntity<ApiResponseData<OrderStatusResponse>> status(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -60,6 +64,7 @@ public class OrderController {
     }
 
     // 목록 조회 (사용자용)
+    @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping()
     public ResponseEntity<ApiResponseData<CustomerOrderResponse>> getList(@AuthenticationPrincipal UserDetails userDetails,
                                                                           @RequestParam(defaultValue = "0") int page,
@@ -73,6 +78,7 @@ public class OrderController {
     }
 
     // 목록 조회 (점주용)
+    @PreAuthorize("hasAnyRole('OWNER','MANAGER')")
     @GetMapping("/store/{storeId}")
     public ResponseEntity<ApiResponseData<OwnerOrderListResponse>> getForOwner(@AuthenticationPrincipal UserDetails userDetails, @PathVariable String storeId,
                                                                                @RequestParam(defaultValue = "0") int page,
@@ -85,11 +91,12 @@ public class OrderController {
         return ResponseEntity.ok(ApiResponseData.success(orderService.getOwnerOrderList(pageable, request)));
     }
 
-    // 상세 조회 (점주용)
+
+    // 상세 조회
     // all
+    @PreAuthorize("hasAnyRole('CUSTOMER','OWNER','MANAGER')")
     @GetMapping("/{orderId}")
     public ResponseEntity<ApiResponseData<OrderDetailResponse>> getDetail(@PathVariable String orderId) {
         return ResponseEntity.ok(ApiResponseData.success(orderService.getDetails(orderId)));
     }
-
 }
