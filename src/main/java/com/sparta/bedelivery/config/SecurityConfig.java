@@ -1,10 +1,10 @@
 package com.sparta.bedelivery.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.security.JwtAuthenticationFilter;
 import com.sparta.bedelivery.security.JwtAuthorizationFilter;
 import com.sparta.bedelivery.security.JwtUtil;
-import com.sparta.bedelivery.global.response.ApiResponseData;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,11 +21,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
@@ -59,8 +57,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/login", "/api/users/register").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("MASTER")
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Swagger 경로에 대한 인증 허용
-                        .requestMatchers("/api/menus/**").permitAll()
-                        .requestMatchers("/api/stores/**").permitAll()
                         .requestMatchers("/error").permitAll() // 404 처리를 위해 Spring Boot의 기본 예외 처리 허용
                         .anyRequest().authenticated()
                 )

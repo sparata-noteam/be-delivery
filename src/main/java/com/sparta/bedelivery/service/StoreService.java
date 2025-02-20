@@ -230,7 +230,7 @@ public class StoreService {
                 .orElseThrow(()-> new RuntimeException("권한을 찾지 못했습니다." + requestDto.getUserId()));
 
         if (!"OWNER".equals(owner.getRole().toString())) {
-            throw new RuntimeException("매장 등록은 OWNER 권한을 가진 사용자만 가능합니다.");
+            throw new RuntimeException("매장 등록은 OWNER 권한을 가진 사용자에게만 가능합니다.");
         }
         // 4. Store 생성
         Store store = Store.builder()
