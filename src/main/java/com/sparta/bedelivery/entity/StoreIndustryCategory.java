@@ -12,13 +12,12 @@ import lombok.Setter;
 public class StoreIndustryCategory {
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "store_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn() // store UUID를 참조 // p_stores 테이블에 불필요한 store_id가 또 생겨서 삭제했습니다.
     private Store store;
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "industry_category_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "industry_category_id") // industryCategory UUID를 참조
     private IndustryCategory industryCategory;
 }
-

@@ -2,6 +2,7 @@ package com.sparta.bedelivery.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.bedelivery.dto.AuthRequest;
+import com.sparta.bedelivery.dto.AuthResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -43,6 +45,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     /**
      * 인증 성공 시 JWT 생성 후 응답
      */
+    // controller 에서 로그인을 안쓰는 경우에 사용
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult) throws IOException, ServletException {
@@ -53,12 +56,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String token = jwtUtil.generateAccessToken(userDetails.getUsername(), role);
 
         response.setHeader("Authorization", "Bearer " + token);
-//        response.setContentType("application/json");
-//        response.setCharacterEncoding("UTF-8");
-//
-//        PrintWriter writer = response.getWriter();
-//        writer.write(new ObjectMapper().writeValueAsString(new AuthResponse(token)));
-//        writer.flush();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        PrintWriter writer = response.getWriter();
+        writer.write(new ObjectMapper().writeValueAsString(new AuthResponse(token,role)));
+        writer.flush();
     }
 
     /**
@@ -68,6 +71,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                               AuthenticationException failed) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().write("Authentication Failed: " + failed.getMessage());
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        String errorMessage = "{\"message\":\"Authentication Failed: " + failed.getMessage() + "\"}";
+        response.getWriter().write(errorMessage);
     }
 }

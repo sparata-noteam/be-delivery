@@ -46,5 +46,6 @@ public class Review extends BaseSystemFieldEntity {
         this.rating = reviewCreateRequest.getRating();
         this.comment = reviewCreateRequest.getComment();
     }
+
 }
 

@@ -11,6 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "p_menu_images")
+// menu_id (FK) 를 갖게된다. 키의 주인은 Menu 테이블이지만 잠시 맡아놓는 개념.
 public class MenuImage extends BaseSystemFieldEntity {
 
     @Id
@@ -19,14 +20,13 @@ public class MenuImage extends BaseSystemFieldEntity {
     @Column(columnDefinition = "UUID", updatable = false, nullable = false)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "menu_id", nullable = false)
-    private Menu menu;
-
     @Column(nullable = false, length = 255)
     private String imageUrl;
 
     @Column(nullable = false)
     private Integer orderIndex = 0;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Menu menu;
 }
 

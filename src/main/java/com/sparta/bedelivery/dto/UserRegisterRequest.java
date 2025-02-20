@@ -2,9 +2,13 @@ package com.sparta.bedelivery.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserRegisterRequest { //회원가입 요청
 
     @NotBlank(message = "아이디는 필수 입력 값입니다.")
@@ -31,4 +35,5 @@ public class UserRegisterRequest { //회원가입 요청
     )
     private String phone;
 
+    private String role;
 }
