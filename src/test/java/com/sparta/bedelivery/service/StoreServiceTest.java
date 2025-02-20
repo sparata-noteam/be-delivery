@@ -6,7 +6,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.entity.*;
 import com.sparta.bedelivery.repository.*;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Order;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Slf4j
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -50,11 +48,11 @@ class StoreServiceTest {
     @Test
     @DisplayName("매장 등록 요청하기")
     void createStoreRequest() throws JsonProcessingException {
-        String userId = "test";
+        String userId = "owner1";
         String createBy = "TestUser";
         String userNameAndNickName = "TestUser";
-        String password = "1234";
-        String phone = "123456789";
+        String password = "Password1!";
+        String phone = "01023456789";
 
         UUID locationCategoryId = UUID.fromString("a6dad1bb-3d7b-46ca-891a-7d9c906d07e5");
         UUID industryCategoryId = UUID.fromString("d9453d44-daa9-49c9-b7ab-6c4e2de4b475");
@@ -89,7 +87,6 @@ class StoreServiceTest {
         locationCategoryRepository.save(mockLocationCategory);
 
         String json = objectMapper.writeValueAsString(result);
-        log.info("매장 등록 요청 완료: result = {}", json);
     }
 
     @Test
@@ -138,7 +135,6 @@ class StoreServiceTest {
         locationCategoryRepository.save(mockLocationCategory);
 
         String json = objectMapper.writeValueAsString(result);
-        log.info("매장 등록 요청 완료: result = {}", json);
     }
 
     @Test
@@ -154,14 +150,11 @@ class StoreServiceTest {
         StoreStatusResponseDto storeStatusResponseDto = new StoreStatusResponseDto(store);
 
         String json = objectMapper.writeValueAsString(storeStatusResponseDto);
-        log.info("매장 등록 요청 정보 : " + json);
     }
 
     @Test
     @DisplayName("Open 상태인 매장 찾기")
     void findOpenStores() throws JsonProcessingException {
-        log.info("Open 상태인 매장 가져오기");
-
         List<Store> stores = storeRepository.findByStatus(Store.Status.OPEN);
 
         for (Store store : stores) {
@@ -173,7 +166,6 @@ class StoreServiceTest {
                 .map(StoreResponseDto::new).toList();
 
         String json = objectMapper.writeValueAsString(storeResponseDtos);
-        log.info("Open 상태인 매장 리스트 : " + json);
 
         assertFalse(stores.isEmpty(), "영업중인 매장이 없습니다.");
     }
@@ -194,7 +186,6 @@ class StoreServiceTest {
         storeDetailsResponseDtos.add(new StoreDetailsResponseDto(store));
 
         String json = objectMapper.writeValueAsString(storeDetailsResponseDtos);
-        log.info("매장 상세 정보 : " + json);
     }
 
     @Nested
@@ -216,7 +207,6 @@ class StoreServiceTest {
             StoreStatusResponseDto storeStatusResponseDto = new StoreStatusResponseDto(store);
 
             String json = objectMapper.writeValueAsString(storeStatusResponseDto);
-            log.info("매장 삭제 요청 정보 : " + json);
         }
 
         @Test
@@ -234,7 +224,6 @@ class StoreServiceTest {
             StoreStatusResponseDto storeStatusResponseDto = new StoreStatusResponseDto(store);
 
             String json = objectMapper.writeValueAsString(storeStatusResponseDto);
-            log.info("매장 삭제 요청 정보 : " + json);
         }
     }
 
@@ -263,7 +252,6 @@ class StoreServiceTest {
         StoreStatusResponseDto storeStatusResponseDto = new StoreStatusResponseDto(store);
 
         String json = objectMapper.writeValueAsString(storeStatusResponseDto);
-        log.info("매장 수정 요청 정보 : " + json);
     }
 
     @Test
@@ -285,7 +273,6 @@ class StoreServiceTest {
         updateStore.setStatus(Store.Status.UPDATED);
 
         String json = objectMapper.writeValueAsString(new StoreStatusResponseDto(updateStore));
-        log.info("매장 수정 승인 정보 : " + json);
     }
 
     @Test
@@ -302,6 +289,5 @@ class StoreServiceTest {
                 stores.stream().map(StoreStatusResponseDto::new).toList();
 
         String json = objectMapper.writeValueAsString(storeStatusResponseDtos);
-        log.info("매장 수정 요청 정보 : " + json);
     }
 }
