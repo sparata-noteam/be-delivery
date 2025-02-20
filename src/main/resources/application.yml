@@ -1,12 +1,15 @@
 spring:
+  sql:
+    init:
+      mode: always
+      schema-locations: "classpath:db/schema.sql"
+#      data-locations: "classpath:db/data.sql"
   datasource:
     url: jdbc:postgresql://localhost:5432/bedelivery
     username: postgres
     password: root
     driver-class-name: org.postgresql.Driver
   jpa:
-    show-sql: true
-    database: postgresql
     hibernate:
       ddl-auto: update
 jwt:
