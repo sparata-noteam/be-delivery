@@ -135,25 +135,32 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderCancelResponse cancel(UUID orderId) {
+    public OrderCancelResponse cancel(LoginUser loginUser, UUID orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다."));
+        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new IllegalArgumentException("해단하는 결제는 존재하지 않습니다."));
         LocalDateTime orderTime = order.getOrderedAt().plusMinutes(5L);
         LocalDateTime now = LocalDateTime.now();
-        Order.OrderStatus status = order.getStatus();
 
-        if (status != Order.OrderStatus.PENDING) {
-            throw new IllegalArgumentException("주문은 대기 상태일때만 취소할 수 있습니다.");
+        // 고객은 결제대기 상태에서만 취소할수 있습니다.
+        if (loginUser.getRole() == User.Role.CUSTOMER &&
+            payment.getStatus() != Payment.Status.PENDING) {
+            throw new IllegalArgumentException("주문은 결제 대기 상태일때만 취소할 수 있습니다.");
         }
 
         if (now.isAfter(orderTime)) {
             throw new IllegalArgumentException("주문 생성후 5분이내에만 취소가 가능합니다.");
         }
 
+        //가게주인 or 직원이 주문 취소하는 경우
+        //환불처리한다.
+        if (List.of(User.Role.OWNER, User.Role.MANAGER).contains(loginUser.getRole())) {
+            payment.initStatus();
+        }
+
         // 주문 취소
         order.cancel();
 
         // 아이템 제거
-
         return new OrderCancelResponse(order);
     }
 
@@ -173,6 +180,21 @@ public class OrderService {
 
         Order.OrderStatus orderStatus = order.getStatus();
         Payment.Status paymentStatus = payment.getStatus();
+
+        // 주문취소로 변경하고 싶은 경우
+        // 결제 상태가 아닐때
+        if (payment.getStatus() == Payment.Status.PENDING && nextStatus == Order.OrderStatus.CANCELLED) {
+            order.changeStatus(nextStatus);
+            return new ChangeForceStatusResponse(nextStatus);
+        }
+
+        // 결제 상태일때 취소가 되어지는 경우
+        // 환불처리를 한다.
+        if (payment.getStatus() == Payment.Status.PAID && nextStatus == Order.OrderStatus.CANCELLED) {
+            order.changeStatus(nextStatus);
+            payment.initStatus();
+            return new ChangeForceStatusResponse(nextStatus);
+        }
 
         // 결제 완료 상태에서 강제적으로 PENDING이나 CONFIRMED로 변경하려는 경우
         // 관리자 API이므로 강제로 처리하지만, 그로 인한 부작용을 관리해야 한다.

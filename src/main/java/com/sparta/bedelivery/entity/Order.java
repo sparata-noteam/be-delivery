@@ -63,7 +63,7 @@ public class Order extends BaseSystemFieldEntity {
         this.address = createOrderRequest.getAddress();
         this.totalPrice = totalPrice;
         this.status = OrderStatus.PENDING;
-        this.orderType = OrderType.DELIVERY;
+        this.orderType = createOrderRequest.getType();
         this.orderedAt = LocalDateTime.now();
         this.description = createOrderRequest.getDescription();
     }
@@ -91,6 +91,10 @@ public class Order extends BaseSystemFieldEntity {
 
     public void changeStatus(OrderStatus status) {
         this.status = status;
+        // 테이크 아웃인 경우에는 배달이 아닌 완료처리로 돌린다.
+        if (orderType == OrderType.TAKEOUT) {
+            this.status = OrderStatus.COMPLETED;
+        }
     }
 
     public void addMenu(List<OrderItem> prepareOrderItems) {
