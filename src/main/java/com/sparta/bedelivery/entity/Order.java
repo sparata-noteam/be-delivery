@@ -2,6 +2,7 @@ package com.sparta.bedelivery.entity;
 
 import com.sparta.bedelivery.dto.CreateOrderRequest;
 import jakarta.persistence.*;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -109,6 +110,12 @@ public class Order extends BaseSystemFieldEntity {
 
     public enum OrderType {
         TAKEOUT, DELIVERY
+    }
+
+    public List<String> getMenuNames() {
+        return orderItems.stream()
+                .map(OrderItem::getMenuName)
+                .collect(Collectors.toList());
     }
 
 }

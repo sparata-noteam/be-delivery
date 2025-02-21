@@ -14,6 +14,7 @@ import com.sparta.bedelivery.dto.ReviewCreateResponse;
 import com.sparta.bedelivery.dto.ReviewModifyResponse;
 import com.sparta.bedelivery.dto.StoreReviewResponse;
 import com.sparta.bedelivery.dto.UserReviewResponse;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,8 +47,6 @@ public class ReviewService {
         Order order = orderRepository.findById(reviewCreateRequest.getOrderId())
                 .orElseThrow(()-> new IllegalArgumentException("주문내역을 찾을 수 없습니다."));
 
-        Store store = order.getStore();
-
         // 주문 정보에 있는 유저와 요청하는 유저가 일치하지 않을 경우 예외 처리한다.
         if(!order.getUserId().equals(user.getUserId())){
             throw new IllegalArgumentException("주문정보의 유자와 일치하지 않습니다.");
@@ -65,15 +64,15 @@ public class ReviewService {
         return new ReviewCreateResponse(review);
     }
 
-        // 6.2 매장의 모든 리뷰 조회
-        @Transactional(readOnly = true)
-        public Page<StoreReviewResponse> getStoreReviews(UUID storeId, int page, int size) {
+    // 6.2 매장의 모든 리뷰 조회
+    @Transactional(readOnly = true)
+    public Page<StoreReviewResponse> getStoreReviews(UUID storeId, int page, int size) {
 
-            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createAt"));
-            Page<Review> storeReviews = reviewRepository.findByStoreIdAndDeleteAtIsNull(storeId, pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createAt"));
+        Page<Review> storeReviews = reviewRepository.findByStoreIdAndDeleteAtIsNull(storeId, pageable);
 
-            return storeReviews.map(StoreReviewResponse::new);
-        }
+        return storeReviews.map(StoreReviewResponse::new);
+    }
 
     // 6.3 사용자 리뷰 조회 - 유저가 작성한 모든 리뷰 조회
     @Transactional(readOnly = true)
