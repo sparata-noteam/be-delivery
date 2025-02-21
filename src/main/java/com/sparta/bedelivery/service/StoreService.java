@@ -31,15 +31,20 @@ public class StoreService {
     private final UserRepository userRepository;
 
     private final StoreUpdateRequestRepository storeUpdateRequestRepository;
+    private final MenuRepository menuRepository;
 
     @Transactional
     public StoreResponseDto createStoreRequest(StoreRequestDto requestDto, String userId) {
+        // 업종의 이름으로 요청받음
+        IndustryCategory industryCategoryName = industryCategoryRepository.findByName(requestDto.getIndustryName());
+        // 지역의 이름으로 요청받음
+        LocationCategory locationCategoryName = locationCategoryRepository.findByName(requestDto.getLocationName());
         // 1. IndustryCategory 조회
-        IndustryCategory industryCategory = industryCategoryRepository.findById(requestDto.getIndustryCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Industry category not found with ID: " + requestDto.getIndustryCategoryId()));
+        IndustryCategory industryCategory = industryCategoryRepository.findById(industryCategoryName.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Industry category not found with ID: "));
         // 2. LocationCategory 조회
-        LocationCategory locationCategory = locationCategoryRepository.findById(requestDto.getLocationCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Location category not found with ID: " + requestDto.getLocationCategoryId()));
+        LocationCategory locationCategory = locationCategoryRepository.findById(locationCategoryName.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Location category not found with ID: "));
 
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException("UserId not found"));
@@ -85,20 +90,25 @@ public class StoreService {
 
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("Store not found"));
-        if (store.getStatus() != Store.Status.DELETE && store.getStatus() != Store.Status.DELETE_REQUESTED) {
+
+        boolean hiddenMenu = menuRepository.findByStore_Id(storeId)
+                .stream().anyMatch(menu -> !menu.getIsHidden());
+
+        if (store.getStatus() != Store.Status.DELETE && hiddenMenu) {
             return List.of(new StoreDetailsResponseDto(store));
         }
         throw new EntityNotFoundException("영업 중인 매장이 없습니다.");
     }
+
     @Transactional
     public StoreStatusResponseDto deleteStoreRequest(UUID storeId) {
         Store status = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("Store not found with ID: " + storeId));
 
-        if (status.getStatus() == Store.Status.DELETE) {
-            throw new EntityNotFoundException("Store is deleted");
+        if (status.getStatus() == Store.Status.DELETE || status.getStatus() == Store.Status.DELETE_REQUESTED) {
+            throw new EntityNotFoundException("이미 삭제 되었거나 삭제가 요청되었습니다.");
         }
-        status.delete("MASTER");
+        status.delete(status.getUser().getUserId());
         status.setStatus(Store.Status.DELETE_REQUESTED);
         storeRepository.save(status);
 
@@ -123,7 +133,6 @@ public class StoreService {
                         .build();
                 storeUpdateRequestRepository.save(updateRequest);
             }
-
             status.setStatus(Store.Status.UPDATE_REQUESTED);
 
             storeRepository.save(status);
@@ -132,7 +141,6 @@ public class StoreService {
         }
         throw new EntityNotFoundException("해당 매장은 오픈 준비중인 매장이 아닙니다.");
     }
-
 
     // 전체 매장 목록 조회 (관리자용)
     public List<StoreStatusResponseDto> findAllStores(String userId) {
@@ -155,7 +163,7 @@ public class StoreService {
     public void deleteStore(UUID storeId) {
         Store store_id = storeRepository.findById(storeId)
                 .orElseThrow(() -> new EntityNotFoundException("Store not found with ID: " + storeId));
-        if (store_id.getStatus() != Store.Status.DELETE) {
+        if (store_id.getIsHidden().equals(true)) {
             throw new RuntimeException("이미 삭제된 매장입니다.");
         }
         StoreRequestDto requestDto = new StoreRequestDto();
@@ -164,9 +172,9 @@ public class StoreService {
         requestDto.setPhone(store_id.getPhone());
         requestDto.setImageUrl(store_id.getImageUrl());
 
-        store_id.delete(String.valueOf(User.Role.MASTER));
+        store_id.delete(store_id.getUser().getUserId());
+        store_id.setIsHidden(true);
         store_id.setStatus(Store.Status.DELETE);
-        store_id.delete("MASTER");
 
         storeRepository.save(store_id);
     }
@@ -180,13 +188,14 @@ public class StoreService {
         Store.Status currentStatus = current_status.getStatus(); // 현재 상태 확인
         // 매장 등록 승인
         if (Store.Status.PENDING.equals(currentStatus)) {
-            current_status.setCreateBy(valueOf(User.Role.MASTER));
+            current_status.delete(current_status.getUser().getUserId());
             current_status.setStatus(Store.Status.OPEN);
         }
         // 매장 삭제 승인
         else if (Store.Status.DELETE_REQUESTED.equals(currentStatus)) {
-            current_status.delete(String.valueOf(User.Role.MASTER));// 매장을 삭제한 deleteBy 가 저장이 안되는 사항 수정해야 함
+            current_status.delete(current_status.getUser().getUserId());// 매장을 삭제한 deleteBy 가 저장이 안되는 사항 수정해야 함
             current_status.setStatus(Store.Status.DELETE);
+            current_status.setIsHidden(true);
         }
         // 유효하지 않은 상태
         else {
@@ -222,13 +231,16 @@ public class StoreService {
 
     @Transactional
     public CreateStoreResponseDto createStore(CreateStoreRequestDto requestDto) {
+        // 업종의 이름으로 요청받음
+        IndustryCategory industryCategoryName = industryCategoryRepository.findByName(requestDto.getIndustryName());
+        // 지역의 이름으로 요청받음
+        LocationCategory locationCategoryName = locationCategoryRepository.findByName(requestDto.getLocationName());
         // 1. IndustryCategory 조회
-        IndustryCategory industryCategory = industryCategoryRepository.findById(requestDto.getIndustryCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Industry category not found with ID: " + requestDto.getIndustryCategoryId()));
-
+        IndustryCategory industryCategory = industryCategoryRepository.findById(industryCategoryName.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Industry category not found with ID: "));
         // 2. LocationCategory 조회
-        LocationCategory locationCategory = locationCategoryRepository.findById(requestDto.getLocationCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Location category not found with ID: " + requestDto.getLocationCategoryId()));
+        LocationCategory locationCategory = locationCategoryRepository.findById(locationCategoryName.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Location category not found with ID: "));
 
         // 3. User 조회 및 OWNER 권한 체크
         User owner = userRepository.findByUserId(requestDto.getUserId())

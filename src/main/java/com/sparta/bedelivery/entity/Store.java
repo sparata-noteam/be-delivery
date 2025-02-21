@@ -37,18 +37,15 @@ public class Store extends BaseSystemFieldEntity {
     @Column(nullable = false, length = 255)
     private String imageUrl;
 
+    @Column(nullable = false)
+    private Boolean isHidden = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
     private Status status = Status.PENDING;
 
     public enum Status {
-        PENDING, OPEN, CLOSED, SUSPENDED, HIDDEN, DELETE_REQUESTED, DELETE, UPDATED, COMPLETED, UPDATE_REQUESTED
-    }
-
-    // 매장이 삭제 처리했을 때 숨김처리.
-    public void hidden(String deleteBy){
-        this.status = Status.HIDDEN;
-        super.delete(deleteBy);
+        PENDING, OPEN, CLOSED, DELETE_REQUESTED, DELETE, UPDATED, COMPLETED, UPDATE_REQUESTED
     }
 
     @Builder
