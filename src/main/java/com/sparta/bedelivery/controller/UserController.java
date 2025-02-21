@@ -6,6 +6,7 @@ import com.sparta.bedelivery.security.CustomUserDetails;
 import com.sparta.bedelivery.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,7 +34,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "성공적으로 내 정보가 수정되었습니다.")
     @PutMapping("/me")
     public ResponseEntity<ApiResponseData<UserResponse>> updateUser(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                                    @RequestBody UserUpdateRequest request) {
+                                                                    @Valid @RequestBody UserUpdateRequest request) {
         return ResponseEntity.ok(ApiResponseData.success(userService.updateUser(userDetails.getUsername(), request)));
     }
 
