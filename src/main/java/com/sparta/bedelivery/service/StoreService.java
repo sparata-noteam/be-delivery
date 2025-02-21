@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static java.lang.String.*;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -35,6 +33,14 @@ public class StoreService {
 
     @Transactional
     public StoreResponseDto createStoreRequest(StoreRequestDto requestDto, String userId) {
+        // 전화번호 중복 검사
+        if (storeRepository.findByPhone(requestDto.getPhone()).isPresent()) {
+            throw new IllegalArgumentException("이미 등록된 전화번호입니다: " + requestDto.getPhone());
+        }
+        // 주소 중복 검사
+        if (storeRepository.findByAddress(requestDto.getAddress()).isPresent()) {
+            throw new IllegalArgumentException("이미 등록된 주소입니다: " + requestDto.getAddress());
+        }
         // 업종의 이름으로 요청받음
         IndustryCategory industryCategoryName = industryCategoryRepository.findByName(requestDto.getIndustryName());
         // 지역의 이름으로 요청받음
@@ -231,6 +237,14 @@ public class StoreService {
 
     @Transactional
     public CreateStoreResponseDto createStore(CreateStoreRequestDto requestDto) {
+        // 전화번호 중복 검사
+        if (storeRepository.findByPhone(requestDto.getPhone()).isPresent()) {
+            throw new IllegalArgumentException("이미 등록된 전화번호입니다: " + requestDto.getPhone());
+        }
+        // 주소 중복 검사
+        if (storeRepository.findByAddress(requestDto.getAddress()).isPresent()) {
+            throw new IllegalArgumentException("이미 등록된 주소입니다: " + requestDto.getAddress());
+        }
         // 업종의 이름으로 요청받음
         IndustryCategory industryCategoryName = industryCategoryRepository.findByName(requestDto.getIndustryName());
         // 지역의 이름으로 요청받음
