@@ -2,7 +2,9 @@ package com.sparta.bedelivery.dto;
 
 import com.sparta.bedelivery.entity.Review;
 import java.util.UUID;
+import lombok.Getter;
 
+@Getter
 public class ReviewCreateResponse {
     UUID reviewId;
     Integer rating;

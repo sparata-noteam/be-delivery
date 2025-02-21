@@ -1,5 +1,6 @@
 package com.sparta.bedelivery.repository;
 
+import com.sparta.bedelivery.entity.Order;
 import com.sparta.bedelivery.entity.Review;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,4 +24,6 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
     // 관리자가 전체 리뷰 조회
     Page<Review> findAllByDeleteAtIsNull(Pageable pageable);
+
+    UUID order(Order order);
 }
