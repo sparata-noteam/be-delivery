@@ -45,9 +45,10 @@ public class Review extends BaseSystemFieldEntity {
     private Menu menu;
 
 
-    public Review(ReviewCreateRequest reviewCreateRequest, User user, Order order, Store store) {
+    public Review(ReviewCreateRequest reviewCreateRequest, User user, Order order) {
         this.user = user;
-        this.store = store;
+        this.order = order;
+        this.store = order.getStore();
         this.rating = reviewCreateRequest.getRating();
         this.comment = reviewCreateRequest.getComment();
     }

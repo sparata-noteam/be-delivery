@@ -59,7 +59,7 @@ public class ReviewService {
         }
 
         // 리뷰 정보를 저장한다.
-        Review review = reviewRepository.save(new Review(reviewCreateRequest, user, order, store));
+        Review review = reviewRepository.save(new Review(reviewCreateRequest, user, order));
 
         // 응답할 리뷰 정보를 생성후 return한다.
         return new ReviewCreateResponse(review);
@@ -69,7 +69,7 @@ public class ReviewService {
         @Transactional(readOnly = true)
         public Page<StoreReviewResponse> getStoreReviews(UUID storeId, int page, int size) {
 
-            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createAt"));
             Page<Review> storeReviews = reviewRepository.findByStoreIdAndDeleteAtIsNull(storeId, pageable);
 
             return storeReviews.map(StoreReviewResponse::new);
@@ -81,7 +81,7 @@ public class ReviewService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createAt"));
 
         Page<Review> userReviews = reviewRepository.findByUserIdAndDeleteAtIsNull(user.getId(), pageable);
 

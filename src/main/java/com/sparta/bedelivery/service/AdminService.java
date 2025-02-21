@@ -100,7 +100,7 @@ public class AdminService {
     // 리뷰 전체 조회
     @Transactional(readOnly = true)
     public Page<AdminReviewResponse> getAllReviews(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createAt"));
         Page<Review> reviews = reviewRepository.findAllByDeleteAtIsNull(pageable);
         return reviews.map(AdminReviewResponse::new);
     }
