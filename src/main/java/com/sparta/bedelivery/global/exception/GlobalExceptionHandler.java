@@ -82,5 +82,9 @@ public class GlobalExceptionHandler {
     public ApiResponseData<String> handleIllegalArgumentException(IllegalArgumentException ex) {
         return ApiResponseData.failure(404, ex.getMessage());  // 예외 메시지 그대로 반환
     }
+
+
+
+
 }
 

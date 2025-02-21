@@ -5,6 +5,7 @@ import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ public class PaymentController {
 
 
     //5.1 결제 요청
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
     public ResponseEntity<ApiResponseData<CreatePaymentResponse>> create(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -30,12 +32,14 @@ public class PaymentController {
 
 
     //5.2 환불 요청
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PutMapping("/{orderId}/refund")
     public ResponseEntity<ApiResponseData<PaymentRefundResponse>> refund(@PathVariable String orderId) {
         return ResponseEntity.ok(ApiResponseData.success(paymentService.refund(UUID.fromString(orderId)), "주문이 환불 요청되었습니다."));
     }
 
     //#5.3 결제 취소
+    @PreAuthorize("hasAnyRole('OWNER','MANAGER')")
     @PutMapping("/{paymentId}/cancel")
     public ResponseEntity<ApiResponseData<PaymentCancelResponse>> cancel(@PathVariable String paymentId) {
         return ResponseEntity.ok(ApiResponseData.success(paymentService.cancel(UUID.fromString(paymentId)), "결제 취소요청되었습니다"));

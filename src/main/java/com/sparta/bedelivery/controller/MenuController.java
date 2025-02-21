@@ -21,7 +21,7 @@ public class MenuController {
     private final MenuService menuService;
 
     // 7.1 메뉴 등록
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAnyRole('OWNER','MANAGER')")
     @PostMapping("/menus")
     public ResponseEntity<ApiResponseData<CreateMenuResponseDto>> createMenu(@RequestBody CreateMenuRequestDto requestDto){
 
@@ -52,7 +52,7 @@ public class MenuController {
     }
 
     // 7.4 메뉴 수정
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAnyRole('OWNER','MANAGER')")
     @PutMapping("/menus/{menuId}")
     public ResponseEntity<ApiResponseData<CreateMenuResponseDto>> updateMenu(@PathVariable UUID menuId,
                                                             @RequestBody CreateMenuRequestDto requestDto) {
@@ -62,7 +62,7 @@ public class MenuController {
     }
 
     // 7.5 메뉴 삭제
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAnyRole('OWNER','MANAGER')")
     @DeleteMapping("/menus/{menuId}")
     public ResponseEntity<ApiResponseData<Void>> deleteMenu(@PathVariable UUID menuId) {
         menuService.deleteMenu(menuId);

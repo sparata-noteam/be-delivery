@@ -20,7 +20,7 @@ public class MenuImage extends BaseSystemFieldEntity {
     @Column(columnDefinition = "UUID", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = true, length = 255)
     private String imageUrl;
 
     @Column(nullable = false)

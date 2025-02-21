@@ -203,7 +203,7 @@ public class StoreService {
         List<StoreUpdateRequest> updateRequests = storeUpdateRequestRepository.findByStore_IdOrderByCreateAtDesc(storeId);
 
         if (updateRequests.isEmpty()) {
-            throw new RuntimeException("수정 요청을 시도한 매장이 존재하지 않습니다.");
+            throw new IllegalArgumentException("수정 요청을 시도한 매장이 존재하지 않습니다.");
         }
         StoreUpdateRequest updateRequest = updateRequests.get(0); // 최신 요청만 처리
         Store updateStore = updateRequest.getStore();
@@ -224,18 +224,18 @@ public class StoreService {
     public CreateStoreResponseDto createStore(CreateStoreRequestDto requestDto) {
         // 1. IndustryCategory 조회
         IndustryCategory industryCategory = industryCategoryRepository.findById(requestDto.getIndustryCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Industry category not found with ID: " + requestDto.getIndustryCategoryId()));
+                .orElseThrow(() -> new IllegalArgumentException("Industry category not found with ID: " + requestDto.getIndustryCategoryId()));
 
         // 2. LocationCategory 조회
         LocationCategory locationCategory = locationCategoryRepository.findById(requestDto.getLocationCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Location category not found with ID: " + requestDto.getLocationCategoryId()));
+                .orElseThrow(() -> new IllegalArgumentException("Location category not found with ID: " + requestDto.getLocationCategoryId()));
 
         // 3. User 조회 및 OWNER 권한 체크
         User owner = userRepository.findByUserId(requestDto.getUserId())
-                .orElseThrow(() -> new RuntimeException("권한을 찾지 못했습니다." + requestDto.getUserId()));
+                .orElseThrow(()-> new IllegalArgumentException("권한을 찾지 못했습니다." + requestDto.getUserId()));
 
         if (!"OWNER".equals(owner.getRole().toString())) {
-            throw new RuntimeException("매장 등록은 OWNER 권한을 가진 사용자만 가능합니다.");
+            throw new IllegalArgumentException("매장 등록은 OWNER 권한을 가진 사용자에게만 가능합니다.");
         }
         // 4. Store 생성
         Store store = Store.builder()

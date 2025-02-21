@@ -42,8 +42,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'//WebClient 사용을 위한 의존성 추가\
 
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
