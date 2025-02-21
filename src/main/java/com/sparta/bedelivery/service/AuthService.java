@@ -30,6 +30,8 @@ public class AuthService {
         }
         if (userRepository.existsByNicknameAndDeleteAtIsNull(request.getNickName())) {
             throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+        }if (userRepository.existsByPhoneAndDeleteAtIsNull(request.getPhone())) {
+            throw new IllegalArgumentException("이미 존재하는 전화번호입니다.");
         }
 
         User user = new User(request,passwordEncoder);

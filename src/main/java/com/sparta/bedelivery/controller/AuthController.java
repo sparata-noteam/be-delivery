@@ -54,7 +54,7 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "비밀번호 변경 성공")
     @PostMapping("/me/password")
     public ResponseEntity<ApiResponseData<?>> changePassword(@AuthenticationPrincipal UserDetails userDetails,
-                                                             @RequestBody ChangePasswordRequest request) {
+                                                             @Valid @RequestBody ChangePasswordRequest request) {
         authService.changePassword(userDetails.getUsername(), request);
         ApiResponseData<?> response = ApiResponseData.success(Map.of("message", "비밀번호가 성공적으로 변경되었습니다."));
         return ResponseEntity.status(HttpStatus.OK).body(response);
