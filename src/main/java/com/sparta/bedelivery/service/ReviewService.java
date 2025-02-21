@@ -1,5 +1,6 @@
 package com.sparta.bedelivery.service;
 
+import com.sparta.bedelivery.dto.StoreRatingInfo;
 import com.sparta.bedelivery.entity.Order;
 import com.sparta.bedelivery.entity.Order.OrderStatus;
 import com.sparta.bedelivery.entity.Review;
@@ -7,6 +8,7 @@ import com.sparta.bedelivery.entity.Store;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.repository.OrderRepository;
 import com.sparta.bedelivery.repository.ReviewRepository;
+import com.sparta.bedelivery.repository.StoreRepository;
 import com.sparta.bedelivery.repository.UserRepository;
 import com.sparta.bedelivery.dto.ReviewCreateRequest;
 import com.sparta.bedelivery.dto.ReviewModifyRequest;
@@ -14,13 +16,17 @@ import com.sparta.bedelivery.dto.ReviewCreateResponse;
 import com.sparta.bedelivery.dto.ReviewModifyResponse;
 import com.sparta.bedelivery.dto.StoreReviewResponse;
 import com.sparta.bedelivery.dto.UserReviewResponse;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +37,8 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final StoreRepository storeRepository;
+    private final HashOperations<String, String, String> hashOperations; //redis에 저장시 사용함.
 
     // 6.1 리뷰 생성
     @Transactional
@@ -124,5 +132,42 @@ public class ReviewService {
         // 소프트 삭제 처리
         review.delete(userId);
         reviewRepository.save(review);
+    }
+
+    @Transactional(readOnly = true)
+    public void updateStoreRatingsInRedis() {
+        // 삭제되지 않은 매장 목록 조회
+        List<Store> stores = storeRepository.findAllByDeleteAtIsNull();
+
+        // Store 리스트에서 UUID 리스트로 변환
+        List<UUID> storeIds = stores.stream()
+                .map(Store::getId)
+                .collect(Collectors.toList());
+
+        // 평균 별점과 리뷰 개수 조회
+        List<StoreRatingInfo> results = reviewRepository.findAverageRatingAndReviewCountByStoreIds(storeIds);
+
+        // Redis에 저장
+        for (StoreRatingInfo info : results) {
+            UUID storeId = info.getStoreId();
+            String avgRating = info.getAverageRating().toString();
+            Long reviewCount = info.getReviewCount();
+
+            // Redis 해시에 저장할 데이터 맵 생성
+            Map<String, String> ratingData = new HashMap<>();
+            ratingData.put("rating", avgRating);
+            ratingData.put("reviewCount", reviewCount.toString());
+
+            // Redis 해시에 데이터 저장 (키: store:{storeId}:reviewInfo)
+            String redisKey = "store:" + storeId + ":reviewInfo";
+            hashOperations.putAll(redisKey, ratingData);
+        }
+
+    }
+
+    // 매장의 리뷰 개수와 평균 별점을 조회하는 메서드
+    public Map<String, String> getStoreReviewInfo(UUID storeId) {
+        String redisKey = "store:" + storeId + ":reviewInfo";
+        return hashOperations.entries(redisKey);
     }
 }

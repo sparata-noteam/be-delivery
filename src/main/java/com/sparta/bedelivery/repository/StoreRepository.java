@@ -11,4 +11,7 @@ import java.util.UUID;
 public interface StoreRepository extends JpaRepository<Store, UUID> {
 
     List<Store> findByStatus(Store.Status status);
+
+    //삭제되지 않은 모든 매장 조회
+    List<Store> findAllByDeleteAtIsNull();
 }
