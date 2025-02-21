@@ -1,6 +1,7 @@
 package com.sparta.bedelivery.service;
 
 import com.sparta.bedelivery.entity.Order;
+import com.sparta.bedelivery.entity.Order.OrderStatus;
 import com.sparta.bedelivery.entity.Review;
 import com.sparta.bedelivery.entity.Store;
 import com.sparta.bedelivery.entity.User;
@@ -48,9 +49,13 @@ public class ReviewService {
         Store store = order.getStore();
 
         // 주문 정보에 있는 유저와 요청하는 유저가 일치하지 않을 경우 예외 처리한다.
-
         if(!order.getUserId().equals(user.getUserId())){
             throw new IllegalArgumentException("주문정보의 유자와 일치하지 않습니다.");
+        }
+
+        // 해당 주문이 완료된 상태가 아닌 경우 리뷰 작성 못하게 예외 처리한다.
+        if(!order.getStatus().equals(OrderStatus.COMPLETED)){
+            throw new IllegalArgumentException("주문 완료상태가 아닙니다.");
         }
 
         // 리뷰 정보를 저장한다.
