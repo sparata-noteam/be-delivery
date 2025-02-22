@@ -2,8 +2,10 @@ package com.sparta.bedelivery.entity;
 
 import com.sparta.bedelivery.dto.CreateOrderRequest;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;

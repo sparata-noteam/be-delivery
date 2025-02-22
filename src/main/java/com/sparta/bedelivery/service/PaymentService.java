@@ -34,6 +34,11 @@ public class PaymentService {
 
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문은 존재하지 않습니다."));
 
+        // 과금 대기가 아닌 경우에는 결제를 할 수 없습니다.
+        if(payment.getStatus() != Payment.Status.PENDING) {
+            throw new IllegalArgumentException("이미 결제가 진행되어진 결제입니다.");
+        }
+
         // 결제 시작
         // 과금 추가
         BigDecimal totalPrice = order.getTotalPrice();
