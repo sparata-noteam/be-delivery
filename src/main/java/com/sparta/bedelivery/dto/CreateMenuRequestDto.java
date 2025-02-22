@@ -5,13 +5,13 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
 public class CreateMenuRequestDto {
 
-    private UUID storeId;
+//    private UUID storeId;
+    private String storeAddress;
     private String name;
     private BigDecimal price;
     private List<String> imageUrl;
