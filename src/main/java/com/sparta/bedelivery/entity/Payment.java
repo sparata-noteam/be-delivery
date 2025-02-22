@@ -58,22 +58,24 @@ public class Payment extends BaseSystemFieldEntity {
     }
 
     public void cancel() {
+        this.method = null;
+        this.userId = null;
+        this.amount = null;
         this.status = Status.PENDING;
     }
 
-    public void checkAmount(BigDecimal totalPrice) {
-        BigDecimal buyAmount = this.getAmount();
-        if (buyAmount.compareTo(totalPrice) < 0) {
+    public void checkAmount(BigDecimal totalPrice, BigDecimal paidAmount) {
+        if (paidAmount.compareTo(totalPrice) < 0) {
             throw new IllegalArgumentException("주문 금액보다 낮은 금액으로 결제가 불가능합니다.");
         }
-
+        this.amount = totalPrice;
     }
 
     // 결제 상태 변경, 결제 수단 등록, 결제 시작!
     public void start(String userId, CreatePaymentRequest createPaymentRequest) {
         this.userId = userId;
         this.method = createPaymentRequest.getMethod();
-        this.amount = createPaymentRequest.getAmount();
+        this.paidAt = LocalDateTime.now();
         this.status = Status.PAID;
     }
 

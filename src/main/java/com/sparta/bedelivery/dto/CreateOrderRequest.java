@@ -2,6 +2,7 @@ package com.sparta.bedelivery.dto;
 
 
 import com.sparta.bedelivery.entity.Order;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 public class CreateOrderRequest {
      private UUID storeId;
      private Order.OrderType type;

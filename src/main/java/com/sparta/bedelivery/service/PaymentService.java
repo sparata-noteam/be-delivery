@@ -34,12 +34,17 @@ public class PaymentService {
 
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("해당하는 주문은 존재하지 않습니다."));
 
+        // 과금 대기가 아닌 경우에는 결제를 할 수 없습니다.
+        if(payment.getStatus() != Payment.Status.PENDING) {
+            throw new IllegalArgumentException("이미 결제가 진행되어진 결제입니다.");
+        }
+
         // 결제 시작
         // 과금 추가
+        BigDecimal totalPrice = order.getTotalPrice();
         payment.start(user.getUserId(), createPaymentRequest);
 
-        BigDecimal totalPrice = order.getTotalPrice();
-        payment.checkAmount(totalPrice);
+        payment.checkAmount(totalPrice, createPaymentRequest.getAmount());
         BigDecimal reminder = createPaymentRequest.getAmount().subtract(order.getTotalPrice());
         //TODO 각 결제 API 를 통해 실 결제를 진핸한다.
 
@@ -61,7 +66,9 @@ public class PaymentService {
             throw new IllegalArgumentException("결제를 진행중인 경우에만 환불이 가능합니다.");
         }
 
+        //TODO 실제 환불처리가 일어난다.
         payment.refund();
+
         return new PaymentRefundResponse(order.getStatus(), payment);
     }
 
@@ -104,14 +111,4 @@ public class PaymentService {
         return payment;
     }
 
-    // 결제 삭제시 주문 삭제도 함께 일어난다.
-    @Transactional
-    public Object deletePayment(LoginUser loginUser, UUID paymentId) {
-        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new IllegalArgumentException("해당하는 결제가 존재하지 않습니다."));
-        Order order = orderRepository.findById(payment.getOrder().getId()).orElseThrow(() -> new IllegalArgumentException("해당하는 주문이 존재하지 않습니다."));
-        String userId = loginUser.getUserId();
-        payment.delete(userId);
-        order.delete(userId);
-        return null;
-    }
 }

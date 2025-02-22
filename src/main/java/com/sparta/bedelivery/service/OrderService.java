@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,13 +34,20 @@ public class OrderService {
         List<OrderItemRequest> items = createOrderRequest.getItem();
         List<UUID> allMenuIdList = items.stream().map(OrderItemRequest::getMenuId).toList();
 
+        UUID storeId = createOrderRequest.getStoreId();
+        Optional<Store> notOpenStore = storeRepository.findByIdAndDeleteAtIsNullAndOpenStatus(storeId);
+
+        if(notOpenStore.isPresent()) {
+            throw new IllegalArgumentException("가게는 오픈된 상태만 주문을 넣을 수 있습니다.");
+        }
+
         List<Menu> allMenuList = menuRepository.findAllById(allMenuIdList);
 
         OrderCalculateSystem calculate = new OrderCalculateSystem(allMenuList);
         List<OrderCalculate> calculates = calculate.start(items);
 
         Order order = new Order(createOrderRequest, calculate.getTotalPrice());
-        Store store = storeRepository.findById(createOrderRequest.getStoreId()).orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
+        Store store = storeRepository.findById(storeId).orElseThrow(() -> new IllegalArgumentException("가게를 찾을 수 없습니다."));
         order.addStore(store);
         order.who(user.getUserId());
 
@@ -98,7 +106,7 @@ public class OrderService {
         }
 
         // 결제 대기 상태가 아닌경우
-        if (payment.getStatus() != Payment.Status.PAID) {
+        if (payment.getStatus() != Payment.Status.PENDING) {
             throw new IllegalArgumentException("결제 대기인 상태인 주문만 취소가 가능합니다.");
         }
 
@@ -232,7 +240,7 @@ public class OrderService {
         // 결제 상태인 경우에 주문을 삭제하는 경우에는 결제 상태 초기화
         //TODO 실제 환불 처리는 일어나지 않습니다.
         if (payment.getStatus() == Payment.Status.PAID) {
-            payment.initStatus();
+            payment.delete(loginUser.getUserId());
         }
 
         order.delete(loginUser.getUserId());
