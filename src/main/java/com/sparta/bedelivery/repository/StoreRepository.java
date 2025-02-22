@@ -16,5 +16,6 @@ public interface StoreRepository extends JpaRepository<Store, UUID> {
 
     @Query("select s from Store s where s.id = :storeId and s.status != 'OPEN'and s.deleteAt is null")
     Optional<Store> findByIdAndDeleteAtIsNullAndOpenStatus(UUID storeId);
-
+    Optional<Store> findByPhone(String phone);
+    Optional<Store> findByAddress(String address);
 }

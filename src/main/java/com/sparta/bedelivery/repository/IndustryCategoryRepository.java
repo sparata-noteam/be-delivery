@@ -8,4 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface IndustryCategoryRepository extends JpaRepository<IndustryCategory, UUID> {
+    IndustryCategory findByName(String name);
 }

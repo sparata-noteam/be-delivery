@@ -29,7 +29,10 @@ public class MenuService {
 
     @Transactional
     public CreateMenuResponseDto createMenu(CreateMenuRequestDto requestDto) {
-        Store store = storeRepository.findById(requestDto.getStoreId())
+        if(menuRepository.findByName(requestDto.getName()).isPresent()){
+            throw new IllegalArgumentException("해당 메뉴는 존재합니다.");
+        }
+        Store store = storeRepository.findByAddress(requestDto.getStoreAddress())
                 .orElseThrow(() -> new IllegalArgumentException("매장을 찾을 수 없습니다."));
 
         // 메뉴 생성
@@ -85,6 +88,9 @@ public class MenuService {
 
     @Transactional
     public CreateMenuResponseDto updateMenu(UUID menuId, CreateMenuRequestDto requestDto) {
+        if(menuRepository.findByName(requestDto.getName()).isPresent()){
+            throw new IllegalArgumentException("해당 메뉴는 존재합니다.");
+        }
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 메뉴는 없습니다." + menuId));
 

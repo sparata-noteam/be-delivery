@@ -3,7 +3,9 @@ package com.sparta.bedelivery.config;
 
 import com.sparta.bedelivery.entity.User.Role;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.bedelivery.global.exception.CustomAuthenticationFailureHandler;
 import com.sparta.bedelivery.global.response.ApiResponseData;
+import com.sparta.bedelivery.repository.UserRepository;
 import com.sparta.bedelivery.security.JwtAuthenticationFilter;
 import com.sparta.bedelivery.security.JwtAuthorizationFilter;
 import com.sparta.bedelivery.security.JwtUtil;
@@ -34,6 +36,7 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
     private final AuthenticationConfiguration authenticationConfiguration;
 
     @Bean
@@ -48,9 +51,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil, authenticationManager());
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil, userRepository,authenticationManager());
         jwtAuthenticationFilter.setFilterProcessesUrl("/api/users/login");
 
+        jwtAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler());
         JwtAuthorizationFilter jwtAuthorizationFilter = new JwtAuthorizationFilter(jwtUtil, userDetailsService, authenticationManager());
 
         http.csrf(csrf -> csrf.disable())
@@ -62,8 +66,6 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll() // 404 처리를 위해 Spring Boot의 기본 예외 처리 허용
                         .requestMatchers("/api/reviews/**").hasRole(Role.CUSTOMER.name())
                         .requestMatchers("/api/reviews/stores/**").permitAll()
-
-
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

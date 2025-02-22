@@ -3,6 +3,8 @@ package com.sparta.bedelivery.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.bedelivery.dto.AuthRequest;
 import com.sparta.bedelivery.dto.AuthResponse;
+import com.sparta.bedelivery.entity.User;
+import com.sparta.bedelivery.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,11 +20,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
 
 
@@ -34,6 +38,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throws AuthenticationException {
         try {
             AuthRequest authRequest = new ObjectMapper().readValue(request.getInputStream(), AuthRequest.class);
+            // 사용자가 존재하는지 확인 및 delete_at 체크
+            User user = userRepository.findByUserId(authRequest.getUserId())
+                    .orElseThrow(() -> new AuthenticationException("404: 해당 계정이 존재하지 않습니다.") {});
+
+            if (user.getDeleteAt() != null) {
+                throw new AuthenticationException("403: 해당 계정은 삭제된 상태입니다.") {};
+            }
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(authRequest.getUserId(), authRequest.getPassword());
             return authenticationManager.authenticate(authenticationToken);
