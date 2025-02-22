@@ -8,4 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface LocationCategoryRepository extends JpaRepository<LocationCategory, UUID> {
+    LocationCategory findByName(String name);
 }

@@ -78,11 +78,5 @@ public class AdminOrderPaymentController {
         return ResponseEntity.ok(ApiResponseData.success(paymentService.refundSuccess(UUID.fromString(paymentId)), "환불처리 승인하였습니다"));
     }
 
-    // 결제 내역 삭제
-    @DeleteMapping("/payments/{paymentId}")
-    public ResponseEntity<ApiResponseData<?>> deletePayments(@AuthenticationPrincipal UserDetails userDetails, @PathVariable String paymentId) {
-        LoginUser loginUser = new LoginUser(userDetails);
-        return ResponseEntity.ok(ApiResponseData.success(paymentService.deletePayment(loginUser, UUID.fromString(paymentId))));
-    }
 
 }

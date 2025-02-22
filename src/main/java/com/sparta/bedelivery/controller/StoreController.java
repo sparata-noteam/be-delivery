@@ -3,6 +3,8 @@ package com.sparta.bedelivery.controller;
 import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.StoreService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +16,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Tag(name = "매장")
 public class StoreController {
 
     private final StoreService storeService;
@@ -21,6 +24,7 @@ public class StoreController {
     // 3.1 매장 등록 요청
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping("/stores/{userId}")
+    @Operation(summary = "매장 등록 요청", description = "매장 주인 본인이 매장 등록을 요청합니다.")
     public ResponseEntity<ApiResponseData<StoreResponseDto>> createStoreRequest(@RequestBody StoreRequestDto requestDto
     , @PathVariable String userId) {  // UserDetails 대신 User 엔티티를 직접 받음
         StoreResponseDto newStore = storeService.createStoreRequest(requestDto, userId);
@@ -29,8 +33,9 @@ public class StoreController {
     }
 
     // 3.2 전체 매장 목록 조회 OPEN 상태의 매장만 조회 가능.
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasAnyRole('CUSTOMER','OWNER','MANAGER')")
     @GetMapping("/stores")
+    @Operation(summary = "OPEN 상태의 매장 조회", description = "관리자를 제외한 모든 사용자가 OPEN 매장을 조회합니다.")
     public ResponseEntity<ApiResponseData<List<StoreResponseDto>>> findOpenStores() {
 
         List<StoreResponseDto> openStores = storeService.findOpenStores();
@@ -38,8 +43,9 @@ public class StoreController {
         return ResponseEntity.ok().body(ApiResponseData.success(openStores));
     }
 
-    // 3.3 매장 상세 조회 => 메뉴 추가 기능과 리뷰 추가 기능이 있어야 구현 가능할듯.
+    // 3.3 매장 상세 조회
     @GetMapping("/stores/{storeId}")
+    @Operation(summary = "특정 매장 상세 조회", description = "매장 정보와 메뉴 목록을 조회합니다.")
     public ResponseEntity<ApiResponseData<List<StoreDetailsResponseDto>>> getAllStores(@PathVariable UUID storeId){
         List<StoreDetailsResponseDto> findAll = storeService.getAllStores(storeId);
 
@@ -49,6 +55,7 @@ public class StoreController {
     // 3.4 매장 삭제 요청
     @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/stores/{storeId}")
+    @Operation(summary = "매장 삭제 요청", description = "매장 주인 본인이 매장 삭제를 요청합니다.")
     public ResponseEntity<ApiResponseData<StoreStatusResponseDto>> deleteStoreRequest(@PathVariable UUID storeId) {
         StoreStatusResponseDto deleteStore = storeService.deleteStoreRequest(storeId);
 
@@ -58,6 +65,7 @@ public class StoreController {
     // 3.5 매장 수정 요청
     @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/stores/{storeId}")
+    @Operation(summary = "매장 수정 요청", description = "매장 주인 본인이 매장 수정을 요청합니다.")
     public ResponseEntity<ApiResponseData<StoreStatusResponseDto>> updateStoreRequest(@PathVariable UUID storeId,
                                                                      @RequestBody StoreUpdateRequestDto requestDto) {
         StoreStatusResponseDto updateStore = storeService.updateStoreRequest(storeId, requestDto);

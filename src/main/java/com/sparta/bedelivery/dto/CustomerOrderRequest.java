@@ -2,6 +2,7 @@ package com.sparta.bedelivery.dto;
 
 import com.sparta.bedelivery.entity.Order;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class CustomerOrderRequest {

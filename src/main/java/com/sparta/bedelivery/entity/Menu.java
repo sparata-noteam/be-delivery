@@ -15,6 +15,7 @@ import java.util.UUID;
 @Table(name = "p_menus")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Menu extends BaseSystemFieldEntity {
 
     @Id

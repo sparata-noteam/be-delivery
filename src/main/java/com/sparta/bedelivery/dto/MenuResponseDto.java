@@ -21,7 +21,7 @@ public class MenuResponseDto {
     private String description;
     private List<String> imageUrl;
     private Boolean isHidden;
-    private List<ReviewResponseDto> reviews;
+//    private List<ReviewResponseDto> reviews;
 
     public MenuResponseDto(Menu menu) {
         this.menuId = menu.getId();
@@ -30,7 +30,7 @@ public class MenuResponseDto {
         this.price = menu.getPrice();
         this.description = menu.getDescription();
         this.isHidden = menu.getIsHidden();
-        this.reviews = menu.getReviewList()
-                .stream().map(ReviewResponseDto::new).collect(Collectors.toList());
+//        this.reviews = menu.getReviewList()
+//                .stream().map(ReviewResponseDto::new).collect(Collectors.toList());
     }
 }

@@ -28,6 +28,7 @@ public class StoreDetailsResponseDto {
         this.phone = store.getPhone();
         this.storeImageUrl = store.getImageUrl();
         this.status = store.getStatus();
-        this.menus = store.getMenuList().stream().map(MenuResponseDto::new).collect(Collectors.toList());
+        this.menus = store.getMenuList().stream()
+                .filter(menu -> !menu.getIsHidden()).map(MenuResponseDto::new).collect(Collectors.toList());
     }
 }
