@@ -1,6 +1,7 @@
 package com.sparta.bedelivery.dto;
 
 import com.sparta.bedelivery.entity.Review;
+import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
 
@@ -20,6 +21,8 @@ public class AdminReviewResponse {
     Long userId; //User의 PK값
     String userNickname;
 
+    //주문한 메뉴 정보
+    List<String> menuList;
     public AdminReviewResponse(Review review) {
         this.storeId = review.getStore().getId();
         this.storeName = review.getStore().getName();
@@ -28,5 +31,6 @@ public class AdminReviewResponse {
         this.comment = review.getComment();
         this.userNickname = review.getUser().getNickname();
         this.userId = review.getUser().getId();
+        this.menuList = review.getOrder().getMenuNames();
     }
 }

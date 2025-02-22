@@ -13,7 +13,8 @@ import java.util.UUID;
 public interface StoreRepository extends JpaRepository<Store, UUID> {
 
     List<Store> findByStatus(Store.Status status);
-
+    //삭제되지 않은 모든 매장 조회
+    List<Store> findAllByDeleteAtIsNull();
     @Query("select s from Store s where s.id = :storeId and s.status != 'OPEN'and s.deleteAt is null")
     Optional<Store> findByIdAndDeleteAtIsNullAndOpenStatus(UUID storeId);
     Optional<Store> findByPhone(String phone);

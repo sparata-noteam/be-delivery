@@ -4,6 +4,7 @@ import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.entity.*;
 import com.sparta.bedelivery.repository.*;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class StoreService {
     private final StoreUpdateRequestRepository storeUpdateRequestRepository;
     private final MenuRepository menuRepository;
 
+    private final ReviewService reviewService;
     @Transactional
     public StoreResponseDto createStoreRequest(StoreRequestDto requestDto, String userId) {
         // 전화번호 중복 검사
@@ -80,7 +82,7 @@ public class StoreService {
         Store refreshedStore = storeRepository.findById(savedStore.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Store not found"));
 
-        return new StoreResponseDto(refreshedStore);
+        return new StoreResponseDto(refreshedStore,null);
     }
 
     public List<StoreResponseDto> findOpenStores() {
@@ -88,7 +90,9 @@ public class StoreService {
         List<Store> store = storeRepository.findByStatus(Store.Status.OPEN);
 
         return store.stream()
-                .map(StoreResponseDto::new)
+                .map(eachStore -> {
+                    return new StoreResponseDto(eachStore, reviewService.getStoreReviewInfo(eachStore.getId())); // 3️⃣ Store + Redis 데이터 함께 반환
+                })
                 .toList();
     }
 //    @Transactional(readOnly = true)
