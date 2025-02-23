@@ -1,7 +1,7 @@
 spring:
   data:
     redis:
-      host: ${redis-host}
+      host: ${REDIS_HOST}
       port: 6379
       password:
   sql:
@@ -10,16 +10,16 @@ spring:
       schema-locations: "classpath:db/schema.sql"
       data-locations: "classpath:db/data.sql"
   datasource:
-    url: ${database-url}
-    username: ${database-name}
-    password: ${database-password}
+    url: ${DATABASE_URL}
+    username: ${DATABASE_NAME}
+    password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: none
 jwt:
-  secret: ${jwt-token}
+  secret: ${JWT_TOKEN}
 
 gemini:
   api:
-    key: ${ai-key}
+    key: ${AI_KEY}
