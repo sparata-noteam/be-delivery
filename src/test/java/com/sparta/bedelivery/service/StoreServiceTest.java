@@ -39,8 +39,8 @@ class StoreServiceTest {
         String password = "1234";
         String phone = "123456789";
 
-        UUID locationCategoryId = UUID.fromString("c83851a5-ba66-409d-ad54-2c174789e43d");
-        UUID industryCategoryId = UUID.fromString("ff5fd6b8-e594-455c-8270-cfb2a00ca9a2");
+        String locationName = "세종로";
+        String industryName = "한식";
 
         User mockUser = new User();
         mockUser.setUserId(userId);
@@ -55,8 +55,8 @@ class StoreServiceTest {
 
         StoreRequestDto storeRequestDto = new StoreRequestDto();
         storeRequestDto.setName("맛있는 치킨집");
-        storeRequestDto.setLocationCategoryId(locationCategoryId);
-        storeRequestDto.setIndustryCategoryId(industryCategoryId);
+        storeRequestDto.setLocationName(locationName);
+        storeRequestDto.setIndustryName(industryName);
         storeRequestDto.setAddress("수원시 어딘가");
         storeRequestDto.setPhone("03132323");
         storeRequestDto.setImageUrl("example.jpg");
@@ -86,14 +86,14 @@ class StoreServiceTest {
         assertEquals(User.Role.MASTER, masterUser.getRole(),
                 "관리자 권한이 없습니다.");
 
-        UUID locationCategoryId = UUID.fromString("193d17db-a3c3-4cf2-8390-e46c21105abd");
-        UUID industryCategoryId = UUID.fromString("81c54a91-f1a6-4caf-94b9-2eb614e02ca2");
+        String locationName = "세종로";
+        String industryName = "한식";
 
         CreateStoreRequestDto createStoreRequestDto = new CreateStoreRequestDto();
         createStoreRequestDto.setUserId(ownerId);  // OWNER 권한을 가진 유저의 ID
         createStoreRequestDto.setName("맛있는 치킨집");
-        createStoreRequestDto.setLocationCategoryId(locationCategoryId);
-        createStoreRequestDto.setIndustryCategoryId(industryCategoryId);
+        createStoreRequestDto.setLocationName(locationName);
+        createStoreRequestDto.setIndustryName(industryName);
         createStoreRequestDto.setAddress("수원시 어딘가");
         createStoreRequestDto.setPhone("03132323");
         createStoreRequestDto.setImageUrl("example.jpg");
@@ -105,7 +105,7 @@ class StoreServiceTest {
     @Test
     @DisplayName("관리자의 매장 등록 승인")
     void approveStore() {
-        UUID storeId = UUID.fromString("63ff7ab5-cabc-4381-8164-645bd2022482");
+        UUID storeId = UUID.fromString("66ed98f8-b741-4aa6-9143-4f1bcab78153");
         Store store = storeRepository.findById(storeId).orElse(null);
         assertNotNull(store, "찾으시는 매장이 없습니다.");
 
@@ -124,7 +124,7 @@ class StoreServiceTest {
     @Test
     @DisplayName("매장 상세 정보 찾기 (메뉴와 리뷰)")
     void getAllStores() {
-        UUID storeId = UUID.fromString("1fa2514e-3db6-4f81-9149-43b55dde8bf9");
+        UUID storeId = UUID.fromString("422bbca4-b4ef-4350-acfe-bf2789dd95e2");
         Store store = storeRepository.findById(storeId).orElse(null);
         storeService.getAllStores(storeId);
         assertNotNull(storeId, "찾으시는 매장이 없습니다.");
@@ -141,7 +141,7 @@ class StoreServiceTest {
         @Order(1)
         @DisplayName("가게 주인의 매장 삭제 요청")
         void deleteStoreRequest() {
-            UUID storeId = UUID.fromString("e6cce9f0-7ab8-48ec-8dbe-081cd7d94097");
+            UUID storeId = UUID.fromString("422bbca4-b4ef-4350-acfe-bf2789dd95e2");
 
             Store store = storeRepository.findById(storeId).orElse(null);
             storeService.deleteStoreRequest(storeId);
@@ -154,7 +154,7 @@ class StoreServiceTest {
         @Order(2)
         @DisplayName("관리자의 매장 삭제 승인")
         void approveStore1() {
-            UUID storeId = UUID.fromString("e6cce9f0-7ab8-48ec-8dbe-081cd7d94097");
+            UUID storeId = UUID.fromString("37b61cba-a711-4c95-a8f9-cdf112fa4823");
 
             Store store = storeRepository.findById(storeId).orElse(null);
             assertNotNull(store, "찾으시는 매장이 없습니다.");
@@ -167,11 +167,11 @@ class StoreServiceTest {
     @Test
     @DisplayName("가게 주인의 매장 수정 요청")
     void updateStoreRequest() {
-        UUID storeId = UUID.fromString("e6cce9f0-7ab8-48ec-8dbe-081cd7d94097");
+        UUID storeId = UUID.fromString("7358ed4f-aa2d-4c68-88c9-5ea687eba66c");
 
         Store store = storeRepository.findById(storeId).orElse(null);
 
-        assertNotEquals(store.getStatus() == Store.Status.PENDING,
+        assertEquals(store.getStatus(), Store.Status.PENDING,
                 "매장 수정을 요청할 수 없습니다.");
         StoreUpdateRequestDto storeUpdateRequest = new StoreUpdateRequestDto();
         storeUpdateRequest.setName("맛있고 친절한 치킨집");
@@ -180,19 +180,18 @@ class StoreServiceTest {
         storeUpdateRequest.setImageUrl("example.jpg");
 
         storeService.updateStoreRequest(storeId, storeUpdateRequest);
-        store.setStatus(Store.Status.UPDATE_REQUESTED);
     }
 
     @Test
     @DisplayName("관리자의 매장 수정 승인")
     void approveStore2() {
-        UUID storeId = UUID.fromString("e6cce9f0-7ab8-48ec-8dbe-081cd7d94097");
+        UUID storeId = UUID.fromString("56ccf57b-0e0e-433f-8862-9f0e8ee2c57f");
 
         Store store = storeRepository.findById(storeId).orElse(null);
         assertNotNull(store, "찾으시는 매장이 없습니다.");
-        storeService.approveStore(storeId);
-        assertFalse(store.getStatus() == Store.Status.UPDATE_REQUESTED,
+        assertTrue(store.getStatus().equals(Store.Status.UPDATE_REQUESTED),
                 "수정을 요청한 매장이 아닙니다.");
+        storeService.updateStore(storeId);
     }
 
     @Test
