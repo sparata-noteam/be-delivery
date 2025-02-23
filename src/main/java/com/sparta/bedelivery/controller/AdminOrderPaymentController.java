@@ -32,7 +32,7 @@ public class AdminOrderPaymentController {
             @RequestParam(required = false) String storeId,
             @RequestParam(required = false) Boolean isDeleted
     ) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         AdminOrderCondition condition = new AdminOrderCondition(status, storeId, isDeleted);
         return ResponseEntity.ok(ApiResponseData.success(orderService.getOrderList(pageable, condition)));
     }

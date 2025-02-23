@@ -50,9 +50,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         .and(qOrder.deleteAt.isNull())
                         .and(checkStore(storeId))
                         .and(checkStatus(request.getStatus())))
-                .from(qOrder)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize());
+                .from(qOrder);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 
@@ -77,9 +75,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .where(qOrder.deleteAt.isNull()
                         .and(checkStore(storeId))
                         .and(checkStatus(status)))
-                .from(qOrder)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize());
+                .from(qOrder);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -102,10 +98,9 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 
         JPAQuery<Long> countQuery = query.select(qOrder.count())
                 .where(deletedCheck(condition.getIsDeleted()), checkStore(storeId), checkStatus(status))
-                .from(qOrder)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize());
+                .from(qOrder);
 
+        System.out.println(countQuery.stream().findFirst());
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 

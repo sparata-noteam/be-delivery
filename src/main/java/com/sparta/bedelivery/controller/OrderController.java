@@ -72,7 +72,7 @@ public class OrderController {
                                                                           @RequestParam(required = false) String storeId,
                                                                           @RequestParam(required = false) Order.OrderStatus status) {
         LoginUser loginUser = new LoginUser(userDetails);
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         CustomerOrderRequest request = new CustomerOrderRequest(loginUser.getUserId(), storeId, status);
         return ResponseEntity.ok(ApiResponseData.success(orderService.getCustomerOrderList(pageable, request)));
     }
@@ -85,7 +85,7 @@ public class OrderController {
                                                                                @RequestParam(defaultValue = "10") int size,
                                                                                @RequestParam(required = false) Order.OrderStatus status) {
         LoginUser loginUser = new LoginUser(userDetails);
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
         OwnerOrderRequest request = new OwnerOrderRequest(storeId, status);
 
         return ResponseEntity.ok(ApiResponseData.success(orderService.getOwnerOrderList(pageable, request)));
