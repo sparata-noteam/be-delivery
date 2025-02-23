@@ -104,14 +104,7 @@ CREATE TABLE IF NOT EXISTS p_orders (
     PRIMARY KEY (id)
     );
 
-CREATE TABLE IF NOT EXISTS p_payment_history (
-    changed_at TIMESTAMP(6) NOT NULL,
-    id UUID NOT NULL,
-    payment_id UUID NOT NULL,
-    status VARCHAR(50) NOT NULL CHECK (status IN ('PENDING', 'PAID', 'REFUNDED_CALL', 'REFUNDED')),
-    reason TEXT,
-    PRIMARY KEY (id)
-    );
+
 
 CREATE TABLE IF NOT EXISTS p_payments (
     amount NUMERIC(10,2),
@@ -127,6 +120,15 @@ CREATE TABLE IF NOT EXISTS p_payments (
     delete_by VARCHAR(255),
     update_by VARCHAR(255),
     user_id VARCHAR(255),
+    PRIMARY KEY (id)
+    );
+
+CREATE TABLE IF NOT EXISTS p_payment_history (
+    changed_at TIMESTAMP(6) NOT NULL,
+    id UUID NOT NULL,
+    payment_id UUID NOT NULL,
+    status VARCHAR(50) NOT NULL CHECK (status IN ('PENDING', 'PAID', 'REFUNDED_CALL', 'REFUNDED')),
+    reason TEXT,
     PRIMARY KEY (id)
     );
 
