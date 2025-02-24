@@ -9,6 +9,7 @@ import com.sparta.bedelivery.dto.StoreReviewResponse;
 import com.sparta.bedelivery.dto.UserReviewResponse;
 import com.sparta.bedelivery.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
+@Tag(name = "리뷰")
 public class ReviewController {
 
     private final ReviewService reviewService;

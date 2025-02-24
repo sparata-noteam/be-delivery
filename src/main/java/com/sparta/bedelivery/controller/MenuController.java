@@ -5,6 +5,7 @@ import com.sparta.bedelivery.dto.CreateMenuResponseDto;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Tag(name = "메뉴")
 public class MenuController {
 
     private final MenuService menuService;

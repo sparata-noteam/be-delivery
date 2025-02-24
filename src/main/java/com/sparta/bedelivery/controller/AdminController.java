@@ -10,6 +10,7 @@ import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,7 @@ public class AdminController {
 //    3. 없으면 AccessDeniedException 발생 (403 Forbidden)
 
     // 1.8 사용자 목록 조회
+    @Tag(name = "계정")
     @Operation(summary = "사용자 목록 조회", description = "삭제되지 않은 사용자 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "사용자 목록 조회 성공")
     @GetMapping("/users")
@@ -51,6 +53,7 @@ public class AdminController {
     }
 
     // 1.9 특정 사용자 상세 조회
+    @Tag(name = "계정")
     @Operation(summary = "특정 사용자 상세 조회", description = "특정 사용자의 상세 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "사용자 상세 조회 성공")
     @GetMapping("/users/{userId}")
@@ -60,6 +63,7 @@ public class AdminController {
     }
 
     // 1.10 특정 사용자 강제 탈퇴
+    @Tag(name = "계정")
     @Operation(summary = "특정 사용자 강제 탈퇴", description = "관리자가 사용자를 강제 탈퇴시킵니다.")
     @ApiResponse(responseCode = "200", description = "사용자 탈퇴 성공")
     @DeleteMapping("/users/{userId}")
@@ -69,6 +73,7 @@ public class AdminController {
     }
 
     // 1.11 사용자 권한 변경
+    @Tag(name = "계정")
     @Operation(summary = "사용자 권한 변경", description = "관리자가 특정 사용자의 권한을 변경합니다.")
     @ApiResponse(responseCode = "200", description = "사용자 권한 변경 성공")
     @PatchMapping("/users/{userId}/role")
@@ -80,6 +85,8 @@ public class AdminController {
 // ================================================= 매 장 ==========================================================
 
     // 3.6 전체 매장 목록 조회 (관리자용)
+    @Tag(name = "매장")
+    @Operation(summary = "전체 매장 목록 조회 (관리자용)", description = "전체 매장을 조회합니다.")
     @GetMapping("/stores/{userId}")
     public ResponseEntity<ApiResponseData<List<StoreStatusResponseDto>>> findAllStores(@PathVariable String userId) {
         List<StoreStatusResponseDto> findStore = storeService.findAllStores(userId);
@@ -87,7 +94,9 @@ public class AdminController {
         return ResponseEntity.ok().body(ApiResponseData.success(findStore));
     }
 
+    @Tag(name = "매장")
     // 3.7 특정 매장 강제 삭제
+    @Operation(summary = "특정 매장 강제 삭제 (관리자)", description = "특정 매장 강제 삭제 합니다.")
     @DeleteMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponseData<Void>> deleteStore(@PathVariable UUID storeId) {
         storeService.deleteStore(storeId);
@@ -95,7 +104,9 @@ public class AdminController {
         return ResponseEntity.ok().body(ApiResponseData.success(null,"매장이 강제 삭제되었습니다."));
     }
 
+    @Tag(name = "매장")
     // 3.8 매장 등록, 삭제요청 승인
+    @Operation(summary = "매장 등록, 삭제요청 승인 (관리자)", description = "매장 등록, 삭제요청 승인 합니다.")
     @PutMapping("/stores/{storeId}/approve")
     public ResponseEntity<ApiResponseData<StoreStatusResponseDto>> approveStore(@PathVariable UUID storeId){
         StoreStatusResponseDto approve = storeService.approveStore(storeId);
@@ -104,8 +115,10 @@ public class AdminController {
                 approve, "승인되었습니다."
         ));
     }
+    @Tag(name = "매장")
 
     // 3.9 매장 정보 수정 승인 (관리자용)
+    @Operation(summary = "매장 정보 수정 승인 (관리자)", description = "매장 정보 수정을 승인 합니다.")
     @PutMapping("/stores/{storeId}/update")
     public ResponseEntity<ApiResponseData<StoreStatusResponseDto>> updateStore(@PathVariable UUID storeId) {
 
@@ -115,6 +128,8 @@ public class AdminController {
     }
 
     // 3.10 매장 정보 등록 (관리자용)
+    @Tag(name = "매장")
+    @Operation(summary = "매장 정보 등록 (관리자)", description = "매장 정보 등록을 합니다.")
     @PostMapping("/stores")
     public ResponseEntity<ApiResponseData<CreateStoreResponseDto>> createStore(@RequestBody CreateStoreRequestDto requestDto) {
         CreateStoreResponseDto createStore = storeService.createStore(requestDto);
@@ -125,6 +140,7 @@ public class AdminController {
 // ================================================= 리 뷰 ==========================================================
 
     //6.6 전체 리뷰 조회
+    @Tag(name = "리뷰")
     @Operation(summary = "전체 리뷰 조회(관리자)", description = "관리자가 전체 리뷰를 최신순으로 조회 합니다.")
     @GetMapping("/admin/reviews")
     public ResponseEntity<ApiResponseData<Page<AdminReviewResponse>>> getAllReviews(
@@ -136,6 +152,7 @@ public class AdminController {
     }
 
     //6.7 특정 리뷰 삭제
+    @Tag(name = "리뷰")
     @DeleteMapping("/admin/{reviewId}")
     @Operation(summary = "특정 리뷰 삭제(관리자)", description = "관리자가 특정 리뷰를 삭제합니다.")
     public ResponseEntity<ApiResponseData<String>> deleteReviewByAdmin(@PathVariable UUID reviewId) {

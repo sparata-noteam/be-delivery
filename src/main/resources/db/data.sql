@@ -3,9 +3,9 @@ INSERT INTO p_industry_categories
 VALUES
     (uuid_generate_v4(), CURRENT_TIMESTAMP, 'MASTER', CURRENT_TIMESTAMP, 'MASTER', '한식'),
     (uuid_generate_v4(), CURRENT_TIMESTAMP, 'MASTER', CURRENT_TIMESTAMP, 'MASTER', '중식'),
-    (uuid_generate_v4(), CURRENT_TIMESTAMP, 'MASTER', CURRENT_TIMESTAMP, 'MASTER', '일식'),
-    (uuid_generate_v4(), CURRENT_TIMESTAMP, 'MASTER', CURRENT_TIMESTAMP, 'MASTER', '양식'),
-    (uuid_generate_v4(), CURRENT_TIMESTAMP, 'MASTER', CURRENT_TIMESTAMP, 'MASTER', '디저트')
+    (uuid_generate_v4(), CURRENT_TIMESTAMP, 'MASTER', CURRENT_TIMESTAMP, 'MASTER', '분식'),
+    (uuid_generate_v4(), CURRENT_TIMESTAMP, 'MASTER', CURRENT_TIMESTAMP, 'MASTER', '치킨'),
+    (uuid_generate_v4(), CURRENT_TIMESTAMP, 'MASTER', CURRENT_TIMESTAMP, 'MASTER', '피자')
 ON CONFLICT (name) DO NOTHING;
 
 -- 서울시 데이터 삽입
