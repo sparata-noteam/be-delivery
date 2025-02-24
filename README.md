@@ -66,5 +66,5 @@
 |Leader|Member|Member|Member|
 |:---:|:---:|:---:|:---:|
 |주문/걸제|계정/베송지|리뷰/AI|매장/매뉴|
-| ![]() | ![]() | ![](https://github.com/kim946509.png?size=120)|![](https://github.com/seungg8361.png?size=120) |
-|[박용훈](https://github.com/asqwklop12)|[김수현](https://github.com/SeongHo-C)|[김대연](https://github.com/kim946509)|[백승규](https://github.com/seungg8361)|
+| ![](https://github.com/asqwklop12.png?size=120) | ![](https://github.com/rana0122.png?size=120) | ![](https://github.com/kim946509.png?size=120)|![](https://github.com/seungg8361.png?size=120) |
+|[박용훈](https://github.com/asqwklop12)|[김수현](https://github.com/rana0122)|[김대연](https://github.com/kim946509)|[백승규](https://github.com/seungg8361)|
