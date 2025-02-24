@@ -80,7 +80,7 @@
 <br />
 
 ## 💁‍♂️ 프로젝트 팀원
-|Backend|Frontend|
-|:---:|:---:|
-| ![](https://github.com/kim946509.png?size=120) | ![](https://github.com/SeongHo-C.png?size=120) |
-|[김대연](https://github.com/kim946509)|[이성호](https://github.com/SeongHo-C)|
+|Leader|Member|Member|Member|
+|:---:|:---:|:---:|:---:|
+| ![]() | ![]() | ![](https://github.com/kim946509.png?size=120)|![](https://github.com/seungg8361.png?size=120) |
+|[박용훈](https://github.com/asqwklop12)|[김수현](https://github.com/SeongHo-C)|[김대연](https://github.com/kim946509)|[백승규](https://github.com/seungg8361)|
