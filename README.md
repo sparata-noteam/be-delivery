@@ -1,26 +1,9 @@
 <div align="center">
 
-<!-- logo -->
-<img src="https://user-images.githubusercontent.com/80824750/208554611-f8277015-12e8-48d2-b2cc-d09d67f03c02.png" width="400"/>
-
-### Back-end Git Reamd.me Template ✅
-
-[<img src="https://img.shields.io/badge/-readme.md-important?style=flat&logo=google-chrome&logoColor=white" />]() [<img src="https://img.shields.io/badge/-tech blog-blue?style=flat&logo=google-chrome&logoColor=white" />]() [<img src="https://img.shields.io/badge/release-v0.0.0-yellow?style=flat&logo=google-chrome&logoColor=white" />]() 
+[<img src="https://img.shields.io/badge/-readme.md-important?style=flat&logo=google-chrome&logoColor=white" />]() [<img src="https://img.shields.io/badge/-tech blog-blue?style=flat&logo=google-chrome&logoColor=white" />]() [<img src="https://img.shields.io/badge/release-v1.0.0-yellow?style=flat&logo=google-chrome&logoColor=white" />]() 
 <br/> [<img src="https://img.shields.io/badge/프로젝트 기간-2025.02.10~2025.02.25-green?style=flat&logo=&logoColor=white" />]()
 
 </div> 
-
-## 📝 소개
-백엔드 깃 레파지토리의 README.md를 빠르게 작성하기 위해 만든 템플릿입니다.
-
-다음과 같은 내용을 작성할 수 있습니다.
-- 프로젝트 소개
-- 서비스 구성 및 실행 방법
-- 프로젝트 API 설계
-- 사용한 기술 스택
-- 프로젝트 아키텍쳐
-- 기술적 이슈와 해결 과정
-- 프로젝트 팀원 및 역할
 
 <br />
 
@@ -44,6 +27,7 @@
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/SpringDataJPA.png?raw=true" width="80">
     
 <img src="https://blog.kakaocdn.net/dn/cGqlEN/btqKXMjjjTj/Tq3JYjKquDFu4MOlt6lQO1/img.png" width="80">
+<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Redis.png?raw=true" width="80">
 
 </div>
 
@@ -68,13 +52,12 @@
 <br />
 
 ## 🤔 기술적 이슈와 해결 과정
-- Stream 써야할까?
-    - [Stream API에 대하여](https://velog.io/@yewo2nn16/Java-Stream-API)
-- Gmail STMP 이용하여 이메일 전송하기
-    - [gmail 보내기](https://velog.io/@yewo2nn16/Email-이메일-전송하기with-첨부파일)
 - AWS EC2에 배포하기
-    - [서버 배포하기-1](https://velog.io/@yewo2nn16/SpringBoot-서버-배포)
-    - [서버 배포하기-2](https://velog.io/@yewo2nn16/SpringBoot-서버-배포-인텔리제이에서-jar-파일-빌드해서-배포하기)
+    - [서버 배포하기](https://teamsparta.notion.site/AWS-EC2-RDS-d37107b67d474e51aae4896d3cb90af9#f022d1197003427db46fac20456c54e6)
+- ec2에 레디스 추가
+    - [ec2에 레디스 추가](https://b-programmer.tistory.com/389)
+- 환경변수 application.yml에서 감추기
+    - [환경변수 제거](작성중)
 
 
 <br />
@@ -82,5 +65,6 @@
 ## 💁‍♂️ 프로젝트 팀원
 |Leader|Member|Member|Member|
 |:---:|:---:|:---:|:---:|
+|주문/걸제|계정/베송지|리뷰/AI|매장/매뉴|
 | ![]() | ![]() | ![](https://github.com/kim946509.png?size=120)|![](https://github.com/seungg8361.png?size=120) |
 |[박용훈](https://github.com/asqwklop12)|[김수현](https://github.com/SeongHo-C)|[김대연](https://github.com/kim946509)|[백승규](https://github.com/seungg8361)|
