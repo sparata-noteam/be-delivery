@@ -24,13 +24,13 @@
 
 <br />
 
+## 프로젝트 소개
+본 프로젝트는 주문 및 결제와 관련된 사용자 경험을 직관적이고 효율적으로 제공하는 플랫폼입니다. 사용자는 원활한 주문과 결제 서비스를 이용할 수 있으며, 매장 관리 기능도 함께 제공하여 상품 등록, 주문 관리, 결제 내역 조회 등의 운영 편의성을 강화했습니다.
+초기 개발 단계에서는 단일 서비스 구조로 설계되었으나, 향후 MSA(Microservices Architecture)로의 확장 가능성을 고려하여 유연하고 확장성 있는 아키텍처 기반으로 작성되었습니다. 
 
 ## 🗂️ APIs
 작성한 API는 아래에서 확인할 수 있습니다.
-Swagger링크 혹은 여기에 작성
-
-👉🏻 [API 바로보기](/backend/APIs.md)
-
+👉🏻 [API 바로보기](http://3.35.234.12/swagger-ui/index.html)
 
 <br />
 
@@ -42,9 +42,9 @@ Swagger링크 혹은 여기에 작성
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/SpringBoot.png?raw=true" width="80">
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/SpringSecurity.png?raw=true" width="80">
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/SpringDataJPA.png?raw=true" width="80">
-<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Mysql.png?raw=true" width="80">
-<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Ajax.png?raw=true" width="80">
-<img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Thymeleaf.png?raw=true" width="80">
+    
+<img src="https://blog.kakaocdn.net/dn/cGqlEN/btqKXMjjjTj/Tq3JYjKquDFu4MOlt6lQO1/img.png" width="80">
+
 </div>
 
 ### Infra
@@ -61,7 +61,7 @@ Swagger링크 혹은 여기에 작성
 <br />
 
 ## 🛠️ 프로젝트 아키텍쳐
-![no-image](https://user-images.githubusercontent.com/80824750/208294567-738dd273-e137-4bbf-8307-aff64258fe03.png)
+![no-image](https://github.com/sparata-noteam/img/blob/main/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA%202025-02-18%20%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB%2011.57.06.png)
 
 
 
