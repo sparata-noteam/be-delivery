@@ -26,7 +26,7 @@
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/SpringSecurity.png?raw=true" width="80">
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/SpringDataJPA.png?raw=true" width="80">
     
-<img src="https://blog.kakaocdn.net/dn/cGqlEN/btqKXMjjjTj/Tq3JYjKquDFu4MOlt6lQO1/img.png" width="80">
+<img src="https://github.com/sparata-noteam/img/blob/main/image%20(3).png" width="80">
 <img src="https://github.com/yewon-Noh/readme-template/blob/main/skills/Redis.png?raw=true" width="80">
 
 </div>
@@ -52,6 +52,8 @@
 <br />
 
 ## 🤔 기술적 이슈와 해결 과정
+- 리뷰에 레디스 적용
+   - [레디스 적용](https://agongstory.tistory.com/39)
 - AWS EC2에 배포하기
     - [서버 배포하기](https://teamsparta.notion.site/AWS-EC2-RDS-d37107b67d474e51aae4896d3cb90af9#f022d1197003427db46fac20456c54e6)
 - ec2에 레디스 추가
