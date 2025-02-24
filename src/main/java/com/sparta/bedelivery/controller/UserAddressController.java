@@ -5,6 +5,7 @@ import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.UserAddressService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users/me/addresses")
 @RequiredArgsConstructor
+@Tag(name = "배송지")
 public class UserAddressController {
 
     private final UserAddressService userAddressService;

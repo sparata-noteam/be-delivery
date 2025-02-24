@@ -10,6 +10,7 @@ import com.sparta.bedelivery.security.JwtUtil;
 import com.sparta.bedelivery.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Tag(name = "보안")
 public class AuthController {
 
     private final AuthService authService;
@@ -49,17 +51,9 @@ public class AuthController {
     @Operation(summary = "로그아웃", description = "JWT 기반 로그아웃 처리")
     @ApiResponse(responseCode = "200", description = "로그아웃 성공")
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request) {
-        String token = getTokenFromRequest(request);
-
-        if (token == null || !jwtUtil.validateToken(token)) {
-            return ResponseEntity.badRequest().body("유효하지 않은 토큰입니다.");
-        }
-
-        long expirationMillis = jwtUtil.getExpirationTime(token) - System.currentTimeMillis();
-        jwtBlacklistService.addToBlacklist(token, expirationMillis);
-
-        return ResponseEntity.ok("로그아웃 성공");
+    public ResponseEntity<ApiResponseData<?>> logout() {
+        ApiResponseData<?> response = ApiResponseData.success(Map.of("success", true));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     /**
      * 요청에서 JWT 추출
