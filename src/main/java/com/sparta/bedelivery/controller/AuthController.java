@@ -51,10 +51,19 @@ public class AuthController {
     @Operation(summary = "로그아웃", description = "JWT 기반 로그아웃 처리")
     @ApiResponse(responseCode = "200", description = "로그아웃 성공")
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponseData<?>> logout() {
-        ApiResponseData<?> response = ApiResponseData.success(Map.of("success", true));
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<ApiResponseData<String>> logout(HttpServletRequest request) {
+        String token = getTokenFromRequest(request);
+
+        if (token == null || !jwtUtil.validateToken(token)) {
+            return ResponseEntity.badRequest().body(ApiResponseData.failure(400, "유효하지 않은 토큰입니다."));
+        }
+
+        long expirationMillis = jwtUtil.getExpirationTime(token) - System.currentTimeMillis();
+        jwtBlacklistService.addToBlacklist(token, expirationMillis);
+
+        return ResponseEntity.ok(ApiResponseData.success("로그아웃 성공"));
     }
+
     /**
      * 요청에서 JWT 추출
      */
