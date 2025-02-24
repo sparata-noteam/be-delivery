@@ -82,5 +82,5 @@ Swagger링크 혹은 여기에 작성
 ## 💁‍♂️ 프로젝트 팀원
 |Backend|Frontend|
 |:---:|:---:|
-| ![](https://github.com/yewon-Noh.png?size=120) | ![](https://github.com/SeongHo-C.png?size=120) |
-|[노예원](https://github.com/yewon-Noh)|[이성호](https://github.com/SeongHo-C)|
+| ![](https://github.com/kim946509.png?size=120) | ![](https://github.com/SeongHo-C.png?size=120) |
+|[김대연](https://github.com/kim946509)|[이성호](https://github.com/SeongHo-C)|
