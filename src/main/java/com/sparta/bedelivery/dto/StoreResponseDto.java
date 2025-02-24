@@ -28,7 +28,7 @@ public class StoreResponseDto {
     public StoreResponseDto(Store store, Map<String, String> reviewInfo) {
         this.storeId = store.getId();
         this.name = store.getName();
-        this.address = store.getAddress();
+        this.address = store.getLocationCategory().getName() + " " + store.getAddress();
         this.phone = store.getPhone();
         this.image_url = store.getImageUrl();
         this.industryCategoryNames = store.getStoreIndustryCategories().stream()

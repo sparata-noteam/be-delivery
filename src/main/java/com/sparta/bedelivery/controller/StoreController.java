@@ -32,15 +32,16 @@ public class StoreController {
         return ResponseEntity.ok().body(ApiResponseData.success(newStore, "매장 등록 요청이 접수되었습니다."));
     }
 
-    // 3.2 전체 매장 목록 조회 OPEN 상태의 매장만 조회 가능.
+    // 3.2 삭제 상태의 매장 제외 전체 매장 목록 조회 가능.
     @PreAuthorize("hasAnyRole('CUSTOMER','OWNER','MANAGER')")
     @GetMapping("/stores")
-    @Operation(summary = "OPEN 상태의 매장 조회", description = "관리자를 제외한 모든 사용자가 OPEN 매장을 조회합니다.")
-    public ResponseEntity<ApiResponseData<List<StoreResponseDto>>> findOpenStores() {
+    @Operation(summary = "매장 조회", description = "매장을 조회하며, 선택적으로 업종과 지역으로 필터링할 수 있습니다.")
+    public ResponseEntity<ApiResponseData<List<StoreResponseDto>>> getStores(
+            @RequestParam(required = false) String industryName,
+            @RequestParam(required = false) String locationName) {
 
-        List<StoreResponseDto> openStores = storeService.findOpenStores();
-
-        return ResponseEntity.ok().body(ApiResponseData.success(openStores));
+        List<StoreResponseDto> stores = storeService.getStores(industryName, locationName);
+        return ResponseEntity.ok().body(ApiResponseData.success(stores));
     }
 
     // 3.3 매장 상세 조회
