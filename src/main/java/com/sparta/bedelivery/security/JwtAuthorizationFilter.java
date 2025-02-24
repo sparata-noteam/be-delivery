@@ -16,20 +16,34 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final JwtBlacklistService jwtBlacklistService;
     private final AuthenticationManager authenticationManager;  // 추가
+    private final Set<String> blacklistedTokens = new HashSet<>();
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = getTokenFromRequest(request);
+
+        //  블랙리스트 확인: 로그아웃된 토큰이면 요청 차단
+        if (token != null && jwtBlacklistService.isBlacklisted(token)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"message\": \"이미 로그아웃된 토큰입니다.\"}");
+            return;
+        }
 
         // 토큰이 유효하면 인증 정보 설정
         if (token != null && jwtUtil.validateToken(token)) {

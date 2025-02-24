@@ -8,6 +8,7 @@ import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.repository.UserRepository;
 import com.sparta.bedelivery.security.JwtAuthenticationFilter;
 import com.sparta.bedelivery.security.JwtAuthorizationFilter;
+import com.sparta.bedelivery.security.JwtBlacklistService;
 import com.sparta.bedelivery.security.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
@@ -55,7 +57,8 @@ public class SecurityConfig {
         jwtAuthenticationFilter.setFilterProcessesUrl("/api/users/login");
 
         jwtAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler());
-        JwtAuthorizationFilter jwtAuthorizationFilter = new JwtAuthorizationFilter(jwtUtil, userDetailsService, authenticationManager());
+        JwtAuthorizationFilter jwtAuthorizationFilter =
+                new JwtAuthorizationFilter(jwtUtil, userDetailsService, jwtBlacklistService,authenticationManager());
 
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
