@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.bedelivery.dto.AuthRequest;
 import com.sparta.bedelivery.dto.AuthResponse;
 import com.sparta.bedelivery.entity.User;
+import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,6 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -28,6 +31,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
+//    private final Map<String, Integer> failedAttempts = new HashMap<>();
+
 
 
     /**
@@ -51,6 +56,34 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         } catch (IOException e) {
             throw new RuntimeException("로그인 요청 파싱 실패", e);
         }
+//        AuthRequest authRequest = null; // try 블록 밖에서 선언
+//
+//        try {
+//            authRequest = new ObjectMapper().readValue(request.getInputStream(), AuthRequest.class);
+//            String userId = authRequest.getUserId();
+//
+//            // 로그인 실패 횟수 체크
+//            if (failedAttempts.getOrDefault(userId, 0) >= 5) {
+//                throw new AuthenticationException("403: 너무 많은 로그인 시도로 인해 계정이 잠겼습니다.") {};
+//            }
+//
+//            Authentication authentication = authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(userId, authRequest.getPassword())
+//            );
+//
+//            // 로그인 성공 시 실패 횟수 초기화
+//            failedAttempts.remove(userId);
+//            return authentication;
+//        } catch (AuthenticationException e) {
+//            // 로그인 실패 시 횟수 증가
+//            if (authRequest != null) {
+//                String userId = authRequest.getUserId();
+//                failedAttempts.put(userId, failedAttempts.getOrDefault(userId, 0) + 1);
+//            }
+//            throw e;
+//        } catch (IOException e) {
+//            throw new RuntimeException("로그인 요청 파싱 실패", e);
+//        }
     }
 
     /**
@@ -81,11 +114,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                               AuthenticationException failed) throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//
+//        response.setContentType("application/json");
+//        response.setCharacterEncoding("UTF-8");
+//        String errorMessage = "{\"message\":\"Authentication Failed: " + failed.getMessage() + "\"}";
+//        response.getWriter().write(errorMessage);
 
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        String errorMessage = "{\"message\":\"Authentication Failed: " + failed.getMessage() + "\"}";
-        response.getWriter().write(errorMessage);
+
+        ApiResponseData<String> responseData = ApiResponseData.failure(401, "로그인 실패: " + failed.getMessage());
+
+        response.getWriter().write(new ObjectMapper().writeValueAsString(responseData));
     }
 }

@@ -74,4 +74,14 @@ public class JwtUtil {
         }
     }
 
+    public long getExpirationTime(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getExpiration().getTime();
+    }
+
 }
