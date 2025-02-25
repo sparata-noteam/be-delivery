@@ -3,8 +3,6 @@ package com.sparta.bedelivery.service;
 import com.sparta.bedelivery.dto.*;
 import com.sparta.bedelivery.entity.*;
 import com.sparta.bedelivery.repository.*;
-import jakarta.persistence.EntityNotFoundException;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +31,9 @@ public class StoreService {
     private final MenuRepository menuRepository;
 
     private final ReviewService reviewService;
+
+    private final StoreQueryRepositoryImpl storeQueryRepositoryImpl;
+
     @Transactional
     public StoreResponseDto createStoreRequest(StoreRequestDto requestDto, String userId) {
         // 전화번호 중복 검사
@@ -57,7 +58,7 @@ public class StoreService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("가입된 사용자가 없습니다."));
 
-        if (user.getRole() != User.Role.OWNER){ // 토큰 값으로만 등록이 가능해서 추가 수정
+        if (user.getRole() != User.Role.OWNER) { // 토큰 값으로만 등록이 가능해서 추가 수정
             throw new IllegalArgumentException("매장을 등록할 권한이 필요합니다.");
         }
         Store savedStore = Store.builder()
@@ -82,23 +83,25 @@ public class StoreService {
         Store refreshedStore = storeRepository.findById(savedStore.getId())
                 .orElseThrow(() -> new IllegalArgumentException("매장을 찾을 수 없습니다."));
 
-        return new StoreResponseDto(refreshedStore,null);
+        return new StoreResponseDto(refreshedStore, null);
     }
 
-    public List<StoreResponseDto> findOpenStores() {
-
-        List<Store> store = storeRepository.findByStatus(Store.Status.OPEN);
-
-        return store.stream()
+    public List<StoreResponseDto> getStores(String industryName, String locationName) {
+        List<Store> stores = storeQueryRepositoryImpl.findStoresWithCategory(industryName, locationName);
+        if (stores.isEmpty()){
+            throw new IllegalArgumentException("찾으시는 매장이 존재하지 않습니다.");
+        }
+        return stores.stream()
                 .map(eachStore -> {
                     return new StoreResponseDto(eachStore, reviewService.getStoreReviewInfo(eachStore.getId())); // 3️⃣ Store + Redis 데이터 함께 반환
                 })
                 .toList();
     }
-//    @Transactional(readOnly = true)
+
+    //    @Transactional(readOnly = true)
     public List<StoreDetailsResponseDto> getAllStores(UUID storeId) {
 
-        Store store = storeRepository.findById(storeId)
+        Store store = storeRepository.findByIdOrderByCreateAt(storeId)
                 .orElseThrow(() -> new IllegalArgumentException("매장을 찾을 수 없습니다."));
 
         boolean hiddenMenu = menuRepository.findByStore_Id(storeId)
@@ -155,8 +158,8 @@ public class StoreService {
     // 전체 매장 목록 조회 (관리자용)
     public List<StoreStatusResponseDto> findAllStores(String userId) {
         User user = userRepository.findByUserId(userId)
-                .orElseThrow(()->new IllegalArgumentException("유저를 찾을 수 없습니다."));
-        if(user.getRole()!= User.Role.MASTER){
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        if (user.getRole() != User.Role.MASTER) {
             throw new IllegalArgumentException("권한이 없습니다.");
         }
 
