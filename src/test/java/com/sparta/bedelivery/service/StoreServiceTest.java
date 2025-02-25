@@ -105,7 +105,7 @@ class StoreServiceTest {
     @Test
     @DisplayName("관리자의 매장 등록 승인")
     void approveStore() {
-        UUID storeId = UUID.fromString("66ed98f8-b741-4aa6-9143-4f1bcab78153");
+        UUID storeId = UUID.fromString("3f656600-4b76-4f53-a53b-ccad2e0ddc70");
         Store store = storeRepository.findById(storeId).orElse(null);
         assertNotNull(store, "찾으시는 매장이 없습니다.");
 
@@ -124,7 +124,7 @@ class StoreServiceTest {
     @Test
     @DisplayName("매장 상세 정보 찾기 (메뉴와 리뷰)")
     void getAllStores() {
-        UUID storeId = UUID.fromString("422bbca4-b4ef-4350-acfe-bf2789dd95e2");
+        UUID storeId = UUID.fromString("ae3e2e33-fb9c-49cd-90d1-d0321bdd9233");
         Store store = storeRepository.findById(storeId).orElse(null);
         storeService.getAllStores(storeId);
         assertNotNull(storeId, "찾으시는 매장이 없습니다.");
@@ -141,7 +141,7 @@ class StoreServiceTest {
         @Order(1)
         @DisplayName("가게 주인의 매장 삭제 요청")
         void deleteStoreRequest() {
-            UUID storeId = UUID.fromString("422bbca4-b4ef-4350-acfe-bf2789dd95e2");
+            UUID storeId = UUID.fromString("3f656600-4b76-4f53-a53b-ccad2e0ddc70");
 
             Store store = storeRepository.findById(storeId).orElse(null);
             storeService.deleteStoreRequest(storeId);
@@ -154,7 +154,7 @@ class StoreServiceTest {
         @Order(2)
         @DisplayName("관리자의 매장 삭제 승인")
         void approveStore1() {
-            UUID storeId = UUID.fromString("37b61cba-a711-4c95-a8f9-cdf112fa4823");
+            UUID storeId = UUID.fromString("b7c64ad3-e42b-40af-8281-234fc5306b27");
 
             Store store = storeRepository.findById(storeId).orElse(null);
             assertNotNull(store, "찾으시는 매장이 없습니다.");
@@ -167,7 +167,7 @@ class StoreServiceTest {
     @Test
     @DisplayName("가게 주인의 매장 수정 요청")
     void updateStoreRequest() {
-        UUID storeId = UUID.fromString("7358ed4f-aa2d-4c68-88c9-5ea687eba66c");
+        UUID storeId = UUID.fromString("3f656600-4b76-4f53-a53b-ccad2e0ddc70");
 
         Store store = storeRepository.findById(storeId).orElse(null);
 
@@ -185,7 +185,7 @@ class StoreServiceTest {
     @Test
     @DisplayName("관리자의 매장 수정 승인")
     void approveStore2() {
-        UUID storeId = UUID.fromString("56ccf57b-0e0e-433f-8862-9f0e8ee2c57f");
+        UUID storeId = UUID.fromString("a7dff3da-77fe-4087-9c7c-934e4fac6bab");
 
         Store store = storeRepository.findById(storeId).orElse(null);
         assertNotNull(store, "찾으시는 매장이 없습니다.");
