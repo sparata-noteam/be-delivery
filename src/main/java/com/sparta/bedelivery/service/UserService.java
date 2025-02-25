@@ -21,7 +21,6 @@ public class UserService implements UserDetailsService {
     private final UserAddressRepository userAddressRepository;
 
     // 사용자 정보 조회
-// 사용자 정보 조회
     public UserResponse getUserInfo(String userId) {
         User user = userRepository.findByUserIdAndDeleteAtIsNull(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));

@@ -30,4 +30,17 @@ public class JwtBlacklistService {
     public boolean isBlacklisted(String token) {
         return Boolean.TRUE.equals(redisTemplate.hasKey(BLACKLIST_PREFIX + token));
     }
+
+    public void storeRefreshToken(String userId, String refreshToken, int days) {
+        redisTemplate.opsForValue().set("refresh:" + userId, refreshToken, days, TimeUnit.DAYS);
+    }
+
+    public String getRefreshToken(String userId) {
+        return (String) redisTemplate.opsForValue().get("refresh:" + userId);
+    }
+
+    public void deleteRefreshToken(String userId) {
+        redisTemplate.delete("refresh:" + userId);
+    }
+
 }

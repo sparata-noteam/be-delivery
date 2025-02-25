@@ -17,6 +17,7 @@ public class JwtUtil {
     private String secretKey;
 
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10시간
+    private final long REFRESH_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 7일 유효
 
     /**
      * JWT 토큰 생성
@@ -39,6 +40,15 @@ public class JwtUtil {
                 .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
                 .compact();
     }
+    public String generateRefreshToken(String userId) {
+        return Jwts.builder()
+                .setSubject(userId)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() +REFRESH_EXPIRATION_TIME)) // 7일 유효
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
 
     //JWT에서 role 추출
     public String extractRole(String token) {

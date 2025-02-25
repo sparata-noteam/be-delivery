@@ -1,13 +1,16 @@
 package com.sparta.bedelivery.controller;
 
+import com.sparta.bedelivery.dto.AuthResponse;
 import com.sparta.bedelivery.dto.ChangePasswordRequest;
 import com.sparta.bedelivery.dto.UserRegisterRequest;
 import com.sparta.bedelivery.dto.UserResponse;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.global.response.ApiResponseData;
+import com.sparta.bedelivery.repository.UserRepository;
 import com.sparta.bedelivery.security.JwtBlacklistService;
 import com.sparta.bedelivery.security.JwtUtil;
 import com.sparta.bedelivery.service.AuthService;
+import com.sparta.bedelivery.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,12 +19,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -34,6 +36,7 @@ public class AuthController {
     private final AuthService authService;
     private final JwtBlacklistService jwtBlacklistService;
     private final JwtUtil jwtUtil;
+    private final UserService userService;
 
     // 1.1 회원가입
     @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.")
@@ -47,7 +50,36 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    // 1.3 로그아웃 (JWT 기반이라 서버에서 별도 로직 없음)
+//     리프레시 토큰을 사용한 액세스 토큰 재발급
+    @Operation(summary = "액세스 토큰 재발급", description = "리프레시 토큰을 이용하여 새로운 액세스 토큰을 발급합니다.")
+    @ApiResponse(responseCode = "200", description = "토큰 재발급 성공")
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshAccessToken(@RequestHeader("Refresh-Token") String refreshToken) {
+        try {
+            String userId = jwtUtil.parseToken(refreshToken).getSubject();
+
+            // 저장된 리프레시 토큰과 일치하는지 확인
+            String storedRefreshToken = jwtBlacklistService.getRefreshToken(userId);
+            if (!refreshToken.equals(storedRefreshToken)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponseData.failure(401, "유효하지 않은 리프레시 토큰"));
+            }
+
+            UserDetails userDetails = userService.loadUserByUsername(userId);
+            String role = userDetails.getAuthorities().stream()
+                    .findFirst()
+                    .map(GrantedAuthority::getAuthority)
+                    .orElseThrow(() -> new IllegalStateException("사용자의 역할 정보를 찾을 수 없습니다."));
+
+
+            String newAccessToken = jwtUtil.generateAccessToken(userDetails.getUsername(), role);
+
+            return ResponseEntity.ok(new AuthResponse(newAccessToken, refreshToken, role));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponseData.failure(401, "리프레시 토큰이 유효하지 않습니다."));
+        }
+    }
+
+    // 1.3 로그아웃 (JWT 기반)
     @Operation(summary = "로그아웃", description = "JWT 기반 로그아웃 처리")
     @ApiResponse(responseCode = "200", description = "로그아웃 성공")
     @PostMapping("/logout")
@@ -60,6 +92,9 @@ public class AuthController {
 
         long expirationMillis = jwtUtil.getExpirationTime(token) - System.currentTimeMillis();
         jwtBlacklistService.addToBlacklist(token, expirationMillis);
+        // 리프레시 토큰도 삭제
+        String userId = jwtUtil.parseToken(token).getSubject();
+        jwtBlacklistService.deleteRefreshToken(userId);
 
         return ResponseEntity.ok(ApiResponseData.success("로그아웃 성공"));
     }
@@ -74,6 +109,7 @@ public class AuthController {
         }
         return null;
     }
+
 //    public ResponseEntity<ApiResponseData<?>> logout() {
 //        ApiResponseData<?> response = ApiResponseData.success(Map.of("success", true));
 //        return ResponseEntity.status(HttpStatus.OK).body(response);

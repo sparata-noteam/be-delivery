@@ -31,6 +31,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
+    private final JwtBlacklistService jwtBlacklistService;
 //    private final Map<String, Integer> failedAttempts = new HashMap<>();
 
 
@@ -97,14 +98,22 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         UserDetails userDetails = (UserDetails) authResult.getPrincipal();
         String role = ((CustomUserDetails) userDetails).getUser().getRole().name();
 
-        String token = jwtUtil.generateAccessToken(userDetails.getUsername(), role);
+//        String token = jwtUtil.generateAccessToken(userDetails.getUsername(), role);
+        // 액세스 토큰과 리프레시 토큰 생성
+        String accessToken = jwtUtil.generateAccessToken(userDetails.getUsername(), role);
+        String refreshToken = jwtUtil.generateRefreshToken(userDetails.getUsername());
 
-        response.setHeader("Authorization", "Bearer " + token);
+        // 리프레시 토큰을 Redis에 저장 (7일 동안 유지)
+        jwtBlacklistService.storeRefreshToken(userDetails.getUsername(), refreshToken, 7);
+
+//        response.setHeader("Authorization", "Bearer " + token);
+        response.setHeader("Authorization", "Bearer " + accessToken);
+        response.setHeader("Refresh-Token", refreshToken);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         PrintWriter writer = response.getWriter();
-        writer.write(new ObjectMapper().writeValueAsString(new AuthResponse(token,role)));
+        writer.write(new ObjectMapper().writeValueAsString(new AuthResponse(accessToken, refreshToken, role)));
         writer.flush();
     }
 
