@@ -13,7 +13,7 @@
 
 ## 🗂️ APIs
 작성한 API는 아래에서 확인할 수 있습니다.
-👉🏻 [API 바로보기](http://3.35.234.12/swagger-ui/index.html)
+👉🏻 [API 바로보기](http://no-team.agong.store/swagger-ui/index.html#/)
 
 <br />
 
