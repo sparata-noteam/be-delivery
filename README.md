@@ -45,7 +45,7 @@
 <br />
 
 ## 🛠️ 프로젝트 아키텍쳐
-![no-image](https://github.com/sparata-noteam/img/blob/main/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA%202025-02-18%20%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB%2011.57.06.png)
+![no-image](https://github.com/sparata-noteam/img/blob/main/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA%202025-02-25%20%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB%2011.19.28.png)
 
 ## 서버 아키텍쳐
 ![no-image](https://github.com/sparata-noteam/img/blob/main/%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png)
