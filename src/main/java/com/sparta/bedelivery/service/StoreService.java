@@ -107,17 +107,16 @@ public class StoreService {
         boolean hiddenMenu = menuRepository.findByStore_Id(storeId)
                 .stream().anyMatch(menu -> !menu.getIsHidden());
 
-        if (store.getStatus() != Store.Status.DELETE && hiddenMenu) {
+        if (store.getStatus() != Store.Status.DELETE || hiddenMenu) {
             return List.of(new StoreDetailsResponseDto(store));
         }
-        throw new IllegalArgumentException("영업 중인 매장이 없습니다.");
+        throw new IllegalArgumentException("영업 중인 매장이 없습니다." + store.getId());
     }
 
     @Transactional
     public StoreStatusResponseDto deleteStoreRequest(UUID storeId) {
         Store status = storeRepository.findById(storeId)
                 .orElseThrow(() -> new IllegalArgumentException("매장을 찾을 수 없습니다."));
-
         if (status.getStatus() == Store.Status.DELETE || status.getStatus() == Store.Status.DELETE_REQUESTED) {
             throw new IllegalArgumentException("이미 삭제 되었거나 삭제가 요청되었습니다.");
         }
