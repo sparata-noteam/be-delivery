@@ -55,12 +55,10 @@
 ## 🤔 기술적 이슈와 해결 과정
 - 리뷰에 레디스 적용
    - [레디스 적용](https://agongstory.tistory.com/39)
-- AWS EC2에 배포하기
-    - [서버 배포하기](https://teamsparta.notion.site/AWS-EC2-RDS-d37107b67d474e51aae4896d3cb90af9#f022d1197003427db46fac20456c54e6)
 - ec2에 레디스 추가
     - [ec2에 레디스 추가](https://b-programmer.tistory.com/389)
 - 환경변수 application.yml에서 감추기
-    - [환경변수 제거](작성중)
+    - [환경변수 제거](https://b-programmer.tistory.com/390)
 
 
 <br />
