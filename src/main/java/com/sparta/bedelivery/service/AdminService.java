@@ -3,17 +3,18 @@ package com.sparta.bedelivery.service;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.bedelivery.dto.RoleUpdateRequest;
-import com.sparta.bedelivery.dto.UserResponse;
+import com.sparta.bedelivery.dto.user.RoleUpdateRequest;
+import com.sparta.bedelivery.dto.user.UserResponse;
 import com.sparta.bedelivery.entity.Review;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.repository.ReviewRepository;
 import com.sparta.bedelivery.repository.UserRepository;
-import com.sparta.bedelivery.dto.AdminReviewResponse;
+import com.sparta.bedelivery.dto.review.AdminReviewResponse;
 import java.util.UUID;
 import com.sparta.bedelivery.entity.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.PageImpl;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Scope("prototype")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AdminService {
 
