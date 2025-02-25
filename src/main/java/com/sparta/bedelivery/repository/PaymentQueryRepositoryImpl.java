@@ -3,7 +3,7 @@ package com.sparta.bedelivery.repository;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.bedelivery.dto.AdminPaymentCondition;
+import com.sparta.bedelivery.dto.payment.AdminPaymentCondition;
 import com.sparta.bedelivery.entity.Payment;
 import com.sparta.bedelivery.entity.QPayment;
 import lombok.RequiredArgsConstructor;

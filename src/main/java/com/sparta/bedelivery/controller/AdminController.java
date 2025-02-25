@@ -1,12 +1,15 @@
 package com.sparta.bedelivery.controller;
 
-import com.sparta.bedelivery.dto.RoleUpdateRequest;
-import com.sparta.bedelivery.dto.UserResponse;
+import com.sparta.bedelivery.dto.store.StoreStatusResponseDto;
+import com.sparta.bedelivery.dto.user.RoleUpdateRequest;
+import com.sparta.bedelivery.dto.user.UserResponse;
+import com.sparta.bedelivery.dto.store.CreateStoreRequestDto;
+import com.sparta.bedelivery.dto.store.CreateStoreResponseDto;
 import com.sparta.bedelivery.global.response.ApiResponseData;
-import com.sparta.bedelivery.dto.AdminReviewResponse;
+import com.sparta.bedelivery.dto.review.AdminReviewResponse;
 import com.sparta.bedelivery.service.AdminService;
 import java.util.UUID;
-import com.sparta.bedelivery.dto.*;
+
 import com.sparta.bedelivery.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

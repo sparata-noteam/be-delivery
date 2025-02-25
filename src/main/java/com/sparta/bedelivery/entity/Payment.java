@@ -1,6 +1,6 @@
 package com.sparta.bedelivery.entity;
 
-import com.sparta.bedelivery.dto.CreatePaymentRequest;
+import com.sparta.bedelivery.dto.payment.CreatePaymentRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

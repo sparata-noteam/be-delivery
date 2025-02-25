@@ -1,12 +1,11 @@
 package com.sparta.bedelivery.controller;
 
-import com.sparta.bedelivery.dto.AuthResponse;
-import com.sparta.bedelivery.dto.ChangePasswordRequest;
-import com.sparta.bedelivery.dto.UserRegisterRequest;
-import com.sparta.bedelivery.dto.UserResponse;
+import com.sparta.bedelivery.dto.user.AuthResponse;
+import com.sparta.bedelivery.dto.user.ChangePasswordRequest;
+import com.sparta.bedelivery.dto.user.UserRegisterRequest;
+import com.sparta.bedelivery.dto.user.UserResponse;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.global.response.ApiResponseData;
-import com.sparta.bedelivery.repository.UserRepository;
 import com.sparta.bedelivery.security.JwtBlacklistService;
 import com.sparta.bedelivery.security.JwtUtil;
 import com.sparta.bedelivery.service.AuthService;
@@ -22,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;

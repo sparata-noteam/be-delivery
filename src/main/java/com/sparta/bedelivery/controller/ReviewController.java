@@ -1,12 +1,12 @@
 package com.sparta.bedelivery.controller;
 
 import com.sparta.bedelivery.global.response.ApiResponseData;
-import com.sparta.bedelivery.dto.ReviewCreateRequest;
-import com.sparta.bedelivery.dto.ReviewModifyRequest;
-import com.sparta.bedelivery.dto.ReviewCreateResponse;
-import com.sparta.bedelivery.dto.ReviewModifyResponse;
-import com.sparta.bedelivery.dto.StoreReviewResponse;
-import com.sparta.bedelivery.dto.UserReviewResponse;
+import com.sparta.bedelivery.dto.review.ReviewCreateRequest;
+import com.sparta.bedelivery.dto.review.ReviewModifyRequest;
+import com.sparta.bedelivery.dto.review.ReviewCreateResponse;
+import com.sparta.bedelivery.dto.review.ReviewModifyResponse;
+import com.sparta.bedelivery.dto.store.StoreReviewResponse;
+import com.sparta.bedelivery.dto.user.UserReviewResponse;
 import com.sparta.bedelivery.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

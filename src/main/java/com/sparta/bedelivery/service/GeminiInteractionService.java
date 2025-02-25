@@ -2,9 +2,9 @@ package com.sparta.bedelivery.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.bedelivery.dto.AIInteractionRequest;
-import com.sparta.bedelivery.dto.AIInteractionResponse;
-import com.sparta.bedelivery.dto.GeminiResponse;
+import com.sparta.bedelivery.dto.ai.AIInteractionRequest;
+import com.sparta.bedelivery.dto.ai.AIInteractionResponse;
+import com.sparta.bedelivery.dto.ai.GeminiResponse;
 import com.sparta.bedelivery.entity.AIInteraction;
 import com.sparta.bedelivery.repository.AIInteractionRepository;
 import com.sparta.bedelivery.entity.User;

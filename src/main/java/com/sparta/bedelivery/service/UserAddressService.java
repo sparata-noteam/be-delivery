@@ -1,7 +1,7 @@
 package com.sparta.bedelivery.service;
 
-import com.sparta.bedelivery.dto.UserAddressRequest;
-import com.sparta.bedelivery.dto.UserAddressResponse;
+import com.sparta.bedelivery.dto.user.UserAddressRequest;
+import com.sparta.bedelivery.dto.user.UserAddressResponse;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.entity.UserAddress;
 import com.sparta.bedelivery.repository.UserAddressRepository;

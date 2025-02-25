@@ -1,7 +1,7 @@
 package com.sparta.bedelivery.controller;
 
-import com.sparta.bedelivery.dto.AIInteractionRequest;
-import com.sparta.bedelivery.dto.AIInteractionResponse;
+import com.sparta.bedelivery.dto.ai.AIInteractionRequest;
+import com.sparta.bedelivery.dto.ai.AIInteractionResponse;
 import com.sparta.bedelivery.service.GeminiInteractionService;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import io.swagger.v3.oas.annotations.Operation;

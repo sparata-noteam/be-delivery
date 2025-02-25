@@ -1,7 +1,7 @@
 package com.sparta.bedelivery.service;
 
-import com.sparta.bedelivery.dto.CreateMenuRequestDto;
-import com.sparta.bedelivery.dto.CreateMenuResponseDto;
+import com.sparta.bedelivery.dto.menu.CreateMenuRequestDto;
+import com.sparta.bedelivery.dto.menu.CreateMenuResponseDto;
 import com.sparta.bedelivery.entity.Menu;
 import com.sparta.bedelivery.entity.MenuImage;
 import com.sparta.bedelivery.entity.Store;

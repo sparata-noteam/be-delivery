@@ -1,6 +1,6 @@
 package com.sparta.bedelivery.entity;
 
-import com.sparta.bedelivery.dto.OrderCalculate;
+import com.sparta.bedelivery.dto.order.OrderCalculate;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

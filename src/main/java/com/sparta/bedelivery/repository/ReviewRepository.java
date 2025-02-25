@@ -1,9 +1,9 @@
 package com.sparta.bedelivery.repository;
 
-import com.sparta.bedelivery.dto.StoreRatingInfo;
+import com.sparta.bedelivery.dto.store.StoreRatingInfo;
 import com.sparta.bedelivery.entity.Order;
 import com.sparta.bedelivery.entity.Review;
-import com.sparta.bedelivery.entity.Store;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

@@ -1,6 +1,7 @@
 package com.sparta.bedelivery.controller;
 
-import com.sparta.bedelivery.dto.*;
+import com.sparta.bedelivery.dto.user.UserAddressRequest;
+import com.sparta.bedelivery.dto.user.UserAddressResponse;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.UserAddressService;
 import io.swagger.v3.oas.annotations.Operation;

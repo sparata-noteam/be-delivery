@@ -1,6 +1,6 @@
 package com.sparta.bedelivery.entity;
 
-import com.sparta.bedelivery.dto.ReviewCreateRequest;
+import com.sparta.bedelivery.dto.review.ReviewCreateRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

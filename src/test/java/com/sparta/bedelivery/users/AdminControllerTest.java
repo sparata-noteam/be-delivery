@@ -1,11 +1,8 @@
 package com.sparta.bedelivery.users;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.bedelivery.dto.AuthRequest;
-import com.sparta.bedelivery.dto.RoleUpdateRequest;
-import com.sparta.bedelivery.dto.UserResponse;
-import com.sparta.bedelivery.service.AdminService;
-import com.sparta.bedelivery.service.StoreService;
+import com.sparta.bedelivery.dto.user.AuthRequest;
+import com.sparta.bedelivery.dto.user.RoleUpdateRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

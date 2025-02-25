@@ -1,6 +1,6 @@
 package com.sparta.bedelivery.service;
 
-import com.sparta.bedelivery.dto.StoreRatingInfo;
+import com.sparta.bedelivery.dto.store.StoreRatingInfo;
 import com.sparta.bedelivery.entity.Order;
 import com.sparta.bedelivery.entity.Order.OrderStatus;
 import com.sparta.bedelivery.entity.Review;
@@ -10,12 +10,12 @@ import com.sparta.bedelivery.repository.OrderRepository;
 import com.sparta.bedelivery.repository.ReviewRepository;
 import com.sparta.bedelivery.repository.StoreRepository;
 import com.sparta.bedelivery.repository.UserRepository;
-import com.sparta.bedelivery.dto.ReviewCreateRequest;
-import com.sparta.bedelivery.dto.ReviewModifyRequest;
-import com.sparta.bedelivery.dto.ReviewCreateResponse;
-import com.sparta.bedelivery.dto.ReviewModifyResponse;
-import com.sparta.bedelivery.dto.StoreReviewResponse;
-import com.sparta.bedelivery.dto.UserReviewResponse;
+import com.sparta.bedelivery.dto.review.ReviewCreateRequest;
+import com.sparta.bedelivery.dto.review.ReviewModifyRequest;
+import com.sparta.bedelivery.dto.review.ReviewCreateResponse;
+import com.sparta.bedelivery.dto.review.ReviewModifyResponse;
+import com.sparta.bedelivery.dto.store.StoreReviewResponse;
+import com.sparta.bedelivery.dto.user.UserReviewResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

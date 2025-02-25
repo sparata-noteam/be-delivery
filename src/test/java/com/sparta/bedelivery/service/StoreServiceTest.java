@@ -1,8 +1,8 @@
 package com.sparta.bedelivery.service;
 
-import com.sparta.bedelivery.dto.CreateStoreRequestDto;
-import com.sparta.bedelivery.dto.StoreRequestDto;
-import com.sparta.bedelivery.dto.StoreUpdateRequestDto;
+import com.sparta.bedelivery.dto.store.CreateStoreRequestDto;
+import com.sparta.bedelivery.dto.store.StoreRequestDto;
+import com.sparta.bedelivery.dto.store.StoreUpdateRequestDto;
 import com.sparta.bedelivery.entity.Store;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.repository.StoreRepository;

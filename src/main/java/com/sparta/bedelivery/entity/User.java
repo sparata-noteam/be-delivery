@@ -1,8 +1,8 @@
 package com.sparta.bedelivery.entity;
 
-import com.sparta.bedelivery.dto.ChangePasswordRequest;
-import com.sparta.bedelivery.dto.UserRegisterRequest;
-import com.sparta.bedelivery.dto.UserUpdateRequest;
+import com.sparta.bedelivery.dto.user.ChangePasswordRequest;
+import com.sparta.bedelivery.dto.user.UserRegisterRequest;
+import com.sparta.bedelivery.dto.user.UserUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter

@@ -1,6 +1,6 @@
 package com.sparta.bedelivery.service;
 
-import com.sparta.bedelivery.dto.*;
+import com.sparta.bedelivery.dto.store.*;
 import com.sparta.bedelivery.entity.*;
 import com.sparta.bedelivery.repository.*;
 import lombok.RequiredArgsConstructor;

@@ -1,12 +1,11 @@
 package com.sparta.bedelivery.entity;
 
-import com.sparta.bedelivery.dto.CreateOrderRequest;
+import com.sparta.bedelivery.dto.order.CreateOrderRequest;
 import jakarta.persistence.*;
 import java.util.stream.Collectors;
-import lombok.Builder;
+
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;

@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.sparta.bedelivery.dto.ReviewCreateRequest;
-import com.sparta.bedelivery.dto.ReviewCreateResponse;
+import com.sparta.bedelivery.dto.review.ReviewCreateRequest;
+import com.sparta.bedelivery.dto.review.ReviewCreateResponse;
 import com.sparta.bedelivery.entity.Order;
 import com.sparta.bedelivery.entity.Review;
 import com.sparta.bedelivery.entity.Store;

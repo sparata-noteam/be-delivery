@@ -1,8 +1,8 @@
 package com.sparta.bedelivery.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.bedelivery.dto.AuthRequest;
-import com.sparta.bedelivery.dto.AuthResponse;
+import com.sparta.bedelivery.dto.user.AuthRequest;
+import com.sparta.bedelivery.dto.user.AuthResponse;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.repository.UserRepository;
@@ -15,15 +15,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {

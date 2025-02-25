@@ -1,7 +1,7 @@
 package com.sparta.bedelivery.controller;
 
-import com.sparta.bedelivery.dto.CreateMenuRequestDto;
-import com.sparta.bedelivery.dto.CreateMenuResponseDto;
+import com.sparta.bedelivery.dto.menu.CreateMenuRequestDto;
+import com.sparta.bedelivery.dto.menu.CreateMenuResponseDto;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;

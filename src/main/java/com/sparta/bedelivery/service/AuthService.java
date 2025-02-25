@@ -1,8 +1,8 @@
 package com.sparta.bedelivery.service;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.bedelivery.dto.ChangePasswordRequest;
-import com.sparta.bedelivery.dto.UserRegisterRequest;
+import com.sparta.bedelivery.dto.user.ChangePasswordRequest;
+import com.sparta.bedelivery.dto.user.UserRegisterRequest;
 import com.sparta.bedelivery.entity.User;
 import com.sparta.bedelivery.repository.UserRepository;
 import com.sparta.bedelivery.security.JwtUtil;

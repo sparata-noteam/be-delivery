@@ -1,5 +1,7 @@
 package com.sparta.bedelivery.dto;
 
+import com.sparta.bedelivery.dto.order.OrderCalculateSystem;
+import com.sparta.bedelivery.dto.order.OrderItemRequest;
 import com.sparta.bedelivery.entity.Menu;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,8 +11,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class OrderCalculateSystemTest {
 

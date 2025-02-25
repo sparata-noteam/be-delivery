@@ -1,6 +1,6 @@
 package com.sparta.bedelivery.controller;
 
-import com.sparta.bedelivery.dto.*;
+import com.sparta.bedelivery.dto.store.*;
 import com.sparta.bedelivery.global.response.ApiResponseData;
 import com.sparta.bedelivery.service.StoreService;
 import io.swagger.v3.oas.annotations.Operation;
