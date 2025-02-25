@@ -116,9 +116,9 @@ class StoreServiceTest {
     @DisplayName("Open 상태인 매장 찾기")
     void findOpenStores() {
 
-        List<Store> stores = storeRepository.findByStatus(Store.Status.OPEN);
+        List<Store> stores = storeRepository.findByStatusOrderByCreateAt(Store.Status.OPEN);
         assertFalse(stores.isEmpty(), "영업중인 매장이 없습니다.");
-        storeService.findOpenStores();
+        storeService.getStores("한식","세종로");
     }
 
     @Test
