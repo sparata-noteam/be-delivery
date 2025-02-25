@@ -69,7 +69,7 @@ public class CreateReviewServiceTest {
         mockStore = new Store();
         mockOrder.setStore(mockStore);
 
-        mockReview = new Review(request, mockUser, mockOrder, mockStore);
+        mockReview = new Review(request, mockUser, mockOrder);
     }
 
     @Test
