@@ -30,7 +30,7 @@ public class AdminControllerTest {
     public void testGetAllUsers_Success() throws Exception {
         // 로그인 요청
         AuthRequest authRequest = new AuthRequest();
-        authRequest.setUserId("admin");
+        authRequest.setUserId("admin1");
         authRequest.setPassword("adminPassword1@");
 
         MvcResult loginResult = mockMvc.perform(post("/api/users/login")
@@ -52,8 +52,8 @@ public class AdminControllerTest {
     public void testGetAllUsers_fail() throws Exception {
         // 로그인 요청
         AuthRequest authRequest = new AuthRequest();
-        authRequest.setUserId("testuser1"); //일반 사용자
-        authRequest.setPassword("newPassword123@");
+        authRequest.setUserId("testuser2"); //일반 사용자
+        authRequest.setPassword("Password123@");
 
         MvcResult loginResult = mockMvc.perform(post("/api/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -75,7 +75,7 @@ public class AdminControllerTest {
     public void testGetUserById_Success() throws Exception {
         // 로그인 요청
         AuthRequest authRequest = new AuthRequest();
-        authRequest.setUserId("admin");
+        authRequest.setUserId("admin1");
         authRequest.setPassword("adminPassword1@");
 
         MvcResult loginResult = mockMvc.perform(post("/api/users/login")
@@ -101,7 +101,7 @@ public class AdminControllerTest {
     public void testDeleteUserByAdmin_Success() throws Exception {
         // 로그인 요청
         AuthRequest authRequest = new AuthRequest();
-        authRequest.setUserId("admin");
+        authRequest.setUserId("admin1");
         authRequest.setPassword("adminPassword1@");
 
         MvcResult loginResult = mockMvc.perform(post("/api/users/login")
@@ -124,7 +124,7 @@ public class AdminControllerTest {
     public void testUpdateUserRole_Success() throws Exception {
         // 로그인 요청
         AuthRequest authRequest = new AuthRequest();
-        authRequest.setUserId("admin");
+        authRequest.setUserId("admin1");
         authRequest.setPassword("adminPassword1@");
 
         MvcResult loginResult = mockMvc.perform(post("/api/users/login")
@@ -136,7 +136,7 @@ public class AdminControllerTest {
         // 로그인 후 Bearer Token 추출
         String token = loginResult.getResponse().getHeader("Authorization");
 
-        long userId = 1L;
+        long userId = 2L;
         RoleUpdateRequest request = new RoleUpdateRequest();
         request.setRole("OWNER");
 
@@ -153,7 +153,7 @@ public class AdminControllerTest {
     public void testUpdateUserRole_Failure() throws Exception {
         // 로그인 요청
         AuthRequest authRequest = new AuthRequest();
-        authRequest.setUserId("admin");
+        authRequest.setUserId("admin1");
         authRequest.setPassword("adminPassword1@");
 
         MvcResult loginResult = mockMvc.perform(post("/api/users/login")

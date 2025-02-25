@@ -30,19 +30,20 @@ public class AuthControllerTest {
 
     @BeforeEach
     public void setUp() {
-//        userRegisterRequest = new UserRegisterRequest();
-//        userRegisterRequest.setUserId("testuser1");
-//        userRegisterRequest.setPassword("Password123@");
-//        userRegisterRequest.setName("TestName");
-//        userRegisterRequest.setNickName("testnick");
-//        userRegisterRequest.setPhone("01012345679");
-
         userRegisterRequest = new UserRegisterRequest();
-        userRegisterRequest.setUserId("admin");
-        userRegisterRequest.setPassword("adminPassword1@");
-        userRegisterRequest.setName("admin");
-        userRegisterRequest.setNickName("admin");
-        userRegisterRequest.setPhone("01012345688");
+        userRegisterRequest.setUserId("testuser2");
+        userRegisterRequest.setPassword("Password123@");
+        userRegisterRequest.setName("TestName2");
+        userRegisterRequest.setNickName("testnick2");
+        userRegisterRequest.setPhone("01012345672");
+
+//        userRegisterRequest = new UserRegisterRequest();
+//        userRegisterRequest.setUserId("admin1");
+//        userRegisterRequest.setPassword("adminPassword1@");
+//        userRegisterRequest.setName("admin1");
+//        userRegisterRequest.setNickName("admin1");
+//        userRegisterRequest.setRole("MASTER");
+//        userRegisterRequest.setPhone("01012345888");
     }
 
     @Test
@@ -51,7 +52,7 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRegisterRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.userId").value("testuser1"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.userId").value("testuser2"));
     }
 
     @Test
@@ -64,7 +65,8 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(authRequest)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.token").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.accessToken").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.refreshToken").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.role").exists());
 
     }
@@ -79,7 +81,7 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(authRequest)))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Authentication Failed: Bad credentials"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("로그인 실패: 404: 해당 계정이 존재하지 않습니다."));
     }
 
     @Test
@@ -87,7 +89,7 @@ public class AuthControllerTest {
         // 먼저 로그인하여 인증 토큰을 얻기
         AuthRequest authRequest = new AuthRequest();
         authRequest.setUserId("testuser1");
-        authRequest.setPassword("Password123@");
+        authRequest.setPassword("newPassword123@");
 
         MvcResult result = mockMvc.perform(post("/api/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -102,7 +104,7 @@ public class AuthControllerTest {
         mockMvc.perform(post("/api/users/logout")
                         .header("Authorization", token))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.success").value(true));  // 로그아웃 성공 여부 확인
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").value("로그아웃 성공")); // data.success 대신 data 전체를 비교
     }
 
 
